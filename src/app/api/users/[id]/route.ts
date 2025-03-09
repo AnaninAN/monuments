@@ -1,14 +1,14 @@
 import { NextResponse } from 'next/server';
 
-import { getUserById } from '@/data/user';
+import { getUserByIdInt } from '@/data/user';
 
 export async function GET(
   _: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ idInt: string }> }
 ) {
-  const id = Number((await params).id);
+  const idInt = Number((await params).idInt);
 
-  const user = await getUserById(id);
+  const user = await getUserByIdInt(idInt);
 
   return NextResponse.json(user);
 }

@@ -2,20 +2,20 @@
 
 import bcrypt from 'bcryptjs';
 
-import { getUserByEmail, getUserById, getUserMaxIdInt } from '@/data/user';
+import { getUserByEmail, getUserByIdInt, getUserMaxIdInt } from '@/data/user';
 import { db } from '@/lib/db';
 import { TUserFormData, UserFormSchema } from '@/schemas/user-form-schema';
 
-export const user = async (values: TUserFormData, id?: number) => {
-  if (id) {
-    const dbUser = await getUserById(id);
+export const user = async (values: TUserFormData, idInt?: number) => {
+  if (idInt) {
+    const dbUser = await getUserByIdInt(idInt);
 
     if (!dbUser) {
       return { error: 'Пользователь не найден!' };
     }
 
     await db.user.update({
-      where: { idInt: id },
+      where: { idInt },
       data: { ...values },
     });
 

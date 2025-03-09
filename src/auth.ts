@@ -25,7 +25,9 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     async signIn({ user, account }) {
       if (account?.provider !== 'credentials') return true;
 
-      const exitingUser = await getUserById(Number(user.id));
+      if (!user.id) return false;
+
+      const exitingUser = await getUserById(user.id);
 
       if (!exitingUser?.emailVerified) return false;
 
@@ -46,7 +48,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     async jwt({ token }) {
       if (!token.sub) return token;
 
-      const existingUser = await getUserById(Number(token.sub));
+      const existingUser = await getUserById(token.sub);
 
       if (!existingUser) return token;
 
