@@ -1,0 +1,3 @@
+export default function Unauthorized() {
+  return <h1>У вас нет доступа к этой странице!</h1>;
+}
