@@ -6,11 +6,11 @@ import { auth } from '@/auth';
 
 import Unauthorized from '@/components/unauthorized';
 
-const withAuth = <P extends Record<string, unknown>>(
-  Component: React.ComponentType<P>,
+const withAuth = (
+  Component: React.ComponentType,
   allowedRoles: Role[]
-): React.FC<P> => {
-  const Auth: React.FC<P> = async (props) => {
+): React.FC => {
+  const Auth: React.FC = async (props) => {
     const session = await auth();
 
     if (!session) {

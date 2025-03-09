@@ -146,7 +146,7 @@ model CounterpartyType {
 model Warehouse {
   id                      Int     @id @default(autoincrement())
   name                    String  @unique
-  shortName               String?
+  shortName               String  @default("")
   status                  Status  @default(ACTIVE)
   comment                 String  @default("")
 

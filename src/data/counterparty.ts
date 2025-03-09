@@ -34,7 +34,13 @@ export const getCounterpartyByName = async (name: string) => {
 export const getAllCounterparties = async () => {
   try {
     const counterparties = await db.counterparty.findMany({
-      include: { counterpartyType: true },
+      include: {
+        counterpartyType: {
+          select: {
+            name: true,
+          },
+        },
+      },
     });
 
     return counterparties;

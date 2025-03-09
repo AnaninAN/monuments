@@ -28,12 +28,12 @@ export const user = async (values: TUserFormData, id?: number) => {
     }
 
     const hashedPassword = await bcrypt.hash('11111111', 10);
-    const idInt = (await getUserMaxIdInt()) || 0;
+    const idInt = (await getUserMaxIdInt()) || 0 + 1;
 
     const valuesWithPassword = {
       ...validatedFields.data,
       password: hashedPassword,
-      idInt: idInt + 1,
+      idInt,
     };
 
     const existingUser = await getUserByEmail(validatedFields.data.email);
