@@ -8,7 +8,7 @@ export async function GET(
 ) {
   const id = Number((await params).id);
 
-  const user = await getCounterpartyById(id);
+  const counterparty = await getCounterpartyById(id);
 
-  return NextResponse.json(user);
+  return NextResponse.json(counterparty);
 }
