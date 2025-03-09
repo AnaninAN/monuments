@@ -42,8 +42,8 @@ export const NewVerificationForm = () => {
     <CardWrapper
       headerTitle="Подтверждение"
       headerLabel="Подтвердите вашу верификацию"
-      backButtonLabel="Вход"
-      backButtonHref="/auth/login"
+      // backButtonLabel="Вход"
+      // backButtonHref="/auth/login"
     >
       <div className="flex items-center justify-center w-full">
         {!success && !error && <BeatLoader />}

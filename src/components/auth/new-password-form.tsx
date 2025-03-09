@@ -55,8 +55,8 @@ export const NewPasswordForm = () => {
     <CardWrapper
       headerTitle="Восстановление"
       headerLabel="Введите новый пароль"
-      backButtonLabel="Вход"
-      backButtonHref="/auth/login"
+      // backButtonLabel="Вход"
+      // backButtonHref="/auth/login"
     >
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">

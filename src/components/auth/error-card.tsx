@@ -6,8 +6,8 @@ export const ErrorCard = () => {
     <CardWrapper
       headerTitle="Ошибка"
       headerLabel="Опа! Произошла ошибка!"
-      backButtonLabel="Вернуться назад для Входа"
-      backButtonHref="/auth/login"
+      // backButtonLabel="Вернуться назад для Входа"
+      // backButtonHref="/auth/login"
     >
       <div className="w-full flex items-center justify-center">
         <TriangleAlert className="text-destructive" />
