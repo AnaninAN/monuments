@@ -13,10 +13,24 @@ export const getUserByEmail = async (email: string) => {
 export const getUserById = async (id: number) => {
   try {
     const user = await db.user.findUnique({
-      where: { id },
+      where: { idInt: id },
     });
 
     return user;
+  } catch {
+    return null;
+  }
+};
+
+export const getUserMaxIdInt = async () => {
+  try {
+    const maxIdInt = await db.user.aggregate({
+      _max: {
+        idInt: true,
+      },
+    });
+
+    return maxIdInt._max.idInt;
   } catch {
     return null;
   }
@@ -27,6 +41,7 @@ export const getAllUsers = async () => {
     const users = await db.user.findMany({
       select: {
         id: true,
+        idInt: true,
         name: true,
         lastname: true,
         email: true,

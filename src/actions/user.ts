@@ -2,7 +2,7 @@
 
 import bcrypt from 'bcryptjs';
 
-import { getUserByEmail, getUserById } from '@/data/user';
+import { getUserByEmail, getUserById, getUserMaxIdInt } from '@/data/user';
 import { db } from '@/lib/db';
 import { TUserFormData, UserFormSchema } from '@/schemas/user-form-schema';
 
@@ -15,7 +15,7 @@ export const user = async (values: TUserFormData, id?: number) => {
     }
 
     await db.user.update({
-      where: { id },
+      where: { idInt: id },
       data: { ...values },
     });
 
@@ -28,10 +28,12 @@ export const user = async (values: TUserFormData, id?: number) => {
     }
 
     const hashedPassword = await bcrypt.hash('11111111', 10);
+    const idInt = (await getUserMaxIdInt()) || 0;
 
     const valuesWithPassword = {
       ...validatedFields.data,
       password: hashedPassword,
+      idInt: idInt + 1,
     };
 
     const existingUser = await getUserByEmail(validatedFields.data.email);

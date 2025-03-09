@@ -16,7 +16,7 @@ export const settings = async (values: TSettingsData) => {
     return { error: 'Unauthorized' };
   }
 
-  const dbUser = await getUserById(user.id);
+  const dbUser = await getUserById(Number(user.id));
 
   if (!dbUser) {
     return { error: 'Unauthorized' };
@@ -32,7 +32,7 @@ export const settings = async (values: TSettingsData) => {
   if (values.email && values.email !== user.email) {
     const existingUser = await getUserByEmail(values.email);
 
-    if (existingUser && existingUser.id !== user.id) {
+    if (existingUser && existingUser.id !== Number(user.id)) {
       return { error: 'Email already in user!' };
     }
 

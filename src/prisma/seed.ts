@@ -6,6 +6,7 @@ async function up() {
   await db.user.createMany({
     data: [
       {
+        idInt: 1,
         email: 'test_admin@monuments.ru',
         password: hashSync('11111111', 10),
         role: 'ADMIN',
@@ -16,6 +17,7 @@ async function up() {
         phoneNumber: '+7 (921) 111-22-28',
       },
       {
+        idInt: 2,
         email: 'test_operator@monuments.ru',
         password: hashSync('22222222', 10),
         role: 'OPERATOR',

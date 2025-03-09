@@ -4,22 +4,21 @@ import { ColumnDef } from '@tanstack/react-table';
 
 import { TUserFormData } from '@/schemas/user-form-schema';
 
-import { phoneFormat } from '@/lib/utils';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { DataSheet } from '@/components/data-table/data-sheet';
 import { UserForm } from '@/components/data-table/forms/user-form';
 
 export const columns: ColumnDef<TUserFormData>[] = [
   {
-    accessorKey: 'id',
+    accessorKey: 'idInt',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="№" sort />
     ),
     cell: ({ row }) => (
       <div className="text-center">
         <DataSheet
-          id={row.getValue('id')}
-          trigger={row.getValue('id')}
+          id={row.getValue('idInt')}
+          trigger={row.getValue('idInt')}
           FormComponent={UserForm}
         />
       </div>
@@ -54,9 +53,6 @@ export const columns: ColumnDef<TUserFormData>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Номер телефона" />
     ),
-    cell: ({ row }) => {
-      return <div>{phoneFormat(row.getValue('phoneNumber'))}</div>;
-    },
   },
   {
     accessorKey: 'status',
