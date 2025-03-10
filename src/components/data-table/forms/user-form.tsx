@@ -59,7 +59,7 @@ export function UserForm({ id }: { id?: number }) {
   useEffect(() => {
     if (id) {
       (async function () {
-        const data = await Api.users.fetchUserById(id);
+        const data = await Api.users.fetchUserByIdInt(id);
 
         form.setValue('email', data.email);
         form.setValue('name', data.name);
