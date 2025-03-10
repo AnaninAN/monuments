@@ -22,4 +22,8 @@ async function CounterpartiesPage() {
   );
 }
 
-export default withAuth(CounterpartiesPage, menu['COUNTERPARTIES'].roles);
+export default withAuth(
+  CounterpartiesPage,
+  menu['COUNTERPARTIES'].roles,
+  menu['COUNTERPARTIES'].title
+);

@@ -22,4 +22,8 @@ async function EmployeesPage() {
   );
 }
 
-export default withAuth(EmployeesPage, menu['EMPLOYEES'].roles);
+export default withAuth(
+  EmployeesPage,
+  menu['EMPLOYEES'].roles,
+  menu['EMPLOYEES'].title
+);

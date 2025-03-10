@@ -21,4 +21,4 @@ async function UnitsPage() {
   );
 }
 
-export default withAuth(UnitsPage, menu['UNITS'].roles);
+export default withAuth(UnitsPage, menu['UNITS'].roles, menu['UNITS'].title);

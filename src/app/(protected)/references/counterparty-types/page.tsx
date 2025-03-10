@@ -23,5 +23,6 @@ async function CounterpartyTypesPage() {
 
 export default withAuth(
   CounterpartyTypesPage,
-  menu['COUNTERPARTY_TYPES'].roles
+  menu['COUNTERPARTY_TYPES'].roles,
+  menu['COUNTERPARTY_TYPES'].title
 );

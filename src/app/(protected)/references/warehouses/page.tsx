@@ -21,4 +21,8 @@ async function WarehousesPage() {
   );
 }
 
-export default withAuth(WarehousesPage, menu['WAREHOUSES'].roles);
+export default withAuth(
+  WarehousesPage,
+  menu['WAREHOUSES'].roles,
+  menu['WAREHOUSES'].title
+);
