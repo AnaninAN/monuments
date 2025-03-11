@@ -65,6 +65,6 @@ export const columns: ColumnDef<TCounterpartyFormData>[] = [
         column,
         translateColumnsCounterparties
       ),
-    cell: ({ row }) => CellStatus(row.getValue('status')),
+    cell: ({ row }) => <CellStatus value={row.getValue('status')} />,
   },
 ];

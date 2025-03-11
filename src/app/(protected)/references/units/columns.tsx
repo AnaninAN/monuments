@@ -46,6 +46,6 @@ export const columns: ColumnDef<TUnitFormData>[] = [
         column,
         translateColumnsUnits
       ),
-    cell: ({ row }) => CellStatus(row.getValue('status')),
+    cell: ({ row }) => <CellStatus value={row.getValue('status')} />,
   },
 ];

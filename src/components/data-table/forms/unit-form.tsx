@@ -31,6 +31,7 @@ import { useNotificationWithTimer } from '@/hooks/use-notification-with-timer';
 import { TUnitFormData, UnitFormSchema } from '@/schemas/unit-form-schema';
 import { unit } from '@/actions/unit';
 import { translateColumnsUnits } from '@/lib/data-table/translate-colums';
+import { translateStatus } from '@/lib/data-table/cell-status';
 
 export const UnitForm = ({ id }: { id?: number }) => {
   const router = useRouter();
@@ -113,8 +114,12 @@ export const UnitForm = ({ id }: { id?: number }) => {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value={Status.ACTIVE}>Активный</SelectItem>
-                    <SelectItem value={Status.ARCHIVE}>Архивный</SelectItem>
+                    <SelectItem value={Status.ACTIVE}>
+                      {translateStatus[Status.ACTIVE]}
+                    </SelectItem>
+                    <SelectItem value={Status.ARCHIVE}>
+                      {translateStatus[Status.ARCHIVE]}
+                    </SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
