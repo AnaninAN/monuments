@@ -29,6 +29,7 @@ import { useNotificationWithTimer } from '@/hooks/use-notification-with-timer';
 
 export function LoginForm() {
   const searchParams = useSearchParams();
+
   const { error, success, setError, setSuccess } = useNotificationWithTimer();
 
   const callbackUrl = searchParams.get('callbackUrl');
@@ -112,14 +113,6 @@ export function LoginForm() {
                             disabled={isPending}
                           />
                         </FormControl>
-                        <Button
-                          size="sm"
-                          variant="link"
-                          asChild
-                          className="p-0 font-normal"
-                        >
-                          <Link href="/auth/reset">Забыли пароль?</Link>
-                        </Button>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -129,7 +122,11 @@ export function LoginForm() {
                 {success && <FormSuccess message={success} />}
                 {error && <FormError message={error || urlError} />}
 
-                <Button type="submit" className="w-full" disabled={isPending}>
+                <Button
+                  type="submit"
+                  className="w-full mt-1"
+                  disabled={isPending}
+                >
                   Войти
                 </Button>
               </div>
