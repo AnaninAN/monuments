@@ -1,6 +1,5 @@
 'use client';
 
-import { Status } from '@prisma/client';
 import { ColumnDef } from '@tanstack/react-table';
 
 import { KeyTUserFormData, TUserFormData } from '@/schemas/user-form-schema';
@@ -9,7 +8,7 @@ import { translateColumnsEmployees } from '@/lib/data-table/translate-colums';
 import { DataSheet } from '@/components/data-table/data-sheet';
 import { UserForm } from '@/components/data-table/forms/user-form';
 import { dataTableColumnHeader } from '@/lib/data-table/data-table-column-header';
-import { translateStatus } from '@/lib/data-table/cell-status';
+import { CellStatus } from '@/components/data-table/cell-status';
 
 export const columns: ColumnDef<TUserFormData>[] = [
   {
@@ -81,19 +80,6 @@ export const columns: ColumnDef<TUserFormData>[] = [
         column,
         translateColumnsEmployees
       ),
-    cell: ({ row }) => (
-      <div className="flex">
-        {row.getValue('status') === Status.ACTIVE && (
-          <div className="bg-green-700 text-white py-1 px-2 rounded-md">
-            {translateStatus[row.getValue('status') as Status]}
-          </div>
-        )}
-        {row.getValue('status') === Status.ARCHIVE && (
-          <div className="bg-red-700 text-white py-1 px-2 rounded-md">
-            {translateStatus[row.getValue('status') as Status]}
-          </div>
-        )}
-      </div>
-    ),
+    cell: ({ row }) => <CellStatus value={row.getValue('status')} />,
   },
 ];

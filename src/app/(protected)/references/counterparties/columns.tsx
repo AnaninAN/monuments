@@ -11,7 +11,7 @@ import { dataTableColumnHeader } from '@/lib/data-table/data-table-column-header
 
 import { DataSheet } from '@/components/data-table/data-sheet';
 import { CounterpartyForm } from '@/components/data-table/forms/counterpaty-form';
-import { CellStatus } from '@/lib/data-table/cell-status';
+import { CellStatus } from '@/components/data-table/cell-status';
 
 export const columns: ColumnDef<TCounterpartyFormData>[] = [
   {

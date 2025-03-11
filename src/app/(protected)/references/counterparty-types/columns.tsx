@@ -10,7 +10,7 @@ import { translateColumnsCounterpartyType } from '@/lib/data-table/translate-col
 
 import { DataSheet } from '@/components/data-table/data-sheet';
 import { CounterpartyTypeForm } from '@/components/data-table/forms/counterpaty-type-form';
-import { CellStatus } from '@/lib/data-table/cell-status';
+import { CellStatus } from '@/components/data-table/cell-status';
 import { dataTableColumnHeader } from '@/lib/data-table/data-table-column-header';
 
 export const columns: ColumnDef<TCounterpartyTypeFormData>[] = [

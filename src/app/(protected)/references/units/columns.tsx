@@ -8,7 +8,7 @@ import { translateColumnsUnits } from '@/lib/data-table/translate-colums';
 import { DataSheet } from '@/components/data-table/data-sheet';
 import { UnitForm } from '@/components/data-table/forms/unit-form';
 import { dataTableColumnHeader } from '@/lib/data-table/data-table-column-header';
-import { CellStatus } from '@/lib/data-table/cell-status';
+import { CellStatus } from '@/components/data-table/cell-status';
 
 export const columns: ColumnDef<TUnitFormData>[] = [
   {

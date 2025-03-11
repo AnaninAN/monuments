@@ -31,7 +31,7 @@ import { useNotificationWithTimer } from '@/hooks/use-notification-with-timer';
 import { TUnitFormData, UnitFormSchema } from '@/schemas/unit-form-schema';
 import { unit } from '@/actions/unit';
 import { translateColumnsUnits } from '@/lib/data-table/translate-colums';
-import { translateStatus } from '@/lib/data-table/cell-status';
+import { translateStatus } from '@/components/data-table/cell-status';
 
 export const UnitForm = ({ id }: { id?: number }) => {
   const router = useRouter();
