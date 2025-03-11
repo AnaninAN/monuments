@@ -5,17 +5,19 @@ export const translateStatus: Record<Status, string> = {
   ARCHIVE: 'Архивный',
 };
 
-export const CellStatus = (value: string) => (
-  <div className="flex">
-    {value === Status.ACTIVE && (
-      <div className="bg-green-700 text-white py-1 px-2 rounded-md">
-        {translateStatus[value]}
-      </div>
-    )}
-    {value === Status.ARCHIVE && (
-      <div className="bg-red-700 text-white py-1 px-2 rounded-md">
-        {translateStatus[value]}
-      </div>
-    )}
-  </div>
-);
+export function CellStatus(value: string) {
+  return (
+    <div className="flex">
+      {value === Status.ACTIVE && (
+        <div className="bg-green-700 text-white py-1 px-2 rounded-md">
+          {translateStatus[value]}
+        </div>
+      )}
+      {value === Status.ARCHIVE && (
+        <div className="bg-red-700 text-white py-1 px-2 rounded-md">
+          {translateStatus[value]}
+        </div>
+      )}
+    </div>
+  );
+}
