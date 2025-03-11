@@ -62,6 +62,7 @@ export const CounterpartyForm = ({ id }: { id?: number }) => {
       counterpartyType: {
         name: '',
       },
+      counterpartyTypeId: 0,
     },
   });
 

@@ -3,7 +3,7 @@ import { Status } from '@prisma/client';
 
 export const CounterpartyFormSchema = z.object({
   name: z.string().min(1, 'Пустое значение не допустимо!'),
-  counterpartyTypeId: z.number().optional(),
+  counterpartyTypeId: z.number(),
   counterpartyType: z.object({
     name: z.string(),
   }),
