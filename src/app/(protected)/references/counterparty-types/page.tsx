@@ -1,9 +1,11 @@
 import withAuth from '@/hoc/with-auth';
 
-import { getAllCounterpartyTypes } from '@/data/counterparty-type';
 import { menu } from '@/consts/menu';
-
+import { translateColumnsCounterpartyType } from '@/lib/data-table/translate-colums';
 import { columns } from './columns';
+
+import { getAllCounterpartyTypes } from '@/data/counterparty-type';
+
 import { DataTable } from '@/components/data-table/data-table';
 import { CounterpartyTypeForm } from '@/components/data-table/forms/counterpaty-type-form';
 
@@ -17,6 +19,8 @@ async function CounterpartyTypesPage() {
       columns={columns}
       data={counterpartyTypes}
       FormComponent={CounterpartyTypeForm}
+      filter="name"
+      translateColumns={translateColumnsCounterpartyType}
     />
   );
 }

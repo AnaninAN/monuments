@@ -18,21 +18,23 @@ import {
 } from '@/components/ui/sidebar';
 import Link from 'next/link';
 
-export function NavMain({
-  items,
-}: {
-  items: {
+type Items = {
+  title: string;
+  url: string;
+  icon?: LucideIcon;
+  isActive?: boolean;
+  items?: {
     title: string;
     url: string;
     icon?: LucideIcon;
-    isActive?: boolean;
-    items?: {
-      title: string;
-      url: string;
-      icon?: LucideIcon;
-    }[];
   }[];
-}) {
+}[];
+
+interface NavMainProps {
+  items: Items;
+}
+
+export function NavMain({ items }: NavMainProps) {
   return (
     <SidebarGroup>
       <SidebarMenu>

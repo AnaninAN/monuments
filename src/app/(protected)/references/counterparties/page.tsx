@@ -1,9 +1,11 @@
 import withAuth from '@/hoc/with-auth';
 
-import { getAllCounterparties } from '@/data/counterparty';
 import { menu } from '@/consts/menu';
-
+import { translateColumnsCounterparties } from '@/lib/data-table/translate-colums';
 import { columns } from './columns';
+
+import { getAllCounterparties } from '@/data/counterparty';
+
 import { DataTable } from '@/components/data-table/data-table';
 import { CounterpartyForm } from '@/components/data-table/forms/counterpaty-form';
 
@@ -18,6 +20,8 @@ async function CounterpartiesPage() {
       columns={columns}
       data={counterparties}
       FormComponent={CounterpartyForm}
+      filter="name"
+      translateColumns={translateColumnsCounterparties}
     />
   );
 }

@@ -20,7 +20,7 @@ interface AppSidebar extends React.ComponentProps<typeof Sidebar> {
 export function AppSidebar({ user, ...props }: AppSidebar) {
   return (
     <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader className="fle">
+      <SidebarHeader className="flex">
         <ModeToggle />
       </SidebarHeader>
       <SidebarContent>

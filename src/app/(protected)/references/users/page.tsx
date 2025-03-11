@@ -1,11 +1,12 @@
 import withAuth from '@/hoc/with-auth';
 
-import { getAllUsers } from '@/data/user';
 import { menu } from '@/consts/menu';
-
+import { translateColumnsEmployees } from '@/lib/data-table/translate-colums';
 import { columns } from './columns';
-import { DataTable } from '@/components/data-table/data-table';
 
+import { getAllUsers } from '@/data/user';
+
+import { DataTable } from '@/components/data-table/data-table';
 import { UserForm } from '@/components/data-table/forms/user-form';
 
 async function EmployeesPage() {
@@ -17,13 +18,15 @@ async function EmployeesPage() {
       columns={columns}
       data={users}
       FormComponent={UserForm}
-      title={menu['EMPLOYEES'].title}
+      title={menu['USERS'].title}
+      filter="email"
+      translateColumns={translateColumnsEmployees}
     />
   );
 }
 
 export default withAuth(
   EmployeesPage,
-  menu['EMPLOYEES'].roles,
-  menu['EMPLOYEES'].title
+  menu['USERS'].roles,
+  menu['USERS'].title
 );

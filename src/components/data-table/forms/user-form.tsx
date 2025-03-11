@@ -31,6 +31,7 @@ import { useNotificationWithTimer } from '@/hooks/use-notification-with-timer';
 import { TUserFormData, UserFormSchema } from '@/schemas/user-form-schema';
 import { Api } from '@/services/api-client';
 import { user } from '@/actions/user';
+import { translateColumnsEmployees } from '@/lib/data-table/translate-colums';
 
 const primaryPhoneOptions = {
   mask: '+7 (___) ___-__-__',
@@ -100,7 +101,7 @@ export function UserForm({ id }: { id?: number }) {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>{translateColumnsEmployees[field.name]}</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
@@ -119,7 +120,7 @@ export function UserForm({ id }: { id?: number }) {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Имя</FormLabel>
+                  <FormLabel>{translateColumnsEmployees[field.name]}</FormLabel>
                   <FormControl>
                     <Input {...field} placeholder="" disabled={isPending} />
                   </FormControl>
@@ -134,7 +135,7 @@ export function UserForm({ id }: { id?: number }) {
               name="lastname"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Фамилия</FormLabel>
+                  <FormLabel>{translateColumnsEmployees[field.name]}</FormLabel>
                   <FormControl>
                     <Input {...field} placeholder="" disabled={isPending} />
                   </FormControl>
@@ -149,7 +150,7 @@ export function UserForm({ id }: { id?: number }) {
               name="phoneNumber"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Номер телефона</FormLabel>
+                  <FormLabel>{translateColumnsEmployees[field.name]}</FormLabel>
                   <FormControl>
                     <InputMask
                       {...primaryPhoneOptions}
@@ -171,7 +172,7 @@ export function UserForm({ id }: { id?: number }) {
               name="role"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Роль</FormLabel>
+                  <FormLabel>{translateColumnsEmployees[field.name]}</FormLabel>
                   <Select
                     disabled={isPending}
                     onValueChange={field.onChange}
@@ -198,7 +199,7 @@ export function UserForm({ id }: { id?: number }) {
               name="status"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Статус</FormLabel>
+                  <FormLabel>{translateColumnsEmployees[field.name]}</FormLabel>
                   <Select
                     disabled={isPending}
                     onValueChange={field.onChange}

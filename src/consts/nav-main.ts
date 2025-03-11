@@ -68,10 +68,10 @@ export const navMain: NavMain[] = [
     roles: [],
     items: [
       {
-        title: menu['EMPLOYEES'].title,
-        url: menu['EMPLOYEES'].url,
+        title: menu['USERS'].title,
+        url: menu['USERS'].url,
         icon: Users,
-        roles: menu['EMPLOYEES'].roles,
+        roles: menu['USERS'].roles,
       },
       {
         title: menu['WAREHOUSES'].title,

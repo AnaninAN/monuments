@@ -13,7 +13,7 @@ export type MenuType = {
 };
 
 enum MenuTitle {
-  EMPLOYEES = 'EMPLOYEES',
+  USERS = 'USERS',
   WAREHOUSES = 'WAREHOUSES',
   COUNTERPARTY_TYPES = 'COUNTERPARTY_TYPES',
   COUNTERPARTIES = 'COUNTERPARTIES',
@@ -24,9 +24,9 @@ enum MenuTitle {
 }
 
 export const menu: Record<MenuTitle, MenuType> = {
-  [MenuTitle.EMPLOYEES]: {
-    title: 'Сотрудники',
-    url: '/references/employees',
+  [MenuTitle.USERS]: {
+    title: 'Пользователи',
+    url: '/references/users',
     roles: ['ADMIN'],
   },
   [MenuTitle.WAREHOUSES]: {

@@ -30,6 +30,7 @@ import { Api } from '@/services/api-client';
 import { useNotificationWithTimer } from '@/hooks/use-notification-with-timer';
 import { TUnitFormData, UnitFormSchema } from '@/schemas/unit-form-schema';
 import { unit } from '@/actions/unit';
+import { translateColumnsUnits } from '@/lib/data-table/translate-colums';
 
 export const UnitForm = ({ id }: { id?: number }) => {
   const router = useRouter();
@@ -85,7 +86,7 @@ export const UnitForm = ({ id }: { id?: number }) => {
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Наименование</FormLabel>
+                <FormLabel>{translateColumnsUnits[field.name]}</FormLabel>
                 <FormControl>
                   <Input {...field} placeholder="" disabled={isPending} />
                 </FormControl>
@@ -100,7 +101,7 @@ export const UnitForm = ({ id }: { id?: number }) => {
             name="status"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Статус</FormLabel>
+                <FormLabel>{translateColumnsUnits[field.name]}</FormLabel>
                 <Select
                   disabled={isPending}
                   onValueChange={field.onChange}
@@ -112,8 +113,8 @@ export const UnitForm = ({ id }: { id?: number }) => {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value={Status.ACTIVE}>Active</SelectItem>
-                    <SelectItem value={Status.ARCHIVE}>Archive</SelectItem>
+                    <SelectItem value={Status.ACTIVE}>Активный</SelectItem>
+                    <SelectItem value={Status.ARCHIVE}>Архивный</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />

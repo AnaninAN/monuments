@@ -34,6 +34,7 @@ import {
 import { counterpartyType } from '@/actions/counterparty-type';
 import { Api } from '@/services/api-client';
 import { useNotificationWithTimer } from '@/hooks/use-notification-with-timer';
+import { translateColumnsCounterpartyType } from '@/lib/data-table/translate-colums';
 
 export const CounterpartyTypeForm = ({ id }: { id?: number }) => {
   const router = useRouter();
@@ -91,7 +92,9 @@ export const CounterpartyTypeForm = ({ id }: { id?: number }) => {
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Наименование</FormLabel>
+                <FormLabel>
+                  {translateColumnsCounterpartyType[field.name]}
+                </FormLabel>
                 <FormControl>
                   <Input {...field} placeholder="" disabled={isPending} />
                 </FormControl>
@@ -106,7 +109,9 @@ export const CounterpartyTypeForm = ({ id }: { id?: number }) => {
             name="comment"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Комментарий</FormLabel>
+                <FormLabel>
+                  {translateColumnsCounterpartyType[field.name]}
+                </FormLabel>
                 <FormControl>
                   <Textarea placeholder="" className="resize-none" {...field} />
                 </FormControl>
@@ -121,7 +126,9 @@ export const CounterpartyTypeForm = ({ id }: { id?: number }) => {
             name="status"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Статус</FormLabel>
+                <FormLabel>
+                  {translateColumnsCounterpartyType[field.name]}
+                </FormLabel>
                 <Select
                   disabled={isPending}
                   onValueChange={field.onChange}

@@ -34,6 +34,7 @@ import {
   TWarehouseFormData,
   WarehouseFormSchema,
 } from '@/schemas/warehouse-form-schema';
+import { translateColumnsWarehouses } from '@/lib/data-table/translate-colums';
 
 export function WarehouseForm({ id }: { id?: number }) {
   const router = useRouter();
@@ -94,7 +95,9 @@ export function WarehouseForm({ id }: { id?: number }) {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Наименование</FormLabel>
+                  <FormLabel>
+                    {translateColumnsWarehouses[field.name]}
+                  </FormLabel>
                   <FormControl>
                     <Input {...field} placeholder="" disabled={isPending} />
                   </FormControl>
@@ -109,7 +112,9 @@ export function WarehouseForm({ id }: { id?: number }) {
               name="shortName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Краткое наименование</FormLabel>
+                  <FormLabel>
+                    {translateColumnsWarehouses[field.name]}
+                  </FormLabel>
                   <FormControl>
                     <Input {...field} placeholder="" disabled={isPending} />
                   </FormControl>
@@ -124,7 +129,9 @@ export function WarehouseForm({ id }: { id?: number }) {
               name="comment"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Комментарий</FormLabel>
+                  <FormLabel>
+                    {translateColumnsWarehouses[field.name]}
+                  </FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder=""
@@ -143,7 +150,9 @@ export function WarehouseForm({ id }: { id?: number }) {
               name="status"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Статус</FormLabel>
+                  <FormLabel>
+                    {translateColumnsWarehouses[field.name]}
+                  </FormLabel>
                   <Select
                     disabled={isPending}
                     onValueChange={field.onChange}

@@ -34,11 +34,13 @@ import {
 import { counterparty } from '@/actions/counterparty';
 import { Api } from '@/services/api-client';
 import { useNotificationWithTimer } from '@/hooks/use-notification-with-timer';
+import { translateColumnsCounterparties } from '@/lib/data-table/translate-colums';
 
 export const CounterpartyForm = ({ id }: { id?: number }) => {
   const router = useRouter();
 
   const { error, success, setError, setSuccess } = useNotificationWithTimer();
+
   const [counterpartyTypes, setCounterpartyTypes] = useState<
     CounterpartyType[]
   >([]);
@@ -57,7 +59,6 @@ export const CounterpartyForm = ({ id }: { id?: number }) => {
       // legalAddress: '',
       // OGRN: '',
       // phone: '',
-      counterpartyTypeId: 0,
       counterpartyType: {
         name: '',
       },
@@ -83,7 +84,6 @@ export const CounterpartyForm = ({ id }: { id?: number }) => {
         // form.setValue('legalAddress', data.legalAddress);
         // form.setValue('OGRN', data.OGRN);
         // form.setValue('phone', data.phone);
-        form.setValue('counterpartyTypeId', data.counterpartyTypeId);
         form.setValue('counterpartyType.name', data.counterpartyType.name);
       })();
     }
@@ -127,7 +127,9 @@ export const CounterpartyForm = ({ id }: { id?: number }) => {
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Наименование</FormLabel>
+                <FormLabel>
+                  {translateColumnsCounterparties[field.name]}
+                </FormLabel>
                 <FormControl>
                   <Input {...field} placeholder="" disabled={isPending} />
                 </FormControl>
@@ -142,7 +144,9 @@ export const CounterpartyForm = ({ id }: { id?: number }) => {
             name="counterpartyType.name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Категория</FormLabel>
+                <FormLabel>
+                  {translateColumnsCounterparties['counterpartyType_name']}
+                </FormLabel>
                 <Select
                   disabled={isPending}
                   onValueChange={field.onChange}
@@ -172,7 +176,9 @@ export const CounterpartyForm = ({ id }: { id?: number }) => {
             name="comment"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Комментарий</FormLabel>
+                <FormLabel>
+                  {translateColumnsCounterparties[field.name]}
+                </FormLabel>
                 <FormControl>
                   <Textarea placeholder="" className="resize-none" {...field} />
                 </FormControl>
@@ -187,7 +193,9 @@ export const CounterpartyForm = ({ id }: { id?: number }) => {
             name="status"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Статус</FormLabel>
+                <FormLabel>
+                  {translateColumnsCounterparties[field.name]}
+                </FormLabel>
                 <Select
                   disabled={isPending}
                   onValueChange={field.onChange}
