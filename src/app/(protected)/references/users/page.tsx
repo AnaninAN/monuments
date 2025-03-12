@@ -1,7 +1,7 @@
 import withAuth from '@/hoc/with-auth';
 
 import { menu } from '@/consts/menu';
-import { translateColumnsEmployees } from '@/lib/data-table/translate-colums';
+import { translateColumnsEmployees } from '@/lib/data-table/translate-colums-header';
 import { columns } from './columns';
 
 import { getAllUsers } from '@/data/user';

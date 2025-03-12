@@ -1,9 +1,4 @@
-import { Status } from '@prisma/client';
-
-export const translateStatus: Record<Status, string> = {
-  ACTIVE: 'Активный',
-  ARCHIVE: 'Архивный',
-};
+import { Status, translateStatus } from '@/lib/data-table/translate-cell-table';
 
 export const CellStatus = ({ value }: { value: Status }) => {
   return (

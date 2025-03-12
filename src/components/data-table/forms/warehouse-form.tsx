@@ -4,10 +4,8 @@ import { useEffect, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
-import { Status } from '@prisma/client';
 import { toast } from 'sonner';
 
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
   Form,
@@ -17,14 +15,8 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { FormHeader } from '@/components/data-table/forms/form-header';
 
 import { Api } from '@/services/api-client';
 import { warehouse } from '@/actions/warehouse';
@@ -32,7 +24,7 @@ import {
   TWarehouseFormData,
   WarehouseFormSchema,
 } from '@/schemas/warehouse-form-schema';
-import { translateColumnsWarehouses } from '@/lib/data-table/translate-colums';
+import { translateColumnsWarehouses } from '@/lib/data-table/translate-colums-header';
 
 export function WarehouseForm({ id }: { id?: number }) {
   const router = useRouter();
@@ -80,7 +72,17 @@ export function WarehouseForm({ id }: { id?: number }) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="p-6 md:p-8">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-4 px-8 py-2"
+      >
+        <FormHeader
+          id={id}
+          form={form}
+          name="status"
+          isPending={isPending}
+          title="склад"
+        />
         <div className="flex flex-col gap-6">
           <div className="grid gap-2">
             <FormField
@@ -137,39 +139,6 @@ export function WarehouseForm({ id }: { id?: number }) {
               )}
             />
           </div>
-          <div className="grid gap-2">
-            <FormField
-              control={form.control}
-              name="status"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    {translateColumnsWarehouses[field.name]}
-                  </FormLabel>
-                  <Select
-                    disabled={isPending}
-                    onValueChange={field.onChange}
-                    value={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Выберите статус" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value={Status.ACTIVE}>Active</SelectItem>
-                      <SelectItem value={Status.ARCHIVE}>Archive</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <Button type="submit" className="w-full" disabled={isPending}>
-            Сохранить
-          </Button>
         </div>
       </form>
     </Form>

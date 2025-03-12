@@ -5,10 +5,9 @@ import { useForm } from 'react-hook-form';
 import { InputMask } from '@react-input/mask';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
-import { Role, Status } from '@prisma/client';
+import { Role } from '@prisma/client';
 import { toast } from 'sonner';
 
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
   Form,
@@ -25,11 +24,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { FormHeader } from '@/components/data-table/forms/form-header';
 
 import { TUserFormData, UserFormSchema } from '@/schemas/user-form-schema';
 import { Api } from '@/services/api-client';
 import { user } from '@/actions/user';
-import { translateColumnsEmployees } from '@/lib/data-table/translate-colums';
+import { translateColumnsEmployees } from '@/lib/data-table/translate-colums-header';
 
 const primaryPhoneOptions = {
   mask: '+7 (___) ___-__-__',
@@ -86,7 +86,17 @@ export function UserForm({ id }: { id?: number }) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="p-6 md:p-8">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-4 px-8 py-2"
+      >
+        <FormHeader
+          id={id}
+          form={form}
+          name="status"
+          isPending={isPending}
+          title="пользователя"
+        />
         <div className="flex flex-col gap-6">
           <div className="grid gap-2">
             <FormField
@@ -186,37 +196,6 @@ export function UserForm({ id }: { id?: number }) {
               )}
             />
           </div>
-          <div className="grid gap-2">
-            <FormField
-              control={form.control}
-              name="status"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{translateColumnsEmployees[field.name]}</FormLabel>
-                  <Select
-                    disabled={isPending}
-                    onValueChange={field.onChange}
-                    value={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Выберите статус" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value={Status.ACTIVE}>Active</SelectItem>
-                      <SelectItem value={Status.ARCHIVE}>Archive</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <Button type="submit" className="w-full" disabled={isPending}>
-            Сохранить
-          </Button>
         </div>
       </form>
     </Form>

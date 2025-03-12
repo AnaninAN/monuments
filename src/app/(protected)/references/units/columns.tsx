@@ -3,8 +3,8 @@
 import { ColumnDef } from '@tanstack/react-table';
 
 import { KeyTUnitFormData, TUnitFormData } from '@/schemas/unit-form-schema';
-import { translateColumnsUnits } from '@/lib/data-table/translate-colums';
 import { dataTableColumnHeader } from '@/lib/data-table/data-table-column-header';
+import { translateColumnsUnits } from '@/lib/data-table/translate-colums-header';
 
 import { DataSheet } from '@/components/data-table/data-sheet';
 import { UnitForm } from '@/components/data-table/forms/unit-form';

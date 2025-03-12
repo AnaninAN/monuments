@@ -1,7 +1,7 @@
 import withAuth from '@/hoc/with-auth';
 
 import { menu } from '@/consts/menu';
-import { translateColumnsCounterpartyType } from '@/lib/data-table/translate-colums';
+import { translateColumnsCounterpartyType } from '@/lib/data-table/translate-colums-header';
 import { columns } from './columns';
 
 import { getAllCounterpartyTypes } from '@/data/counterparty-type';

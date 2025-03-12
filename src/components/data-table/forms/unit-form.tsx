@@ -4,7 +4,6 @@ import { useEffect, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
-import { Status } from '@prisma/client';
 import { toast } from 'sonner';
 
 import {
@@ -16,20 +15,12 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { FormHeader } from '@/components/data-table/forms/form-header';
 
 import { Api } from '@/services/api-client';
 import { TUnitFormData, UnitFormSchema } from '@/schemas/unit-form-schema';
 import { unit } from '@/actions/unit';
-import { translateColumnsUnits } from '@/lib/data-table/translate-colums';
-import { translateStatus } from '@/components/data-table/cell-status';
+import { translateColumnsUnits } from '@/lib/data-table/translate-colums-header';
 
 export const UnitForm = ({ id }: { id?: number }) => {
   const router = useRouter();
@@ -73,8 +64,18 @@ export const UnitForm = ({ id }: { id?: number }) => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <div className="grid gap-2">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-4 px-8 py-2"
+      >
+        <FormHeader
+          id={id}
+          form={form}
+          name="status"
+          isPending={isPending}
+          title="ед. измерения"
+        />
+        <div className="flex">
           <FormField
             control={form.control}
             name="name"
@@ -89,41 +90,6 @@ export const UnitForm = ({ id }: { id?: number }) => {
             )}
           />
         </div>
-        <div className="grid gap-2">
-          <FormField
-            control={form.control}
-            name="status"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{translateColumnsUnits[field.name]}</FormLabel>
-                <Select
-                  disabled={isPending}
-                  onValueChange={field.onChange}
-                  value={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Выберите статус" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value={Status.ACTIVE}>
-                      {translateStatus[Status.ACTIVE]}
-                    </SelectItem>
-                    <SelectItem value={Status.ARCHIVE}>
-                      {translateStatus[Status.ARCHIVE]}
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        <Button type="submit" className="w-full" disabled={isPending}>
-          Сохранить
-        </Button>
       </form>
     </Form>
   );

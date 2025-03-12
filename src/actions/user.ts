@@ -14,8 +14,6 @@ export const user = async (values: TUserFormData, idInt?: number) => {
       return { error: 'Пользователь не найден!' };
     }
 
-    console.log(values);
-
     await db.user.update({
       where: { idInt },
       data: { ...values },

@@ -6,7 +6,7 @@ import {
   KeyTCounterpartyFormData,
   TCounterpartyFormData,
 } from '@/schemas/counterparty-form-schema';
-import { translateColumnsCounterparties } from '@/lib/data-table/translate-colums';
+import { translateColumnsCounterparties } from '@/lib/data-table/translate-colums-header';
 import { dataTableColumnHeader } from '@/lib/data-table/data-table-column-header';
 
 import { DataSheet } from '@/components/data-table/data-sheet';

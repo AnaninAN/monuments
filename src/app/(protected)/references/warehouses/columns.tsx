@@ -6,7 +6,7 @@ import {
   KeyTWarehouseFormData,
   TWarehouseFormData,
 } from '@/schemas/warehouse-form-schema';
-import { translateColumnsWarehouses } from '@/lib/data-table/translate-colums';
+import { translateColumnsWarehouses } from '@/lib/data-table/translate-colums-header';
 import { dataTableColumnHeader } from '@/lib/data-table/data-table-column-header';
 
 import { DataSheet } from '@/components/data-table/data-sheet';

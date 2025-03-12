@@ -4,7 +4,6 @@ import { useEffect, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
-import { Status } from '@prisma/client';
 import { toast } from 'sonner';
 
 import {
@@ -17,14 +16,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
+import { FormHeader } from '@/components/data-table/forms/form-header';
 
 import {
   CounterpartyTypeFormSchema,
@@ -32,7 +24,7 @@ import {
 } from '@/schemas/counterparty-type-form-schema';
 import { counterpartyType } from '@/actions/counterparty-type';
 import { Api } from '@/services/api-client';
-import { translateColumnsCounterpartyType } from '@/lib/data-table/translate-colums';
+import { translateColumnsCounterpartyType } from '@/lib/data-table/translate-colums-header';
 
 export const CounterpartyTypeForm = ({ id }: { id?: number }) => {
   const router = useRouter();
@@ -78,7 +70,17 @@ export const CounterpartyTypeForm = ({ id }: { id?: number }) => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-4 px-8 py-2"
+      >
+        <FormHeader
+          id={id}
+          form={form}
+          name="status"
+          isPending={isPending}
+          title="кат. контрагента"
+        />
         <div className="grid gap-2">
           <FormField
             control={form.control}
@@ -113,39 +115,6 @@ export const CounterpartyTypeForm = ({ id }: { id?: number }) => {
             )}
           />
         </div>
-        <div className="grid gap-2">
-          <FormField
-            control={form.control}
-            name="status"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>
-                  {translateColumnsCounterpartyType[field.name]}
-                </FormLabel>
-                <Select
-                  disabled={isPending}
-                  onValueChange={field.onChange}
-                  value={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Выберите статус" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value={Status.ACTIVE}>Active</SelectItem>
-                    <SelectItem value={Status.ARCHIVE}>Archive</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        <Button type="submit" className="w-full" disabled={isPending}>
-          Сохранить
-        </Button>
       </form>
     </Form>
   );

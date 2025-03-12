@@ -1,7 +1,7 @@
 import withAuth from '@/hoc/with-auth';
 
 import { menu } from '@/consts/menu';
-import { translateColumnsWarehouses } from '@/lib/data-table/translate-colums';
+import { translateColumnsWarehouses } from '@/lib/data-table/translate-colums-header';
 import { columns } from './columns';
 
 import { getAllWarehouses } from '@/data/warehouse';

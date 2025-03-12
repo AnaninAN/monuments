@@ -3,7 +3,7 @@
 import { ColumnDef } from '@tanstack/react-table';
 
 import { KeyTUserFormData, TUserFormData } from '@/schemas/user-form-schema';
-import { translateColumnsEmployees } from '@/lib/data-table/translate-colums';
+import { translateColumnsEmployees } from '@/lib/data-table/translate-colums-header';
 import { dataTableColumnHeader } from '@/lib/data-table/data-table-column-header';
 
 import { DataSheet } from '@/components/data-table/data-sheet';
