@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { Status } from '@prisma/client';
+import { toast } from 'sonner';
 
 import {
   Form,
@@ -16,8 +17,6 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { FormError } from '@/components/form-error';
-import { FormSuccess } from '@/components/form-success';
 import {
   Select,
   SelectContent,
@@ -27,7 +26,6 @@ import {
 } from '@/components/ui/select';
 
 import { Api } from '@/services/api-client';
-import { useNotificationWithTimer } from '@/hooks/use-notification-with-timer';
 import { TUnitFormData, UnitFormSchema } from '@/schemas/unit-form-schema';
 import { unit } from '@/actions/unit';
 import { translateColumnsUnits } from '@/lib/data-table/translate-colums';
@@ -35,8 +33,6 @@ import { translateStatus } from '@/components/data-table/cell-status';
 
 export const UnitForm = ({ id }: { id?: number }) => {
   const router = useRouter();
-
-  const { error, success, setError, setSuccess } = useNotificationWithTimer();
 
   const [isPending, startTransition] = useTransition();
 
@@ -61,20 +57,17 @@ export const UnitForm = ({ id }: { id?: number }) => {
 
   const onSubmit = (values: TUnitFormData) => {
     startTransition(() => {
-      setError('');
-      setSuccess('');
-
       unit(values, id)
         .then((data) => {
           if (data?.error) {
-            setError(data.error);
+            toast.error(data.error);
           }
           if (data?.success) {
             router.refresh();
-            setSuccess(data.success);
+            toast.success(data.success);
           }
         })
-        .catch(() => setError('Что-то пошло не так!'));
+        .catch(() => toast.error('Что-то пошло не так!'));
     });
   };
 
@@ -127,9 +120,6 @@ export const UnitForm = ({ id }: { id?: number }) => {
             )}
           />
         </div>
-
-        {success && <FormSuccess message={success} />}
-        {error && <FormError message={error} />}
 
         <Button type="submit" className="w-full" disabled={isPending}>
           Сохранить

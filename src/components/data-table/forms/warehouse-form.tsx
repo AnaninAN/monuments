@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { Status } from '@prisma/client';
+import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,8 +17,6 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { FormSuccess } from '@/components/form-success';
-import { FormError } from '@/components/form-error';
 import {
   Select,
   SelectContent,
@@ -27,7 +26,6 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 
-import { useNotificationWithTimer } from '@/hooks/use-notification-with-timer';
 import { Api } from '@/services/api-client';
 import { warehouse } from '@/actions/warehouse';
 import {
@@ -38,8 +36,6 @@ import { translateColumnsWarehouses } from '@/lib/data-table/translate-colums';
 
 export function WarehouseForm({ id }: { id?: number }) {
   const router = useRouter();
-
-  const { error, success, setError, setSuccess } = useNotificationWithTimer();
 
   const [isPending, startTransition] = useTransition();
 
@@ -68,20 +64,17 @@ export function WarehouseForm({ id }: { id?: number }) {
 
   const onSubmit = (values: TWarehouseFormData) => {
     startTransition(() => {
-      setError('');
-      setSuccess('');
-
       warehouse(values, id)
         .then((data) => {
           if (data?.error) {
-            setError(data.error);
+            toast.error(data.error);
           }
           if (data?.success) {
             router.refresh();
-            setSuccess(data.success);
+            toast.success(data.success);
           }
         })
-        .catch(() => setError('Что-то пошло не так!'));
+        .catch(() => toast.error('Что-то пошло не так!'));
     });
   };
 
@@ -173,9 +166,6 @@ export function WarehouseForm({ id }: { id?: number }) {
               )}
             />
           </div>
-
-          {success && <FormSuccess message={success} />}
-          {error && <FormError message={error} />}
 
           <Button type="submit" className="w-full" disabled={isPending}>
             Сохранить

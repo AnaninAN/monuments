@@ -1,26 +1,22 @@
 import { Status } from '@prisma/client';
 
-interface CellStatusProps {
-  value: Status;
-}
-
 export const translateStatus: Record<Status, string> = {
   ACTIVE: 'Активный',
   ARCHIVE: 'Архивный',
 };
 
-export const CellStatus = ({ value }: CellStatusProps) => {
+export const CellStatus = ({ value }: { value: Status }) => {
   return (
-    <div className="flex">
+    <div className="flex justify-end pr-3">
       {value === Status.ACTIVE && (
-        <div className="bg-green-700 text-white py-1 px-2 rounded-md">
-          {translateStatus[value as Status]}
-        </div>
+        <span className="bg-green-700 text-white py-1 px-2 rounded-md">
+          {translateStatus[value]}
+        </span>
       )}
       {value === Status.ARCHIVE && (
-        <div className="bg-red-700 text-white py-1 px-2 rounded-md">
-          {translateStatus[value as Status]}
-        </div>
+        <span className="bg-red-700 text-white py-1 px-2 rounded-md">
+          {translateStatus[value]}
+        </span>
       )}
     </div>
   );

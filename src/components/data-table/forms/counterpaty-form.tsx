@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { CounterpartyType, Status } from '@prisma/client';
+import { toast } from 'sonner';
 
 import {
   Form,
@@ -16,8 +17,6 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { FormError } from '@/components/form-error';
-import { FormSuccess } from '@/components/form-success';
 import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
@@ -26,20 +25,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-
 import {
   CounterpartyFormSchema,
   TCounterpartyFormData,
 } from '@/schemas/counterparty-form-schema';
 import { counterparty } from '@/actions/counterparty';
 import { Api } from '@/services/api-client';
-import { useNotificationWithTimer } from '@/hooks/use-notification-with-timer';
 import { translateColumnsCounterparties } from '@/lib/data-table/translate-colums';
 
 export const CounterpartyForm = ({ id }: { id?: number }) => {
   const router = useRouter();
-
-  const { error, success, setError, setSuccess } = useNotificationWithTimer();
 
   const [counterpartyTypes, setCounterpartyTypes] = useState<
     CounterpartyType[]
@@ -102,20 +97,17 @@ export const CounterpartyForm = ({ id }: { id?: number }) => {
     };
 
     startTransition(() => {
-      setError('');
-      setSuccess('');
-
       counterparty(newValues, id)
         .then((data) => {
           if (data?.error) {
-            setError(data.error);
+            toast.error(data.error);
           }
           if (data?.success) {
             router.refresh();
-            setSuccess(data.success);
+            toast.success(data.success);
           }
         })
-        .catch(() => setError('Что-то пошло не так!'));
+        .catch(() => toast.error('Что-то пошло не так!'));
     });
   };
 
@@ -217,9 +209,6 @@ export const CounterpartyForm = ({ id }: { id?: number }) => {
             )}
           />
         </div>
-
-        {success && <FormSuccess message={success} />}
-        {error && <FormError message={error} />}
 
         <Button type="submit" className="w-full" disabled={isPending}>
           Сохранить

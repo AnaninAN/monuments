@@ -7,10 +7,10 @@ import {
   TWarehouseFormData,
 } from '@/schemas/warehouse-form-schema';
 import { translateColumnsWarehouses } from '@/lib/data-table/translate-colums';
+import { dataTableColumnHeader } from '@/lib/data-table/data-table-column-header';
 
 import { DataSheet } from '@/components/data-table/data-sheet';
 import { WarehouseForm } from '@/components/data-table/forms/warehouse-form';
-import { dataTableColumnHeader } from '@/lib/data-table/data-table-column-header';
 import { CellStatus } from '@/components/data-table/cell-status';
 
 export const columns: ColumnDef<TWarehouseFormData>[] = [

@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { toast } from 'sonner';
 
 import { CardWrapper } from '@/components/auth/card-wrapper';
 import {
@@ -13,16 +14,13 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { ResetFormSchema, TResetFormData } from '@/schemas/reset-form-schema';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { FormError } from '@/components/form-error';
-import { FormSuccess } from '@/components/form-success';
+
+import { ResetFormSchema, TResetFormData } from '@/schemas/reset-form-schema';
 import { reset } from '@/actions/reset';
 
 export const ResetForm = () => {
-  const [error, setError] = useState<string | undefined>('');
-  const [success, setSuccess] = useState<string | undefined>('');
   const [isPending, startTransition] = useTransition();
 
   const form = useForm<TResetFormData>({
@@ -33,13 +31,14 @@ export const ResetForm = () => {
   });
 
   const onSubmit = (values: TResetFormData) => {
-    setError('');
-    setSuccess('');
-
     startTransition(() => {
       reset(values).then((data) => {
-        setError(data?.error);
-        setSuccess(data?.success);
+        if (data?.error) {
+          toast.error(data?.error);
+        }
+        if (data?.success) {
+          toast.success(data?.success);
+        }
       });
     });
   };
@@ -74,8 +73,7 @@ export const ResetForm = () => {
               )}
             />
           </div>
-          <FormSuccess message={success} />
-          <FormError message={error} />
+
           <Button type="submit" className="w-full" disabled={isPending}>
             Сбросить пароль
           </Button>

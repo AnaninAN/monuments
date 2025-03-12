@@ -1,8 +1,8 @@
 'use client';
 
 import { PropsWithChildren, useEffect, useState } from 'react';
-import { Toaster } from 'react-hot-toast';
 import { SessionProvider } from 'next-auth/react';
+import { Toaster } from '@/components/ui/sonner';
 
 import { ThemeProvider } from '@/components/theme-provider';
 
@@ -27,7 +27,14 @@ export const Providers = ({ children }: PropsWithChildren) => {
           {children}
         </ThemeProvider>
       </SessionProvider>
-      <Toaster />
+      <Toaster
+        toastOptions={{
+          classNames: {
+            error: 'bg-red-500',
+            success: 'bg-green-300',
+          },
+        }}
+      />
     </>
   );
 };

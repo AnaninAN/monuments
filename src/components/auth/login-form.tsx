@@ -4,6 +4,7 @@ import { useTransition } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -16,20 +17,15 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { FormSuccess } from '@/components/form-success';
-import { FormError } from '@/components/form-error';
 
 import {
   LoginFormSchema,
   type TLoginFormData,
 } from '@/schemas/login-form-schema';
 import { login } from '@/actions/login';
-import { useNotificationWithTimer } from '@/hooks/use-notification-with-timer';
 
 export function LoginForm() {
   const searchParams = useSearchParams();
-
-  const { error, success, setError, setSuccess } = useNotificationWithTimer();
 
   const callbackUrl = searchParams.get('callbackUrl');
   const urlError =
@@ -49,17 +45,14 @@ export function LoginForm() {
 
   const onSubmit = (values: TLoginFormData) => {
     startTransition(() => {
-      setError('');
-      setSuccess('');
-
       login(values, callbackUrl).then((data) => {
         if (data?.error) {
           form.reset();
-          setError(data.error);
+          toast.error(data.error || urlError);
         }
         if (data?.success) {
           form.reset();
-          setSuccess(data.success);
+          toast.success(data.success);
         }
       });
     });
@@ -117,9 +110,6 @@ export function LoginForm() {
                     )}
                   />
                 </div>
-
-                {success && <FormSuccess message={success} />}
-                {error && <FormError message={error || urlError} />}
 
                 <Button
                   type="submit"

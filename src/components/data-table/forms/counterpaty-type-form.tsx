@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { Status } from '@prisma/client';
+import { toast } from 'sonner';
 
 import {
   Form,
@@ -15,9 +16,6 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { FormError } from '@/components/form-error';
-import { FormSuccess } from '@/components/form-success';
 import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
@@ -26,6 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
 
 import {
   CounterpartyTypeFormSchema,
@@ -33,13 +32,10 @@ import {
 } from '@/schemas/counterparty-type-form-schema';
 import { counterpartyType } from '@/actions/counterparty-type';
 import { Api } from '@/services/api-client';
-import { useNotificationWithTimer } from '@/hooks/use-notification-with-timer';
 import { translateColumnsCounterpartyType } from '@/lib/data-table/translate-colums';
 
 export const CounterpartyTypeForm = ({ id }: { id?: number }) => {
   const router = useRouter();
-
-  const { error, success, setError, setSuccess } = useNotificationWithTimer();
 
   const [isPending, startTransition] = useTransition();
 
@@ -66,20 +62,17 @@ export const CounterpartyTypeForm = ({ id }: { id?: number }) => {
 
   const onSubmit = (values: TCounterpartyTypeFormData) => {
     startTransition(() => {
-      setError('');
-      setSuccess('');
-
       counterpartyType(values, id)
         .then((data) => {
           if (data?.error) {
-            setError(data.error);
+            toast.error(data.error);
           }
           if (data?.success) {
             router.refresh();
-            setSuccess(data.success);
+            toast.success(data.success);
           }
         })
-        .catch(() => setError('Что-то пошло не так!'));
+        .catch(() => toast.error('Что-то пошло не так!'));
     });
   };
 
@@ -149,9 +142,6 @@ export const CounterpartyTypeForm = ({ id }: { id?: number }) => {
             )}
           />
         </div>
-
-        {success && <FormSuccess message={success} />}
-        {error && <FormError message={error} />}
 
         <Button type="submit" className="w-full" disabled={isPending}>
           Сохранить
