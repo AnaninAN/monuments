@@ -51,3 +51,15 @@ export const warehouse = async (values: TWarehouseFormData, id?: number) => {
     return { success: 'Склад создан!' };
   }
 };
+
+export const delWarehouse = async (id: number) => {
+  const existingWarehouse = await getWarehouseById(id);
+
+  if (!existingWarehouse) {
+    return { error: 'Склада не существует!' };
+  }
+
+  await db.warehouse.delete({ where: { id } });
+
+  return { success: 'Склад удален!' };
+};

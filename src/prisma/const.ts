@@ -36,26 +36,10 @@ export const warehous = [
   { name: 'Склад инструментов', shortName: 'СИ' },
 ];
 
-export const materialGroup = [
-  {
-    name: 'Материалы',
-    parentGroup: 0,
-  },
-  {
-    name: 'Букеты',
-  },
-  {
-    name: 'Листовой',
-  },
-  {
-    name: 'Гипсокартон',
-    parentGroup: 3,
-  },
-  {
-    name: 'Фанера',
-    parentGroup: 3,
-  },
-];
+export const materialGroup = {
+  name: 'Материалы',
+  parentGroup: 0,
+};
 
 export const material = [
   {

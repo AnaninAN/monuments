@@ -2,6 +2,12 @@ import { Warehouse } from '@prisma/client';
 
 import { axiosInstance } from './instance';
 
+export const fetchAllWarehouses = async () => {
+  const { data } = await axiosInstance.get<Warehouse[]>('/warehouses');
+
+  return data;
+};
+
 export const fetchWarehouseById = async (
   id: number | undefined
 ): Promise<Warehouse> => {

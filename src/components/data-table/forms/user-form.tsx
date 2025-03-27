@@ -30,6 +30,7 @@ import { TUserFormData, UserFormSchema } from '@/schemas/user-form-schema';
 import { Api } from '@/services/api-client';
 import { user } from '@/actions/user';
 import { translateColumnsEmployees } from '@/lib/data-table/translate-colums-header';
+import { translateRole } from '@/lib/data-table/translate-cell-table';
 
 const primaryPhoneOptions = {
   mask: '+7 (___) ___-__-__',
@@ -187,8 +188,12 @@ export function UserForm({ id }: { id?: number }) {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value={Role.ADMIN}>Admin</SelectItem>
-                      <SelectItem value={Role.OPERATOR}>Operator</SelectItem>
+                      <SelectItem value={Role.ADMIN}>
+                        {translateRole[Role.ADMIN]}
+                      </SelectItem>
+                      <SelectItem value={Role.OPERATOR}>
+                        {translateRole[Role.OPERATOR]}
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />

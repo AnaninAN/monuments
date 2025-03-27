@@ -1,5 +1,6 @@
-import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { Column } from '@tanstack/react-table';
+
+import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 
 export function dataTableColumnHeader<T, K extends string>(
   column: Column<T>,

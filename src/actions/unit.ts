@@ -47,3 +47,15 @@ export const unit = async (values: TUnitFormData, id?: number) => {
     return { success: 'Единица измерения создана!' };
   }
 };
+
+export const delUnit = async (id: number) => {
+  const existingUnit = await getUnitById(id);
+
+  if (!existingUnit) {
+    return { error: 'Единицы измерения не существует!' };
+  }
+
+  await db.unit.delete({ where: { id } });
+
+  return { success: 'Единица измерения удалена!' };
+};

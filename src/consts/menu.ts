@@ -1,6 +1,5 @@
 import { ForwardRefExoticComponent, RefAttributes } from 'react';
 import { LucideProps } from 'lucide-react';
-
 import { Role } from '@prisma/client';
 
 export type MenuType = {
@@ -19,11 +18,29 @@ enum MenuTitle {
   COUNTERPARTIES = 'COUNTERPARTIES',
   UNITS = 'UNITS',
   PROCUREMENTS = 'PROCUREMENTS',
-  PRODUCTS = 'PRODUCTS',
+  RESIDUE_ANALYSIS = 'RESIDUE_ANALYSIS',
   RETAIL = 'RETAIL',
+  MATERIALS = 'MATERIALS',
+  DETAILS = 'DETAILS',
+  PRODUCTS = 'PRODUCTS',
 }
 
 export const menu: Record<MenuTitle, MenuType> = {
+  [MenuTitle.MATERIALS]: {
+    title: 'Материалы',
+    url: '/references/materials',
+    roles: ['ADMIN'],
+  },
+  [MenuTitle.DETAILS]: {
+    title: 'Детали',
+    url: '/references/details',
+    roles: ['ADMIN'],
+  },
+  [MenuTitle.PRODUCTS]: {
+    title: 'Изделия',
+    url: '/references/products',
+    roles: ['ADMIN'],
+  },
   [MenuTitle.USERS]: {
     title: 'Пользователи',
     url: '/references/users',
@@ -54,9 +71,9 @@ export const menu: Record<MenuTitle, MenuType> = {
     url: '/supply/procurements',
     roles: ['ADMIN', 'OPERATOR'],
   },
-  [MenuTitle.PRODUCTS]: {
-    title: 'Товары',
-    url: '/warehouse/products',
+  [MenuTitle.RESIDUE_ANALYSIS]: {
+    title: 'Анализ остатков',
+    url: '/warehouse/residue_analysis',
     roles: ['ADMIN', 'OPERATOR'],
   },
   [MenuTitle.RETAIL]: {

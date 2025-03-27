@@ -8,7 +8,7 @@ export async function GET(
 ) {
   const id = Number((await params).id);
 
-  const user = await getWarehouseById(id);
+  const warehouse = await getWarehouseById(id);
 
-  return NextResponse.json(user);
+  return NextResponse.json(warehouse);
 }

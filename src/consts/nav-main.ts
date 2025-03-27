@@ -3,11 +3,14 @@ import {
   Banknote,
   Caravan,
   ChartBarStacked,
+  ChartSpline,
   HandCoins,
   Handshake,
+  LayoutDashboard,
+  LayoutGrid,
+  LayoutList,
   NotebookTabs,
   Ruler,
-  ShoppingCart,
   Users,
   Warehouse,
 } from 'lucide-react';
@@ -40,10 +43,10 @@ export const navMain: NavMain[] = [
     roles: [],
     items: [
       {
-        title: menu['PRODUCTS'].title,
-        url: menu['PRODUCTS'].url,
-        icon: ShoppingCart,
-        roles: menu['PRODUCTS'].roles,
+        title: menu['RESIDUE_ANALYSIS'].title,
+        url: menu['RESIDUE_ANALYSIS'].url,
+        icon: ChartSpline,
+        roles: menu['RESIDUE_ANALYSIS'].roles,
       },
     ],
   },
@@ -67,6 +70,24 @@ export const navMain: NavMain[] = [
     icon: NotebookTabs,
     roles: [],
     items: [
+      {
+        title: menu['MATERIALS'].title,
+        url: menu['MATERIALS'].url,
+        icon: LayoutGrid,
+        roles: menu['MATERIALS'].roles,
+      },
+      {
+        title: menu['DETAILS'].title,
+        url: menu['DETAILS'].url,
+        icon: LayoutList,
+        roles: menu['DETAILS'].roles,
+      },
+      {
+        title: menu['PRODUCTS'].title,
+        url: menu['PRODUCTS'].url,
+        icon: LayoutDashboard,
+        roles: menu['PRODUCTS'].roles,
+      },
       {
         title: menu['USERS'].title,
         url: menu['USERS'].url,

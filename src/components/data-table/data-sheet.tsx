@@ -1,5 +1,7 @@
 'use client';
 
+import { ReactNode } from 'react';
+
 import {
   Sheet,
   SheetContent,
@@ -8,7 +10,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { ReactNode } from 'react';
 
 interface DataSheetProps {
   trigger: string | ReactNode;

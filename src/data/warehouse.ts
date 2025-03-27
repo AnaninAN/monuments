@@ -2,7 +2,9 @@ import { db } from '@/lib/db';
 
 export const getWarehouseById = async (id: number | undefined) => {
   try {
-    const warehouse = await db.warehouse.findUnique({ where: { id } });
+    const warehouse = await db.warehouse.findUnique({
+      where: { id },
+    });
 
     return warehouse;
   } catch {

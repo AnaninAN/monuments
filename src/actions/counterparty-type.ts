@@ -57,3 +57,15 @@ export const counterpartyType = async (
     return { success: 'Категория контрагента создана!' };
   }
 };
+
+export const delCounterpartyType = async (id: number) => {
+  const existingCounterpartyType = await getCounterpartyTypeById(id);
+
+  if (!existingCounterpartyType) {
+    return { error: 'Категории контрагента не существует!' };
+  }
+
+  await db.counterpartyType.delete({ where: { id } });
+
+  return { success: 'Категория контрагента удалена!' };
+};

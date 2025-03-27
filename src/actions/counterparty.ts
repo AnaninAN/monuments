@@ -64,3 +64,15 @@ export const counterparty = async (
     return { success: 'Контрагент создан!' };
   }
 };
+
+export const delCounterparty = async (id: number) => {
+  const existingCounterparty = await getCounterpartyById(id);
+
+  if (!existingCounterparty) {
+    return { error: 'Контрагент не существует!' };
+  }
+
+  await db.counterparty.delete({ where: { id } });
+
+  return { success: 'Контрагент удален!' };
+};
