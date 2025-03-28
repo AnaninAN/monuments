@@ -9,15 +9,15 @@ export const MaterialFormSchema = z.object({
   comment: z.string(),
   materialGroupId: z.number(),
   materialGroup: z.object({
-    name: z.string(),
+    name: z.string().min(1, 'Необходимо выбрать группу!'),
   }),
   unitId: z.number(),
   unit: z.object({
-    name: z.string(),
+    name: z.string().min(1, 'Необходимо выбрать ед. измерения!'),
   }),
-  warehouseId: z.number(),
+  warehouseId: z.number().optional(),
   warehouse: z.object({
-    name: z.string(),
+    name: z.string().optional(),
   }),
 });
 

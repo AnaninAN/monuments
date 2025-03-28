@@ -12,7 +12,7 @@ import {
   dataTableColumns,
 } from '@/lib/data-table/data-table-colums';
 
-import { CounterpartyForm } from '@/components/data-table/forms/counterpaty-form';
+import { CounterpartyForm } from '@/components/data-table/forms/counterparty-form';
 
 import { delCounterparty } from '@/actions/counterparty';
 

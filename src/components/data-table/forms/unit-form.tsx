@@ -1,32 +1,23 @@
 'use client';
 
-import { useEffect, useTransition } from 'react';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
+import { Form } from '@/components/ui/form';
 import { FormHeader } from '@/components/data-table/forms/form-header';
+import { FormFieldInput } from '@/components/data-table/forms/form-field';
 
 import { Api } from '@/services/api-client';
 import { TUnitFormData, UnitFormSchema } from '@/schemas/unit-form-schema';
 import { unit } from '@/actions/unit';
 import { translateColumnsUnits } from '@/lib/data-table/translate-colums-header';
+import { useMaterialSelectStore } from '@/store/material-select';
+import { useTransitionNoErrors } from '@/hooks/use-transition-no-errors';
 
 export const UnitForm = ({ id }: { id?: number }) => {
-  const router = useRouter();
-
-  const [isPending, startTransition] = useTransition();
-
   const form = useForm<TUnitFormData>({
     resolver: zodResolver(UnitFormSchema),
     defaultValues: {
@@ -34,6 +25,11 @@ export const UnitForm = ({ id }: { id?: number }) => {
       status: 'ACTIVE',
     },
   });
+
+  const router = useRouter();
+  const { setLoadingUnits } = useMaterialSelectStore();
+
+  const { isPending, startTransitionNoErrors } = useTransitionNoErrors(form);
 
   useEffect(() => {
     if (id) {
@@ -47,7 +43,7 @@ export const UnitForm = ({ id }: { id?: number }) => {
   }, [form, id]);
 
   const onSubmit = (values: TUnitFormData) => {
-    startTransition(() => {
+    startTransitionNoErrors(() => {
       unit(values, id)
         .then((data) => {
           if (data?.error) {
@@ -55,6 +51,8 @@ export const UnitForm = ({ id }: { id?: number }) => {
           }
           if (data?.success) {
             router.refresh();
+            form.reset();
+            setLoadingUnits(true);
             toast.success(data.success);
           }
         })
@@ -71,23 +69,17 @@ export const UnitForm = ({ id }: { id?: number }) => {
         <FormHeader
           id={id}
           form={form}
-          name="status"
+          status
           isPending={isPending}
           title="ед. измерения"
         />
         <div className="flex">
-          <FormField
-            control={form.control}
+          <FormFieldInput
+            form={form}
             name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{translateColumnsUnits[field.name]}</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="" disabled={isPending} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            placeholder="Введите ед. измерения"
+            translate={translateColumnsUnits}
+            isPending={isPending}
           />
         </div>
       </form>

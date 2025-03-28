@@ -7,7 +7,7 @@ import { columns } from './columns';
 import { getAllCounterparties } from '@/data/counterparty';
 
 import { DataTable } from '@/components/data-table/data-table';
-import { CounterpartyForm } from '@/components/data-table/forms/counterpaty-form';
+import { CounterpartyForm } from '@/components/data-table/forms/counterparty-form';
 
 async function CounterpartiesPage() {
   const counterparties = await getAllCounterparties();

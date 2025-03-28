@@ -7,7 +7,7 @@ import { columns } from './columns';
 import { getAllCounterpartyTypes } from '@/data/counterparty-type';
 
 import { DataTable } from '@/components/data-table/data-table';
-import { CounterpartyTypeForm } from '@/components/data-table/forms/counterpaty-type-form';
+import { CounterpartyTypeForm } from '@/components/data-table/forms/counterparty-type-form';
 
 async function CounterpartyTypesPage() {
   const counterpartyTypes = await getAllCounterpartyTypes();

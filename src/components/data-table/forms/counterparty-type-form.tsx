@@ -1,22 +1,17 @@
 'use client';
 
-import { useEffect, useTransition } from 'react';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { Form } from '@/components/ui/form';
 import { FormHeader } from '@/components/data-table/forms/form-header';
+import {
+  FormFieldInput,
+  FormFieldTextarea,
+} from '@/components/data-table/forms/form-field';
 
 import {
   CounterpartyTypeFormSchema,
@@ -25,12 +20,10 @@ import {
 import { counterpartyType } from '@/actions/counterparty-type';
 import { Api } from '@/services/api-client';
 import { translateColumnsCounterpartyType } from '@/lib/data-table/translate-colums-header';
+import { useCounterpartySelectStore } from '@/store/counterparty-select';
+import { useTransitionNoErrors } from '@/hooks/use-transition-no-errors';
 
 export const CounterpartyTypeForm = ({ id }: { id?: number }) => {
-  const router = useRouter();
-
-  const [isPending, startTransition] = useTransition();
-
   const form = useForm<TCounterpartyTypeFormData>({
     resolver: zodResolver(CounterpartyTypeFormSchema),
     defaultValues: {
@@ -39,6 +32,11 @@ export const CounterpartyTypeForm = ({ id }: { id?: number }) => {
       status: 'ACTIVE',
     },
   });
+
+  const router = useRouter();
+  const { setloadingCounterpartyTypes } = useCounterpartySelectStore();
+
+  const { isPending, startTransitionNoErrors } = useTransitionNoErrors(form);
 
   useEffect(() => {
     if (id) {
@@ -53,7 +51,7 @@ export const CounterpartyTypeForm = ({ id }: { id?: number }) => {
   }, [form, id]);
 
   const onSubmit = (values: TCounterpartyTypeFormData) => {
-    startTransition(() => {
+    startTransitionNoErrors(() => {
       counterpartyType(values, id)
         .then((data) => {
           if (data?.error) {
@@ -61,6 +59,8 @@ export const CounterpartyTypeForm = ({ id }: { id?: number }) => {
           }
           if (data?.success) {
             router.refresh();
+            form.reset();
+            setloadingCounterpartyTypes(true);
             toast.success(data.success);
           }
         })
@@ -77,42 +77,25 @@ export const CounterpartyTypeForm = ({ id }: { id?: number }) => {
         <FormHeader
           id={id}
           form={form}
-          name="status"
+          status
           isPending={isPending}
           title="кат. контрагента"
         />
         <div className="grid gap-2">
-          <FormField
-            control={form.control}
+          <FormFieldInput
+            form={form}
             name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>
-                  {translateColumnsCounterpartyType[field.name]}
-                </FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="" disabled={isPending} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            placeholder="Введите наименование типа контрагента"
+            translate={translateColumnsCounterpartyType}
+            isPending={isPending}
           />
         </div>
         <div className="grid gap-2">
-          <FormField
-            control={form.control}
+          <FormFieldTextarea
+            form={form}
             name="comment"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>
-                  {translateColumnsCounterpartyType[field.name]}
-                </FormLabel>
-                <FormControl>
-                  <Textarea placeholder="" className="resize-none" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            placeholder="Введите комментарий"
+            translate={translateColumnsCounterpartyType}
           />
         </div>
       </form>

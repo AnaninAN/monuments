@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useTransition } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { MaterialGroup, Unit, Warehouse } from '@prisma/client';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -9,6 +9,12 @@ import { toast } from 'sonner';
 
 import { Form } from '@/components/ui/form';
 import { FormHeader } from '@/components/data-table/forms/form-header';
+import {
+  FormFieldInput,
+  FormFieldSelect,
+  FormFieldTextarea,
+} from '@/components/data-table/forms/form-field';
+import { UnitForm } from '@/components/data-table/forms/unit-form';
 
 import {
   MaterialFormSchema,
@@ -17,21 +23,10 @@ import {
 import { material } from '@/actions/material';
 import { Api } from '@/services/api-client';
 import { translateColumnsMaterials } from '@/lib/data-table/translate-colums-header';
-import {
-  FormFieldInput,
-  FormFieldSelect,
-  FormFieldTextarea,
-} from './form-field';
+import { useMaterialSelectStore } from '@/store/material-select';
+import { useTransitionNoErrors } from '@/hooks/use-transition-no-errors';
 
 export const MaterialForm = ({ id }: { id?: number }) => {
-  const router = useRouter();
-
-  const [materialGroups, setMaterialGroups] = useState<MaterialGroup[]>([]);
-  const [units, setUnits] = useState<Unit[]>([]);
-  const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
-
-  const [isPending, startTransition] = useTransition();
-
   const form = useForm<TMaterialFormData>({
     resolver: zodResolver(MaterialFormSchema),
     defaultValues: {
@@ -48,29 +43,63 @@ export const MaterialForm = ({ id }: { id?: number }) => {
       unit: {
         name: '',
       },
-      warehouseId: 0,
+      warehouseId: undefined,
       warehouse: {
-        name: '',
+        name: undefined,
       },
     },
   });
 
+  const router = useRouter();
+  const {
+    loadingUnits,
+    loadingMaterialGroups,
+    loadingWarehouses,
+    setLoadingMaterialGroups,
+    setLoadingUnits,
+    setLoadingWarehouses,
+  } = useMaterialSelectStore();
+
+  const [materialGroups, setMaterialGroups] = useState<MaterialGroup[]>([]);
+  const [units, setUnits] = useState<Unit[]>([]);
+  const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
+
+  const { isPending, startTransitionNoErrors } = useTransitionNoErrors(form);
+
   useEffect(() => {
-    (async function () {
-      const data = await Api.materialGroups.fetchAllMaterialGroups();
-      setMaterialGroups(data);
-    })();
+    if (loadingMaterialGroups) {
+      (async function () {
+        const data = await Api.materialGroups.fetchAllMaterialGroups();
+        setMaterialGroups(data);
+      })();
+      setLoadingMaterialGroups(false);
+    }
 
-    (async function () {
-      const data = await Api.units.fetchAllUnits();
-      setUnits(data);
-    })();
+    if (loadingUnits) {
+      (async function () {
+        const data = await Api.units.fetchAllUnits();
+        setUnits(data);
+      })();
+      setLoadingUnits(false);
+    }
 
-    (async function () {
-      const data = await Api.warehouses.fetchAllWarehouses();
-      setWarehouses(data);
-    })();
+    if (loadingWarehouses) {
+      (async function () {
+        const data = await Api.warehouses.fetchAllWarehouses();
+        setWarehouses(data);
+      })();
+      setLoadingWarehouses(false);
+    }
+  }, [
+    loadingMaterialGroups,
+    loadingUnits,
+    loadingWarehouses,
+    setLoadingMaterialGroups,
+    setLoadingUnits,
+    setLoadingWarehouses,
+  ]);
 
+  useEffect(() => {
     if (id) {
       (async function () {
         const data = await Api.materials.fetchMaterialById(id);
@@ -82,10 +111,22 @@ export const MaterialForm = ({ id }: { id?: number }) => {
         form.setValue('minBalance', data.minBalance);
         form.setValue('materialGroup.name', data.materialGroup.name);
         form.setValue('unit.name', data.unit.name);
-        form.setValue('warehouse.name', data.warehouse.name);
+        form.setValue('warehouse.name', data.warehouse?.name);
       })();
     }
-  }, [form, id]);
+
+    return () => {
+      setLoadingMaterialGroups(true);
+      setLoadingUnits(true);
+      setLoadingWarehouses(true);
+    };
+  }, [
+    form,
+    id,
+    setLoadingMaterialGroups,
+    setLoadingUnits,
+    setLoadingWarehouses,
+  ]);
 
   const onSubmit = async (values: TMaterialFormData) => {
     const newMaterialGroupId =
@@ -97,7 +138,7 @@ export const MaterialForm = ({ id }: { id?: number }) => {
     const newWarehouseId =
       warehouses.find(
         (warehouses) => warehouses.name === values.warehouse?.name
-      )?.id || values.warehouseId;
+      )?.id || values?.warehouseId;
 
     const newValues: typeof values = {
       ...values,
@@ -106,11 +147,10 @@ export const MaterialForm = ({ id }: { id?: number }) => {
       warehouseId: newWarehouseId,
     };
 
-    startTransition(() => {
+    startTransitionNoErrors(() => {
       material(newValues, id)
         .then((data) => {
           if (data?.error) {
-            form.reset();
             toast.error(data.error);
           }
           if (data?.success) {
@@ -172,6 +212,7 @@ export const MaterialForm = ({ id }: { id?: number }) => {
               translate={translateColumnsMaterials}
               items={units}
               isPending={isPending}
+              ButtonOpenForm={UnitForm}
             />
           </div>
           <div className="grid gap-2">

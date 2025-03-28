@@ -59,3 +59,15 @@ export const material = async (values: TMaterialFormData, id?: number) => {
     return { success: 'Материал создан!' };
   }
 };
+
+export const delMaterial = async (id: number) => {
+  const existingMaterial = await getMaterialById(id);
+
+  if (!existingMaterial) {
+    return { error: 'Материала не существует!' };
+  }
+
+  await db.material.delete({ where: { id } });
+
+  return { success: 'Материал удален!' };
+};

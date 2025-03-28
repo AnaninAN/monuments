@@ -1,22 +1,17 @@
 'use client';
 
-import { useEffect, useTransition } from 'react';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
-import { Input } from '@/components/ui/input';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { Textarea } from '@/components/ui/textarea';
+import { Form } from '@/components/ui/form';
 import { FormHeader } from '@/components/data-table/forms/form-header';
+import {
+  FormFieldInput,
+  FormFieldTextarea,
+} from '@/components/data-table/forms/form-field';
 
 import { Api } from '@/services/api-client';
 import { warehouse } from '@/actions/warehouse';
@@ -25,12 +20,9 @@ import {
   WarehouseFormSchema,
 } from '@/schemas/warehouse-form-schema';
 import { translateColumnsWarehouses } from '@/lib/data-table/translate-colums-header';
+import { useTransitionNoErrors } from '@/hooks/use-transition-no-errors';
 
 export function WarehouseForm({ id }: { id?: number }) {
-  const router = useRouter();
-
-  const [isPending, startTransition] = useTransition();
-
   const form = useForm<TWarehouseFormData>({
     resolver: zodResolver(WarehouseFormSchema),
     defaultValues: {
@@ -40,6 +32,10 @@ export function WarehouseForm({ id }: { id?: number }) {
       status: 'ACTIVE',
     },
   });
+
+  const router = useRouter();
+
+  const { isPending, startTransitionNoErrors } = useTransitionNoErrors(form);
 
   useEffect(() => {
     if (id) {
@@ -55,7 +51,7 @@ export function WarehouseForm({ id }: { id?: number }) {
   }, [form, id]);
 
   const onSubmit = (values: TWarehouseFormData) => {
-    startTransition(() => {
+    startTransitionNoErrors(() => {
       warehouse(values, id)
         .then((data) => {
           if (data?.error) {
@@ -63,6 +59,7 @@ export function WarehouseForm({ id }: { id?: number }) {
           }
           if (data?.success) {
             router.refresh();
+            form.reset();
             toast.success(data.success);
           }
         })
@@ -79,64 +76,35 @@ export function WarehouseForm({ id }: { id?: number }) {
         <FormHeader
           id={id}
           form={form}
-          name="status"
+          status
           isPending={isPending}
           title="склад"
         />
         <div className="flex flex-col gap-6">
           <div className="grid gap-2">
-            <FormField
-              control={form.control}
+            <FormFieldInput
+              form={form}
               name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    {translateColumnsWarehouses[field.name]}
-                  </FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="" disabled={isPending} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              placeholder="Введите наименование склада"
+              translate={translateColumnsWarehouses}
+              isPending={isPending}
             />
           </div>
           <div className="grid gap-2">
-            <FormField
-              control={form.control}
+            <FormFieldInput
+              form={form}
               name="shortName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    {translateColumnsWarehouses[field.name]}
-                  </FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="" disabled={isPending} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              placeholder="Введите краткое наименование склада"
+              translate={translateColumnsWarehouses}
+              isPending={isPending}
             />
           </div>
           <div className="grid gap-2">
-            <FormField
-              control={form.control}
+            <FormFieldTextarea
+              form={form}
               name="comment"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    {translateColumnsWarehouses[field.name]}
-                  </FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder=""
-                      className="resize-none"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              placeholder="Введите комментарий"
+              translate={translateColumnsWarehouses}
             />
           </div>
         </div>

@@ -1,36 +1,24 @@
 'use client';
 
-import { useEffect, useTransition } from 'react';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { InputMask } from '@react-input/mask';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
-import { Role } from '@prisma/client';
 import { toast } from 'sonner';
 
-import { Input } from '@/components/ui/input';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Form } from '@/components/ui/form';
 import { FormHeader } from '@/components/data-table/forms/form-header';
+import {
+  FormFieldInput,
+  FormFieldInputMask,
+  FormFieldRoleSelect,
+} from '@/components/data-table/forms/form-field';
 
 import { TUserFormData, UserFormSchema } from '@/schemas/user-form-schema';
 import { Api } from '@/services/api-client';
 import { user } from '@/actions/user';
 import { translateColumnsEmployees } from '@/lib/data-table/translate-colums-header';
-import { translateRole } from '@/lib/data-table/translate-cell-table';
+import { useTransitionNoErrors } from '@/hooks/use-transition-no-errors';
 
 const primaryPhoneOptions = {
   mask: '+7 (___) ___-__-__',
@@ -38,10 +26,6 @@ const primaryPhoneOptions = {
 };
 
 export function UserForm({ id }: { id?: number }) {
-  const router = useRouter();
-
-  const [isPending, startTransition] = useTransition();
-
   const form = useForm<TUserFormData>({
     resolver: zodResolver(UserFormSchema),
     defaultValues: {
@@ -53,6 +37,10 @@ export function UserForm({ id }: { id?: number }) {
       phoneNumber: '',
     },
   });
+
+  const router = useRouter();
+
+  const { isPending, startTransitionNoErrors } = useTransitionNoErrors(form);
 
   useEffect(() => {
     if (id) {
@@ -70,7 +58,7 @@ export function UserForm({ id }: { id?: number }) {
   }, [form, id]);
 
   const onSubmit = (values: TUserFormData) => {
-    startTransition(() => {
+    startTransitionNoErrors(() => {
       user(values, id)
         .then((data) => {
           if (data?.error) {
@@ -78,6 +66,7 @@ export function UserForm({ id }: { id?: number }) {
           }
           if (data?.success) {
             router.refresh();
+            form.reset();
             toast.success(data.success);
           }
         })
@@ -94,111 +83,53 @@ export function UserForm({ id }: { id?: number }) {
         <FormHeader
           id={id}
           form={form}
-          name="status"
+          status
           isPending={isPending}
           title="пользователя"
         />
         <div className="flex flex-col gap-6">
           <div className="grid gap-2">
-            <FormField
-              control={form.control}
+            <FormFieldInput
+              form={form}
               name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{translateColumnsEmployees[field.name]}</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      placeholder="test@monuments.ru"
-                      disabled={isPending}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              placeholder="test@monuments.ru"
+              translate={translateColumnsEmployees}
+              isPending={isPending}
             />
           </div>
           <div className="grid gap-2">
-            <FormField
-              control={form.control}
+            <FormFieldInput
+              form={form}
               name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{translateColumnsEmployees[field.name]}</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="" disabled={isPending} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              placeholder="Введите имя пользователя"
+              translate={translateColumnsEmployees}
+              isPending={isPending}
             />
           </div>
           <div className="grid gap-2">
-            <FormField
-              control={form.control}
+            <FormFieldInput
+              form={form}
               name="lastname"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{translateColumnsEmployees[field.name]}</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="" disabled={isPending} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              placeholder="Введите фамилию пользователя"
+              translate={translateColumnsEmployees}
+              isPending={isPending}
             />
           </div>
           <div className="grid gap-2">
-            <FormField
-              control={form.control}
+            <FormFieldInputMask
+              form={form}
               name="phoneNumber"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{translateColumnsEmployees[field.name]}</FormLabel>
-                  <FormControl>
-                    <InputMask
-                      {...primaryPhoneOptions}
-                      showMask
-                      separate
-                      placeholder=""
-                      {...field}
-                      component={Input}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              placeholder="+7 (___) ___-__-__"
+              translate={translateColumnsEmployees}
+              isPending={isPending}
+              options={primaryPhoneOptions}
             />
           </div>
           <div className="grid gap-2">
-            <FormField
-              control={form.control}
-              name="role"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{translateColumnsEmployees[field.name]}</FormLabel>
-                  <Select
-                    disabled={isPending}
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Выберите роль" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value={Role.ADMIN}>
-                        {translateRole[Role.ADMIN]}
-                      </SelectItem>
-                      <SelectItem value={Role.OPERATOR}>
-                        {translateRole[Role.OPERATOR]}
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
+            <FormFieldRoleSelect
+              form={form}
+              translate={translateColumnsEmployees}
+              isPending={isPending}
             />
           </div>
         </div>
