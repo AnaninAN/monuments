@@ -51,7 +51,7 @@ export const UnitForm = ({ id }: { id?: number }) => {
           }
           if (data?.success) {
             router.refresh();
-            form.reset();
+            if (!id) form.reset();
             setLoadingUnits(true);
             toast.success(data.success);
           }

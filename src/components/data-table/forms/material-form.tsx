@@ -43,10 +43,8 @@ export const MaterialForm = ({ id }: { id?: number }) => {
       unit: {
         name: '',
       },
-      warehouseId: undefined,
-      warehouse: {
-        name: undefined,
-      },
+      warehouseId: null,
+      warehouse: { name: '' },
     },
   });
 
@@ -155,7 +153,7 @@ export const MaterialForm = ({ id }: { id?: number }) => {
           }
           if (data?.success) {
             router.refresh();
-            form.reset();
+            if (!id) form.reset();
             toast.success(data.success);
           }
         })

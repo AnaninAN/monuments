@@ -66,7 +66,7 @@ export function UserForm({ id }: { id?: number }) {
           }
           if (data?.success) {
             router.refresh();
-            form.reset();
+            if (!id) form.reset();
             toast.success(data.success);
           }
         })

@@ -59,7 +59,7 @@ export const CounterpartyTypeForm = ({ id }: { id?: number }) => {
           }
           if (data?.success) {
             router.refresh();
-            form.reset();
+            if (!id) form.reset();
             setloadingCounterpartyTypes(true);
             toast.success(data.success);
           }

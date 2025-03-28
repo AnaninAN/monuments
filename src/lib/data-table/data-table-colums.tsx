@@ -22,7 +22,7 @@ export function dataTableColumns<T, K extends string>(
     columns.map(({ key, sort }) => {
       if (key !== 'status') {
         col.push({
-          accessorKey: key,
+          accessorKey: key.replace('_', '.'),
           header: ({ column }) =>
             dataTableColumnHeader<T, K>(column, translateColumns, sort),
         });

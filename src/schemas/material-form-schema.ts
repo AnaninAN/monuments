@@ -15,10 +15,12 @@ export const MaterialFormSchema = z.object({
   unit: z.object({
     name: z.string().min(1, 'Необходимо выбрать ед. измерения!'),
   }),
-  warehouseId: z.number().optional(),
-  warehouse: z.object({
-    name: z.string().optional(),
-  }),
+  warehouseId: z.number().nullable(),
+  warehouse: z
+    .object({
+      name: z.string(),
+    })
+    .nullable(),
 });
 
 export type TMaterialFormData = z.infer<typeof MaterialFormSchema>;
