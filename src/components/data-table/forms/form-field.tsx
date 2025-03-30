@@ -61,7 +61,6 @@ type FormFieldSelectProps<T extends FieldValues = FieldValues> =
 type FormFieldStatusSelectProps<T extends FieldValues = FieldValues> = {
   isPending: boolean;
   form: UseFormReturn<T>;
-  translate: Record<string, string>;
 };
 
 type FormFieldRoleSelectProps<T extends FieldValues = FieldValues> = {
