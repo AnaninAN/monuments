@@ -79,7 +79,7 @@ export const NavUser = ({ user }: NavUserProps) => {
             <LogoutButton>
               <DropdownMenuItem>
                 <LogOut />
-                Log out
+                Выйти
               </DropdownMenuItem>
             </LogoutButton>
           </DropdownMenuContent>

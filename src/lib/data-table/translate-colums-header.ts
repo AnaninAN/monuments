@@ -49,6 +49,7 @@ export const translateColumnsUnits: Record<KeyTUnitFormData, string> = {
   id: '№',
   name: 'Наименование',
   status: 'Статус',
+  comment: 'Коментарий',
 };
 
 export const translateColumnsMaterials: Record<KeyTMaterialFormData, string> = {
@@ -62,4 +63,13 @@ export const translateColumnsMaterials: Record<KeyTMaterialFormData, string> = {
   unit_name: 'Единица измерения',
   warehouse_name: 'Склад хранения',
   comment: 'Коментарий',
+};
+
+export const translateColumnActions: Record<string, string> = {
+  actions: 'Действия',
+};
+
+export const translateColumnLogin: Record<string, string> = {
+  email: 'Email',
+  password: 'Пароль',
 };

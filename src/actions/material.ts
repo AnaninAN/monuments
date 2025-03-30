@@ -25,7 +25,6 @@ export const material = async (values: TMaterialFormData, id?: number) => {
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { materialGroup, unit, warehouse, ...newValues } = values;
-
     await db.material.update({
       where: { id },
       data: { ...newValues },
@@ -47,13 +46,8 @@ export const material = async (values: TMaterialFormData, id?: number) => {
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { materialGroup, unit, warehouse, ...newValues } = values;
-
-    console.log(newValues);
-
     await db.material.create({
-      data: {
-        ...newValues,
-      },
+      data: { ...newValues },
     });
 
     return { success: 'Материал создан!' };

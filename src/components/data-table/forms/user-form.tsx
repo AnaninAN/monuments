@@ -1,10 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
 
 import { Form } from '@/components/ui/form';
 import { FormHeader } from '@/components/data-table/forms/form-header';
@@ -14,63 +10,31 @@ import {
   FormFieldRoleSelect,
 } from '@/components/data-table/forms/form-field';
 
-import { TUserFormData, UserFormSchema } from '@/schemas/user-form-schema';
-import { Api } from '@/services/api-client';
-import { user } from '@/actions/user';
+import { TUserFormData } from '@/schemas/user-form-schema';
 import { translateColumnsEmployees } from '@/lib/data-table/translate-colums-header';
 import { useTransitionNoErrors } from '@/hooks/use-transition-no-errors';
+import { useUserData } from '@/hooks/data-table/use-user-data';
 
 const primaryPhoneOptions = {
   mask: '+7 (___) ___-__-__',
   replacement: { _: /\d/ },
 };
 
-export function UserForm({ id }: { id?: number }) {
-  const form = useForm<TUserFormData>({
-    resolver: zodResolver(UserFormSchema),
-    defaultValues: {
-      email: '',
-      name: '',
-      lastname: '',
-      status: 'ACTIVE',
-      role: 'OPERATOR',
-      phoneNumber: '',
-    },
-  });
+interface UserFormProps {
+  id?: number;
+}
 
+export function UserForm({ id }: UserFormProps) {
   const router = useRouter();
-
+  const { form, handleUserSubmit } = useUserData(id);
   const { isPending, startTransitionNoErrors } = useTransitionNoErrors(form);
-
-  useEffect(() => {
-    if (id) {
-      (async function () {
-        const data = await Api.users.fetchUserByIdInt(id);
-
-        form.setValue('email', data.email);
-        form.setValue('name', data.name);
-        form.setValue('lastname', data.lastname);
-        form.setValue('role', data.role);
-        form.setValue('status', data.status);
-        form.setValue('phoneNumber', data.phoneNumber);
-      })();
-    }
-  }, [form, id]);
 
   const onSubmit = (values: TUserFormData) => {
     startTransitionNoErrors(() => {
-      user(values, id)
-        .then((data) => {
-          if (data?.error) {
-            toast.error(data.error);
-          }
-          if (data?.success) {
-            router.refresh();
-            if (!id) form.reset();
-            toast.success(data.success);
-          }
-        })
-        .catch(() => toast.error('Что-то пошло не так!'));
+      handleUserSubmit(values, id, () => {
+        router.refresh();
+        if (!id) form.reset();
+      });
     });
   };
 

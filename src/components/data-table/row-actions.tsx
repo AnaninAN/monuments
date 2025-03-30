@@ -29,7 +29,7 @@ export const RowActions = ({ id, name, actionDel }: RowActionsProps) => {
       cancelLabel: 'Отмена',
       actionLabel: 'Удалить',
       onAction: () => {
-        actionDel!(id)
+        actionDel?.(id)
           .then((data) => {
             if (data?.error) {
               toast.error(data.error);

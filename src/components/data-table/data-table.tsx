@@ -32,6 +32,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { ChevronDown } from 'lucide-react';
+import { translateColumnActions } from '@/lib/data-table/translate-colums-header';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -104,7 +105,9 @@ export function DataTable<TData, TValue>({
                       }
                     >
                       {translateColumns
-                        ? translateColumns[column.id]
+                        ? { ...translateColumns, ...translateColumnActions }[
+                            column.id
+                          ]
                         : column.id}
                     </DropdownMenuCheckboxItem>
                   );

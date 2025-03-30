@@ -2,11 +2,18 @@ import { z } from 'zod';
 
 export const MaterialFormSchema = z.object({
   image: z.string().optional(),
-  name: z.string().min(1, 'Пустое значение не допустимо!'),
-  article: z.string(),
+  name: z
+    .string()
+    .min(1, 'Пустое значение не допустимо!')
+    .max(50, 'Наименование не должно превышать 50 символов!')
+    .trim(),
+  article: z.string().trim(),
   priceIn: z.coerce.number(),
   minBalance: z.coerce.number(),
-  comment: z.string(),
+  comment: z
+    .string()
+    .max(100, 'Комментарий не должен превышать 100 символов!')
+    .trim(),
   materialGroupId: z.number(),
   materialGroup: z.object({
     name: z.string().min(1, 'Необходимо выбрать группу!'),

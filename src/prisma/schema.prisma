@@ -18,6 +18,124 @@ enum Status {
   ARCHIVE
 }
 
+enum EntityType {
+  MATERIAL
+  DETAIL
+  PRODUCT
+  SERVICE
+}
+
+enum MovementType {
+  IN
+  OUT
+  TRANSFER  
+}
+
+enum OrderType {
+  SALE
+  PURCHASE
+}
+
+enum OrderStatus {
+  DRAFT
+  CONFIRMED
+  IN_PROCESS
+  COMPLETED
+  CANCELLED
+}
+
+enum StockAlertType {
+  LOW_STOCK
+  REORDER_POINT
+  EXPIRY
+  OVERSTOCK
+}
+
+enum NotificationType {
+  STOCK_ALERT
+  ORDER_STATUS
+  PRODUCTION_STATUS
+  QUALITY_ALERT
+}
+
+enum NotificationPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum NotificationStatus {
+  NEW
+  READ
+  ARCHIVED
+}
+
+enum PaymentType {
+  CASH
+  BANK
+  CARD
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
+}
+
+enum DocumentType {
+  INVOICE
+  DELIVERY_NOTE
+  QUALITY_CERTIFICATE
+}
+
+enum DocumentStatus {
+  DRAFT
+  CONFIRMED
+  ARCHIVED
+}
+
+enum ProductionOrderStatus {
+  PLANNED
+  IN_PROCESS
+  COMPLETED
+  CANCELLED
+}
+
+enum ProductionOperationStatus {
+  PLANNED
+  IN_PROCESS
+  COMPLETED
+}
+
+enum QualityCheckType {
+  INCOMING
+  IN_PROCESS
+  FINAL
+}
+
+enum QualityCheckStatus {
+  PENDING
+  PASSED
+  FAILED
+}
+
+enum BatchStatus {
+  ACTIVE
+  USED
+  EXPIRED
+}
+
+enum SerialNumberStatus {
+  NEW
+  IN_USE
+  SCRAPPED
+}
+
+enum PriceType {
+  IN
+  OUT
+}
+
 model User {
   id                  String                    @id @default(cuid())
   idInt               Int                       @unique
@@ -37,6 +155,9 @@ model User {
   isTwoFactorEnabled  Boolean                   @default(false)
   
   twoFactorConfirmation TwoFactorConfirmation?
+  
+  notifications       Notification[]
+  notificationPreferences NotificationPreference[]
   
   createdAt           DateTime                  @default(now())
   updatedAt           DateTime                  @updatedAt
@@ -108,9 +229,6 @@ model Counterparty {
   name                String            @unique
   status              Status            @default(ACTIVE)
 
-  counterpartyTypeId  Int
-  counterpartyType    CounterpartyType  @relation(fields: [counterpartyTypeId], references: [id])
-
   legalAddress        String            @default("")
   phone               String            @default("")
   email               String            @default("")
@@ -118,6 +236,11 @@ model Counterparty {
   KPP                 String            @default("")
   OGRN                String            @default("")
   comment             String            @default("")
+
+  orders              Order[]
+
+  counterpartyTypeId  Int
+  counterpartyType    CounterpartyType  @relation(fields: [counterpartyTypeId], references: [id])
 
   createdAt           DateTime          @default(now())
   updatedAt           DateTime          @updatedAt
@@ -127,10 +250,13 @@ model Unit {
   id        Int         @id @default(autoincrement())
   name      String      @unique
   status    Status      @default(ACTIVE)
+  comment   String      @default("")
 
   material  Material[]
+  product   Product[]
+  detail    Detail[]
   
-  createdAt DateTime    @default(now())
+  createdAt DateTime    @default(now())   
   updatedAt DateTime    @updatedAt
 }
 
@@ -154,43 +280,225 @@ model Warehouse {
   comment   String      @default("")
 
   material  Material[]
+  product   Product[]
+  detail    Detail[]
+  movements StockMovement[]
 
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
 }
 
 model Product {
-  id          Int     @id @default(autoincrement())
-  kod         String  @unique
-  name        String  @unique
-  price_in    Int     @default(0)
-  price_out   Int     @default(0)
-  count       Int     @default(0)
+  id          Int          @id @default(autoincrement())
+  kod         String       @unique
+  name        String       @unique
+  description String       @default("")
+  priceIn     Int          @default(0)
+  priceOut    Int          @default(0)
+  count       Int          @default(0)
+  status      Status       @default(ACTIVE)
+  comment     String       @default("")
+  image       String       @default("")
+  article     String       @default("")
+  minBalance  Int          @default(0)
 
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  materials   ProductMaterial[]
+  details     ProductDetail[]
+  services    ProductService[]
+  productionOrders ProductionOrder[]
+
+  unitId      Int
+  unit        Unit         @relation(fields: [unitId], references: [id])
+
+  warehouseId Int?           
+  warehouse   Warehouse?    @relation(fields: [warehouseId], references: [id])
+
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([warehouseId])
+}
+
+model Detail {
+  id          Int          @id @default(autoincrement())
+  kod         String       @unique
+  name        String       @unique
+  description String       @default("")
+  priceIn     Int          @default(0)
+  priceOut    Int          @default(0)
+  count       Int          @default(0)
+  status      Status       @default(ACTIVE)
+  comment     String       @default("")
+  image       String       @default("")
+  article     String       @default("")
+  minBalance  Int          @default(0)
+
+  materials   DetailMaterial[]
+  services    DetailService[]
+  products    ProductDetail[]
+
+  unitId      Int
+  unit        Unit         @relation(fields: [unitId], references: [id])
+
+  warehouseId Int?           
+  warehouse   Warehouse?    @relation(fields: [warehouseId], references: [id])
+
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([warehouseId])
+}
+
+model Service {
+  id          Int          @id @default(autoincrement())
+  name        String       @unique
+  description String       @default("")
+  price       Int          @default(0)
+  status      Status       @default(ACTIVE)
+  comment     String       @default("")
+
+  details     DetailService[]
+  products    ProductService[]
+
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model ProductMaterial {
+  id          Int       @id @default(autoincrement())
+  productId   Int
+  materialId  Int
+  quantity    Int
+  price       Int       // Цена на момент добавления
+  
+  product     Product   @relation(fields: [productId], references: [id])
+  material    Material  @relation(fields: [materialId], references: [id])
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([productId, materialId])
+  @@index([productId])
+  @@index([materialId])
+}
+
+model ProductDetail {
+  id          Int       @id @default(autoincrement())
+  productId   Int
+  detailId    Int
+  quantity    Int
+  price       Int       // Цена на момент добавления
+  
+  product     Product   @relation(fields: [productId], references: [id])
+  detail      Detail    @relation(fields: [detailId], references: [id])
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([productId, detailId])
+  @@index([productId])
+  @@index([detailId])
+}
+
+model ProductService {
+  id          Int       @id @default(autoincrement())
+  productId   Int
+  serviceId   Int
+  quantity    Int
+  price       Int       // Цена на момент добавления
+  
+  product     Product   @relation(fields: [productId], references: [id])
+  service     Service   @relation(fields: [serviceId], references: [id])
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([productId, serviceId])
+  @@index([productId])
+  @@index([serviceId])
+}
+
+model DetailMaterial {
+  id          Int       @id @default(autoincrement())
+  detailId    Int
+  materialId  Int
+  quantity    Int
+  price       Int       // Цена на момент добавления
+  
+  detail      Detail    @relation(fields: [detailId], references: [id])
+  material    Material  @relation(fields: [materialId], references: [id])
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([detailId, materialId])
+  @@index([detailId])
+  @@index([materialId])
+}
+
+model DetailService {
+  id          Int       @id @default(autoincrement())
+  detailId    Int
+  serviceId   Int
+  quantity    Int
+  price       Int       // Цена на момент добавления
+  
+  detail      Detail    @relation(fields: [detailId], references: [id])
+  service     Service   @relation(fields: [serviceId], references: [id])
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([detailId, serviceId])
+  @@index([detailId])
+  @@index([serviceId])
 }
 
 model Material {
-  id              Int           @id @default(autoincrement())
-  image           String        @default("")
-  name            String        @unique
-  article         String        @default("")
-  priceIn         Int           @default(0)
-  minBalance      Int           @default(0)
-  comment         String        @default("") 
-  
-  materialGroupId Int
-  materialGroup   MaterialGroup @relation(fields: [materialGroupId], references: [id])
-  
-  unitId          Int
-  unit            Unit          @relation(fields: [unitId], references: [id])
+  id                  Int           @id @default(autoincrement())
+  image               String        @default("")
+  name                String        @unique
+  article             String        @default("")
+  priceIn             Int           @default(0)
+  priceOut            Int           @default(0)
+  count               Int           @default(0)
+  minBalance          Int           @default(0)
+  comment             String        @default("")
+  status              Status        @default(ACTIVE)
 
-  warehouseId     Int?           
-  warehouse       Warehouse?    @relation(fields: [warehouseId], references: [id])
+  movements           MaterialMovement[]
+  productMaterials    ProductMaterial[]
+  detailMaterials     DetailMaterial[]
+  operationMaterials  OperationMaterial[]
+  
+  materialGroupId     Int
+  materialGroup       MaterialGroup @relation(fields: [materialGroupId], references: [id])
+  
+  unitId              Int
+  unit                Unit          @relation(fields: [unitId], references: [id])
 
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  warehouseId         Int?           
+  warehouse           Warehouse?    @relation(fields: [warehouseId], references: [id])
+
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  @@index([warehouseId])
+}
+
+model MaterialMovement {
+  id          Int           @id @default(autoincrement())
+  materialId  Int
+  material    Material      @relation(fields: [materialId], references: [id])
+  type        MovementType
+  quantity    Int
+  price       Int
+  comment     String        @default("")
+  
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([materialId])
 }
 
 model MaterialGroup {
@@ -202,4 +510,357 @@ model MaterialGroup {
 
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
+}
+
+model PriceHistory {
+  id          Int       @id @default(autoincrement())
+  entityType  EntityType
+  entityId    Int
+  priceType   PriceType
+  price       Int
+  startDate   DateTime
+  endDate     DateTime?
+  comment     String    @default("")
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([entityType, entityId])
+}
+
+model StockMovement {
+  id          Int         @id @default(autoincrement())
+  entityType  EntityType
+  entityId    Int
+  type        MovementType
+  quantity    Int
+  price       Int
+  comment     String      @default("")
+  
+  warehouseId Int?
+  warehouse   Warehouse? @relation(fields: [warehouseId], references: [id]) 
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([entityType, entityId])
+  @@index([warehouseId])
+}
+
+// Управление продажами и закупками
+model Order {
+  id              Int           @id @default(autoincrement())
+  number          String        @unique
+  type            OrderType
+  status          OrderStatus
+  date            DateTime
+  deliveryDate    DateTime?
+  totalAmount     Int
+  comment         String        @default("")
+
+  items           OrderItem[]
+  payments        Payment[]
+  documents       Document[]
+
+  counterpartyId  Int
+  counterparty    Counterparty  @relation(fields: [counterpartyId], references: [id])
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([counterpartyId])
+}
+
+model OrderItem {
+  id          Int       @id @default(autoincrement())
+  entityType  EntityType
+  entityId    Int
+  quantity    Int
+  price       Int
+  amount      Int
+  comment     String    @default("")
+
+  orderId     Int
+  order       Order     @relation(fields: [orderId], references: [id])
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([orderId])
+  @@index([entityType, entityId])
+}
+
+model Payment {
+  id          Int             @id @default(autoincrement())
+  amount      Int
+  date        DateTime
+  type        PaymentType
+  status      PaymentStatus
+  comment     String          @default("")
+
+  orderId     Int
+  order       Order           @relation(fields: [orderId], references: [id])
+
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([orderId])
+}
+
+// Управление производством
+model ProductionOrder {
+  id                  Int                     @id @default(autoincrement())
+  number              String                  @unique
+  status              ProductionOrderStatus
+  startDate           DateTime
+  endDate             DateTime?
+  quantity            Int
+  completedQuantity   Int                     @default(0)
+  comment             String                  @default("")
+
+  operations          ProductionOperation[]
+  qualityChecks       QualityCheck[]
+
+  productId           Int
+  product             Product                 @relation(fields: [productId], references: [id])
+
+  createdAt           DateTime                @default(now())
+  updatedAt           DateTime                @updatedAt
+
+  @@index([productId])
+}
+
+model ProductionOperation {
+  id                  Int                     @id @default(autoincrement())
+  sequence            Int
+  name                String
+  description         String                  @default("")
+  status              ProductionOperationStatus
+  startDate           DateTime?
+  endDate             DateTime?
+  quantity            Int
+  completedQuantity   Int                     @default(0)
+  comment             String                  @default("")
+
+  materials           OperationMaterial[]
+  tools               OperationTool[]
+  
+  productionOrderId   Int
+  productionOrder     ProductionOrder         @relation(fields: [productionOrderId], references: [id])
+  
+  workCenterId        Int?
+  workCenter          WorkCenter?             @relation(fields: [workCenterId], references: [id])
+
+  createdAt           DateTime                @default(now())
+  updatedAt           DateTime                @updatedAt
+
+  @@index([productionOrderId])
+  @@index([workCenterId])
+}
+
+model WorkCenter {
+  id              Int                   @id @default(autoincrement())
+  name            String                @unique
+  description     String                @default("")
+  status          Status                @default(ACTIVE)
+  capacity        Int                   @default(1)
+  comment         String                @default("")
+
+  operations      ProductionOperation[]
+  tools           Tool[]
+
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+}
+
+model Tool {
+  id              Int                   @id @default(autoincrement())
+  name            String                @unique
+  description     String                @default("")
+  status          Status                @default(ACTIVE)
+  comment         String                @default("")
+
+  operations      OperationTool[]
+
+  workCenterId    Int?
+  workCenter      WorkCenter?           @relation(fields: [workCenterId], references: [id])
+
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+
+  @@index([workCenterId])
+}
+
+model OperationMaterial {
+  id                  Int               @id @default(autoincrement())
+  quantity            Int
+  comment             String            @default("")
+  
+  operationId         Int
+  operation           ProductionOperation @relation(fields: [operationId], references: [id])
+  
+  materialId          Int
+  material            Material           @relation(fields: [materialId], references: [id])
+
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+
+  @@unique([operationId, materialId])
+  @@index([operationId])
+  @@index([materialId])
+}
+
+model OperationTool {
+  id                  Int               @id @default(autoincrement())
+  comment             String            @default("")
+  
+  operationId         Int
+  operation           ProductionOperation @relation(fields: [operationId], references: [id])
+  
+  toolId              Int
+  tool                Tool               @relation(fields: [toolId], references: [id])
+
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+
+  @@unique([operationId, toolId])
+  @@index([operationId])
+  @@index([toolId])
+}
+
+// Контроль качества
+model QualityCheck {
+  id                  Int                 @id @default(autoincrement())
+  type                QualityCheckType
+  status              QualityCheckStatus
+  date                DateTime
+  quantity            Int
+  checkedQuantity     Int
+  passedQuantity      Int
+  comment             String              @default("")
+
+  productionOrderId   Int
+  productionOrder     ProductionOrder     @relation(fields: [productionOrderId], references: [id])
+
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+
+  @@index([productionOrderId])
+}
+
+// Управление документами
+model Document {
+  id          Int             @id @default(autoincrement())
+  type        DocumentType
+  number      String          @unique
+  date        DateTime
+  status      DocumentStatus
+  fileUrl     String
+  comment     String          @default("")
+
+  orderId     Int?
+  order       Order?          @relation(fields: [orderId], references: [id])
+
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([orderId])
+}
+
+// Batch/Lot Tracking
+model Batch {
+  id              Int           @id @default(autoincrement())
+  number          String        @unique
+  entityType      EntityType
+  entityId        Int
+  quantity        Int
+  productionDate  DateTime
+  expiryDate      DateTime?
+  status          BatchStatus
+  comment         String        @default("")
+
+  serialNumbers   SerialNumber[]
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([entityType, entityId])
+}
+
+// Serial Number Tracking
+model SerialNumber {
+  id              Int               @id @default(autoincrement())
+  number          String            @unique
+  entityType      EntityType
+  entityId        Int
+  status          SerialNumberStatus
+  comment         String            @default("")
+
+  batchId         Int?
+  batch           Batch?            @relation(fields: [batchId], references: [id])
+
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@index([entityType, entityId])
+  @@index([batchId])
+}
+
+// Оповещения и уведомления об уровне запасов
+model StockAlert {
+  id              Int             @id @default(autoincrement())
+  entityType      EntityType
+  entityId        Int
+  type            StockAlertType
+  threshold       Int
+  currentValue    Int
+  isActive        Boolean         @default(true)
+  comment         String          @default("")
+
+  notifications   Notification[]
+
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@index([entityType, entityId])
+}
+
+model Notification {
+  id              Int                 @id @default(autoincrement())
+  type            NotificationType
+  title           String
+  message         String
+  priority        NotificationPriority
+  status          NotificationStatus
+  readAt          DateTime?
+  comment         String              @default("")
+
+  userId          String?
+  user            User?               @relation(fields: [userId], references: [id])
+  
+  stockAlertId    Int?
+  stockAlert      StockAlert?         @relation(fields: [stockAlertId], references: [id])
+
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+
+  @@index([userId])
+  @@index([stockAlertId])
+}
+
+model NotificationPreference {
+  id              Int                 @id @default(autoincrement())
+  type            NotificationType
+  priority        NotificationPriority
+  isEnabled       Boolean             @default(true)
+  comment         String              @default("")
+
+  userId          String
+  user            User                @relation(fields: [userId], references: [id])
+
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+
+  @@unique([userId, type, priority])
+  @@index([userId])
 }

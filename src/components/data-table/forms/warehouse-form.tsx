@@ -1,10 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
 
 import { Form } from '@/components/ui/form';
 import { FormHeader } from '@/components/data-table/forms/form-header';
@@ -13,57 +9,25 @@ import {
   FormFieldTextarea,
 } from '@/components/data-table/forms/form-field';
 
-import { Api } from '@/services/api-client';
-import { warehouse } from '@/actions/warehouse';
-import {
-  TWarehouseFormData,
-  WarehouseFormSchema,
-} from '@/schemas/warehouse-form-schema';
+import { TWarehouseFormData } from '@/schemas/warehouse-form-schema';
 import { translateColumnsWarehouses } from '@/lib/data-table/translate-colums-header';
 import { useTransitionNoErrors } from '@/hooks/use-transition-no-errors';
+import { useLoadingSelectStore } from '@/store/loading-select';
+import { useWarehouseData } from '@/hooks/data-table/use-warehouse-data';
 
 export function WarehouseForm({ id }: { id?: number }) {
-  const form = useForm<TWarehouseFormData>({
-    resolver: zodResolver(WarehouseFormSchema),
-    defaultValues: {
-      name: '',
-      shortName: '',
-      comment: '',
-      status: 'ACTIVE',
-    },
-  });
-
   const router = useRouter();
-
+  const { form, handleWarehouseSubmit } = useWarehouseData(id);
+  const { setLoadingWarehouses } = useLoadingSelectStore();
   const { isPending, startTransitionNoErrors } = useTransitionNoErrors(form);
-
-  useEffect(() => {
-    if (id) {
-      (async function () {
-        const data = await Api.warehouses.fetchWarehouseById(id);
-
-        form.setValue('name', data.name);
-        form.setValue('shortName', data.shortName);
-        form.setValue('status', data.status);
-        form.setValue('comment', data.comment);
-      })();
-    }
-  }, [form, id]);
 
   const onSubmit = (values: TWarehouseFormData) => {
     startTransitionNoErrors(() => {
-      warehouse(values, id)
-        .then((data) => {
-          if (data?.error) {
-            toast.error(data.error);
-          }
-          if (data?.success) {
-            router.refresh();
-            if (!id) form.reset();
-            toast.success(data.success);
-          }
-        })
-        .catch(() => toast.error('Что-то пошло не так!'));
+      handleWarehouseSubmit(values, id, () => {
+        router.refresh();
+        if (!id) form.reset();
+        setLoadingWarehouses(true);
+      });
     });
   };
 
@@ -105,6 +69,7 @@ export function WarehouseForm({ id }: { id?: number }) {
               name="comment"
               placeholder="Введите комментарий"
               translate={translateColumnsWarehouses}
+              isPending={isPending}
             />
           </div>
         </div>

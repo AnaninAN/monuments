@@ -39,7 +39,7 @@ type FormFieldProps<T extends FieldValues = FieldValues> = {
   form: UseFormReturn<T>;
   translate: Record<string, string>;
   placeholder: string;
-  type?: 'text' | 'number' | 'file';
+  type?: 'text' | 'number' | 'file' | 'password';
   className?: string;
   ButtonOpenForm?: React.ComponentType;
 };
@@ -52,7 +52,7 @@ type FormFieldInputMaskProps<T extends FieldValues = FieldValues> =
 
 type FormFieldTextareaProps<T extends FieldValues = FieldValues> = Omit<
   FormFieldProps<T>,
-  'isPending' | 'type'
+  'type'
 >;
 
 type FormFieldSelectProps<T extends FieldValues = FieldValues> =
@@ -61,6 +61,7 @@ type FormFieldSelectProps<T extends FieldValues = FieldValues> =
 type FormFieldStatusSelectProps<T extends FieldValues = FieldValues> = {
   isPending: boolean;
   form: UseFormReturn<T>;
+  translate: Record<string, string>;
 };
 
 type FormFieldRoleSelectProps<T extends FieldValues = FieldValues> = {
@@ -157,6 +158,7 @@ export function FormFieldTextarea<T extends FieldValues = FieldValues>({
   form,
   translate,
   placeholder,
+  isPending,
 }: FormFieldTextareaProps<T>) {
   return (
     <FormField
@@ -176,6 +178,7 @@ export function FormFieldTextarea<T extends FieldValues = FieldValues>({
             <Textarea
               placeholder={placeholder}
               className="resize-none"
+              disabled={isPending}
               {...field}
             />
           </FormControl>
@@ -310,7 +313,7 @@ export function FormFieldRoleSelect<T extends FieldValues = FieldValues>({
             <Select
               disabled={isPending}
               onValueChange={field.onChange}
-              defaultValue={field.value}
+              value={field.value}
             >
               <FormControl>
                 <SelectTrigger>

@@ -2,58 +2,31 @@
 
 import { useTransition } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
+import { Form } from '@/components/ui/form';
 
-import {
-  LoginFormSchema,
-  type TLoginFormData,
-} from '@/schemas/login-form-schema';
-import { login } from '@/actions/login';
+import { type TLoginFormData } from '@/schemas/login-form-schema';
+import { useLoginData } from '@/hooks/data-table/use-login-data';
+import { FormFieldInput } from '../data-table/forms/form-field';
+import { translateColumnLogin } from '@/lib/data-table/translate-colums-header';
 
 export function LoginForm() {
   const searchParams = useSearchParams();
-
   const callbackUrl = searchParams.get('callbackUrl');
+  const [isPending, startTransition] = useTransition();
+  const { form, handleLoginSubmit } = useLoginData();
+
   const urlError =
     searchParams.get('error') === 'OAuthAccountNotLinked'
       ? 'email уже используется у другого провайдера'
       : '';
 
-  const [isPending, startTransition] = useTransition();
-
-  const form = useForm<TLoginFormData>({
-    resolver: zodResolver(LoginFormSchema),
-    defaultValues: {
-      email: '',
-      password: '',
-    },
-  });
-
   const onSubmit = (values: TLoginFormData) => {
     startTransition(() => {
-      login(values, callbackUrl).then((data) => {
-        if (data?.error) {
-          form.reset();
-          toast.error(data.error || urlError);
-        }
-        if (data?.success) {
-          form.reset();
-          toast.success(data.success);
-        }
+      handleLoginSubmit(values, callbackUrl, urlError, () => {
+        form.reset();
       });
     });
   };
@@ -72,45 +45,24 @@ export function LoginForm() {
                   </p>
                 </div>
                 <div className="grid gap-2">
-                  <FormField
-                    control={form.control}
+                  <FormFieldInput
+                    form={form}
                     name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            placeholder="test@monuments.ru"
-                            disabled={isPending}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
+                    placeholder="test@monuments.ru"
+                    translate={translateColumnLogin}
+                    isPending={isPending}
                   />
                 </div>
                 <div className="grid gap-2">
-                  <FormField
-                    control={form.control}
+                  <FormFieldInput
+                    form={form}
                     name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Пароль</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            placeholder="введите пароль"
-                            type="password"
-                            disabled={isPending}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
+                    placeholder="Введите пароль"
+                    translate={translateColumnLogin}
+                    isPending={isPending}
+                    type="password"
                   />
                 </div>
-
                 <Button
                   type="submit"
                   className="w-full mt-1"

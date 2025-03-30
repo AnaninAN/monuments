@@ -1,62 +1,38 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
 
 import { Form } from '@/components/ui/form';
 import { FormHeader } from '@/components/data-table/forms/form-header';
-import { FormFieldInput } from '@/components/data-table/forms/form-field';
+import {
+  FormFieldInput,
+  FormFieldTextarea,
+} from '@/components/data-table/forms/form-field';
 
-import { Api } from '@/services/api-client';
-import { TUnitFormData, UnitFormSchema } from '@/schemas/unit-form-schema';
-import { unit } from '@/actions/unit';
+import { TUnitFormData } from '@/schemas/unit-form-schema';
 import { translateColumnsUnits } from '@/lib/data-table/translate-colums-header';
-import { useMaterialSelectStore } from '@/store/material-select';
 import { useTransitionNoErrors } from '@/hooks/use-transition-no-errors';
+import { useUnitData } from '@/hooks/data-table/use-unit-data';
 
-export const UnitForm = ({ id }: { id?: number }) => {
-  const form = useForm<TUnitFormData>({
-    resolver: zodResolver(UnitFormSchema),
-    defaultValues: {
-      name: '',
-      status: 'ACTIVE',
-    },
-  });
+import { useLoadingSelectStore } from '@/store/loading-select';
 
+interface UnitFormProps {
+  id?: number;
+}
+
+export const UnitForm = ({ id }: UnitFormProps) => {
   const router = useRouter();
-  const { setLoadingUnits } = useMaterialSelectStore();
-
+  const { form, handleUnitSubmit } = useUnitData(id);
+  const { setLoadingUnits } = useLoadingSelectStore();
   const { isPending, startTransitionNoErrors } = useTransitionNoErrors(form);
-
-  useEffect(() => {
-    if (id) {
-      (async function () {
-        const data = await Api.units.fetchUnitById(id);
-
-        form.setValue('name', data.name);
-        form.setValue('status', data.status);
-      })();
-    }
-  }, [form, id]);
 
   const onSubmit = (values: TUnitFormData) => {
     startTransitionNoErrors(() => {
-      unit(values, id)
-        .then((data) => {
-          if (data?.error) {
-            toast.error(data.error);
-          }
-          if (data?.success) {
-            router.refresh();
-            if (!id) form.reset();
-            setLoadingUnits(true);
-            toast.success(data.success);
-          }
-        })
-        .catch(() => toast.error('Что-то пошло не так!'));
+      handleUnitSubmit(values, id, () => {
+        router.refresh();
+        if (!id) form.reset();
+        setLoadingUnits(true);
+      });
     });
   };
 
@@ -78,6 +54,15 @@ export const UnitForm = ({ id }: { id?: number }) => {
             form={form}
             name="name"
             placeholder="Введите ед. измерения"
+            translate={translateColumnsUnits}
+            isPending={isPending}
+          />
+        </div>
+        <div className="grid gap-2">
+          <FormFieldTextarea
+            form={form}
+            name="comment"
+            placeholder="Введите комментарий"
             translate={translateColumnsUnits}
             isPending={isPending}
           />

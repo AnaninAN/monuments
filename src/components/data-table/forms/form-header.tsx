@@ -10,6 +10,7 @@ interface FormHeaderProps<T extends FieldValues = FieldValues> {
   title: string;
   isPending: boolean;
   form: UseFormReturn<T>;
+  setSubmit?: (flag: boolean) => void;
 }
 
 export function FormHeader<T extends FieldValues = FieldValues>({
@@ -18,6 +19,7 @@ export function FormHeader<T extends FieldValues = FieldValues>({
   form,
   isPending,
   title,
+  setSubmit,
 }: FormHeaderProps<T>) {
   return (
     <>
@@ -26,7 +28,11 @@ export function FormHeader<T extends FieldValues = FieldValues>({
           {id ? `Изменить ${title} №${id}` : `Добавить ${title}`}
         </h1>
         <div className="flex gap-4">
-          <Button type="submit" className="" disabled={isPending}>
+          <Button
+            onClick={() => setSubmit?.(true)}
+            type="submit"
+            disabled={isPending}
+          >
             {id ? 'Сохранить' : 'Создать'}
           </Button>
           {status && (

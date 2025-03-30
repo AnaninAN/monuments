@@ -1,11 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { MaterialGroup, Unit, Warehouse } from '@prisma/client';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
 
 import { Form } from '@/components/ui/form';
 import { FormHeader } from '@/components/data-table/forms/form-header';
@@ -15,118 +10,29 @@ import {
   FormFieldTextarea,
 } from '@/components/data-table/forms/form-field';
 import { UnitForm } from '@/components/data-table/forms/unit-form';
+import { WarehouseForm } from '@/components/data-table/forms/warehouse-form';
 
-import {
-  MaterialFormSchema,
-  TMaterialFormData,
-} from '@/schemas/material-form-schema';
-import { material } from '@/actions/material';
-import { Api } from '@/services/api-client';
+import { TMaterialFormData } from '@/schemas/material-form-schema';
 import { translateColumnsMaterials } from '@/lib/data-table/translate-colums-header';
-import { useMaterialSelectStore } from '@/store/material-select';
 import { useTransitionNoErrors } from '@/hooks/use-transition-no-errors';
+import { useStopPropagationStore } from '@/store/stop-propagation';
+import { useMaterialData } from '@/hooks/data-table/use-material-data';
 
-export const MaterialForm = ({ id }: { id?: number }) => {
-  const form = useForm<TMaterialFormData>({
-    resolver: zodResolver(MaterialFormSchema),
-    defaultValues: {
-      name: '',
-      comment: '',
-      article: '',
-      minBalance: undefined,
-      priceIn: undefined,
-      materialGroupId: 0,
-      materialGroup: {
-        name: '',
-      },
-      unitId: 0,
-      unit: {
-        name: '',
-      },
-      warehouseId: null,
-      warehouse: { name: '' },
-    },
-  });
+interface MaterialFormProps {
+  id?: number;
+}
 
+export const MaterialForm = ({ id }: MaterialFormProps) => {
   const router = useRouter();
-  const {
-    loadingUnits,
-    loadingMaterialGroups,
-    loadingWarehouses,
-    setLoadingMaterialGroups,
-    setLoadingUnits,
-    setLoadingWarehouses,
-  } = useMaterialSelectStore();
-
-  const [materialGroups, setMaterialGroups] = useState<MaterialGroup[]>([]);
-  const [units, setUnits] = useState<Unit[]>([]);
-  const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
-
-  const { isPending, startTransitionNoErrors } = useTransitionNoErrors(form);
-
-  useEffect(() => {
-    if (loadingMaterialGroups) {
-      (async function () {
-        const data = await Api.materialGroups.fetchAllMaterialGroups();
-        setMaterialGroups(data);
-      })();
-      setLoadingMaterialGroups(false);
-    }
-
-    if (loadingUnits) {
-      (async function () {
-        const data = await Api.units.fetchAllUnits();
-        setUnits(data);
-      })();
-      setLoadingUnits(false);
-    }
-
-    if (loadingWarehouses) {
-      (async function () {
-        const data = await Api.warehouses.fetchAllWarehouses();
-        setWarehouses(data);
-      })();
-      setLoadingWarehouses(false);
-    }
-  }, [
-    loadingMaterialGroups,
-    loadingUnits,
-    loadingWarehouses,
-    setLoadingMaterialGroups,
-    setLoadingUnits,
-    setLoadingWarehouses,
-  ]);
-
-  useEffect(() => {
-    if (id) {
-      (async function () {
-        const data = await Api.materials.fetchMaterialById(id);
-
-        form.setValue('name', data.name);
-        form.setValue('comment', data.comment);
-        form.setValue('article', data.article);
-        form.setValue('priceIn', data.priceIn);
-        form.setValue('minBalance', data.minBalance);
-        form.setValue('materialGroup.name', data.materialGroup.name);
-        form.setValue('unit.name', data.unit.name);
-        form.setValue('warehouse.name', data.warehouse?.name);
-      })();
-    }
-
-    return () => {
-      setLoadingMaterialGroups(true);
-      setLoadingUnits(true);
-      setLoadingWarehouses(true);
-    };
-  }, [
+  const { form, materialGroups, units, warehouses, handleMaterialSubmit } =
+    useMaterialData(id);
+  const { submit, setSubmit } = useStopPropagationStore();
+  const { isPending, startTransitionNoErrors } = useTransitionNoErrors(
     form,
-    id,
-    setLoadingMaterialGroups,
-    setLoadingUnits,
-    setLoadingWarehouses,
-  ]);
+    submit
+  );
 
-  const onSubmit = async (values: TMaterialFormData) => {
+  const transformFormData = (values: TMaterialFormData): TMaterialFormData => {
     const newMaterialGroupId =
       materialGroups.find((groups) => groups.name === values.materialGroup.name)
         ?.id || values.materialGroupId;
@@ -138,26 +44,22 @@ export const MaterialForm = ({ id }: { id?: number }) => {
         (warehouses) => warehouses.name === values.warehouse?.name
       )?.id || values?.warehouseId;
 
-    const newValues: typeof values = {
+    return {
       ...values,
       materialGroupId: newMaterialGroupId,
       unitId: newUnitId,
       warehouseId: newWarehouseId,
     };
+  };
+
+  const onSubmit = async (values: TMaterialFormData) => {
+    const transformedValues = transformFormData(values);
 
     startTransitionNoErrors(() => {
-      material(newValues, id)
-        .then((data) => {
-          if (data?.error) {
-            toast.error(data.error);
-          }
-          if (data?.success) {
-            router.refresh();
-            if (!id) form.reset();
-            toast.success(data.success);
-          }
-        })
-        .catch(() => toast.error('Что-то пошло не так!'));
+      handleMaterialSubmit(transformedValues, id, () => {
+        router.refresh();
+        if (!id) form.reset();
+      });
     });
   };
 
@@ -172,6 +74,7 @@ export const MaterialForm = ({ id }: { id?: number }) => {
           form={form}
           isPending={isPending}
           title="материал"
+          setSubmit={setSubmit}
         />
         <div className="space-y-4 px-8 py-2 overflow-auto h-[calc(100vh-190px)]">
           <div className="grid gap-2">
@@ -221,6 +124,7 @@ export const MaterialForm = ({ id }: { id?: number }) => {
               translate={translateColumnsMaterials}
               items={warehouses}
               isPending={isPending}
+              ButtonOpenForm={WarehouseForm}
             />
           </div>
           <div className="grid gap-2">
@@ -249,6 +153,7 @@ export const MaterialForm = ({ id }: { id?: number }) => {
               name="comment"
               placeholder="Введите комментарий"
               translate={translateColumnsMaterials}
+              isPending={isPending}
             />
           </div>
         </div>

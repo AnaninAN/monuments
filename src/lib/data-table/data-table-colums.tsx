@@ -4,41 +4,45 @@ import { DataSheet } from '@/components/data-table/data-sheet';
 import { CellStatus } from '@/components/data-table/cell-status';
 import { RowActions } from '@/components/data-table/row-actions';
 
-import { dataTableColumnHeader } from './data-table-column-header';
+import { dataTableColumnHeader } from '@/lib/data-table/data-table-column-header';
+import { translateColumnActions } from '@/lib/data-table/translate-colums-header';
 
 export type ColumnsType<K> = { key: K; sort: boolean }[];
 
-export function dataTableColumns<T, K extends string>(
+const renderColumns = <T extends Record<string, unknown>, K extends string>(
+  columns: ColumnsType<K>,
+  translateColumns: Record<K, string>
+): ColumnDef<T>[] => {
+  const col: ColumnDef<T>[] = [];
+  columns.forEach(({ key, sort }) => {
+    if (key !== 'status') {
+      col.push({
+        accessorKey: key.replace('_', '.'),
+        header: ({ column }) =>
+          dataTableColumnHeader<T, K>(column, translateColumns, sort),
+      });
+    } else {
+      col.push({
+        accessorKey: key,
+        header: ({ column }) =>
+          dataTableColumnHeader<T, K>(column, translateColumns),
+        cell: ({ row }) => <CellStatus value={row.getValue(key)} />,
+      });
+    }
+  });
+  return col;
+};
+
+export function dataTableColumns<
+  T extends Record<string, unknown>,
+  K extends string,
+>(
   key: K,
   columns: ColumnsType<K>,
   translateColumns: Record<K, string>,
   actionDel?: (id: number) => Promise<{ success?: string; error?: string }>,
-  FormComponent?: React.ComponentType<{
-    id?: number;
-  }>
+  FormComponent?: React.ComponentType<{ id?: number }>
 ): ColumnDef<T>[] {
-  const renderColumns = () => {
-    const col: ColumnDef<T>[] = [];
-    columns.map(({ key, sort }) => {
-      if (key !== 'status') {
-        col.push({
-          accessorKey: key.replace('_', '.'),
-          header: ({ column }) =>
-            dataTableColumnHeader<T, K>(column, translateColumns, sort),
-        });
-      } else {
-        col.push({
-          accessorKey: key,
-          header: ({ column }) =>
-            dataTableColumnHeader<T, K>(column, translateColumns),
-          cell: ({ row }) => <CellStatus value={row.getValue(key)} />,
-        });
-      }
-    });
-
-    return col;
-  };
-
   return [
     {
       accessorKey: key,
@@ -48,25 +52,25 @@ export function dataTableColumns<T, K extends string>(
         <div className="pl-3">
           <DataSheet
             id={row.getValue(key)}
-            trigger={row.getValue(key)}
-            className="bg-white p-1 text-blue-700 rounded-md hover:text-white hover:bg-blue-700 cursor-pointer"
+            trigger={String(row.getValue(key))}
             FormComponent={FormComponent}
+            className="bg-white p-1 text-blue-700 rounded-md hover:text-white hover:bg-blue-700 cursor-pointer"
           />
         </div>
       ),
     },
-    ...renderColumns(),
+    ...renderColumns<T, K>(columns, translateColumns),
     {
       id: 'actions',
-      cell: ({ row }) => {
-        return (
-          <RowActions
-            id={row.getValue(key) as number}
-            name={row.getValue('name')}
-            actionDel={actionDel}
-          />
-        );
-      },
+      header: ({ column }) =>
+        dataTableColumnHeader<T, K>(column, translateColumnActions),
+      cell: ({ row }) => (
+        <RowActions
+          id={row.getValue(key)}
+          name={row.getValue('name')}
+          actionDel={actionDel}
+        />
+      ),
     },
   ];
 }

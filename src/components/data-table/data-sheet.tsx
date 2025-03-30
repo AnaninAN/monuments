@@ -22,14 +22,14 @@ interface DataSheetProps {
 
 export function DataSheet({
   trigger,
-  className,
   FormComponent,
   id,
+  className,
 }: DataSheetProps) {
   return (
     <Sheet>
-      <SheetTrigger asChild className={className}>
-        <span>{trigger}</span>
+      <SheetTrigger asChild>
+        <span className={className}>{trigger}</span>
       </SheetTrigger>
       <SheetContent className="w-10/12">
         <SheetHeader>

@@ -1,10 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
 
 import { Form } from '@/components/ui/form';
 import { FormHeader } from '@/components/data-table/forms/form-header';
@@ -13,58 +9,25 @@ import {
   FormFieldTextarea,
 } from '@/components/data-table/forms/form-field';
 
-import {
-  CounterpartyTypeFormSchema,
-  TCounterpartyTypeFormData,
-} from '@/schemas/counterparty-type-form-schema';
-import { counterpartyType } from '@/actions/counterparty-type';
-import { Api } from '@/services/api-client';
+import { TCounterpartyTypeFormData } from '@/schemas/counterparty-type-form-schema';
 import { translateColumnsCounterpartyType } from '@/lib/data-table/translate-colums-header';
-import { useCounterpartySelectStore } from '@/store/counterparty-select';
+import { useLoadingSelectStore } from '@/store/loading-select';
 import { useTransitionNoErrors } from '@/hooks/use-transition-no-errors';
+import { useCounterpartyTypeData } from '@/hooks/data-table/use-counterparty-type-data';
 
 export const CounterpartyTypeForm = ({ id }: { id?: number }) => {
-  const form = useForm<TCounterpartyTypeFormData>({
-    resolver: zodResolver(CounterpartyTypeFormSchema),
-    defaultValues: {
-      name: '',
-      comment: '',
-      status: 'ACTIVE',
-    },
-  });
-
   const router = useRouter();
-  const { setloadingCounterpartyTypes } = useCounterpartySelectStore();
-
+  const { form, handleCounterpartyTypeSubmit } = useCounterpartyTypeData(id);
+  const { setloadingCounterpartyTypes } = useLoadingSelectStore();
   const { isPending, startTransitionNoErrors } = useTransitionNoErrors(form);
-
-  useEffect(() => {
-    if (id) {
-      (async function () {
-        const data = await Api.counterpartyTypes.fetchCounterpartyTypeById(id);
-
-        form.setValue('name', data.name);
-        form.setValue('comment', data.comment);
-        form.setValue('status', data.status);
-      })();
-    }
-  }, [form, id]);
 
   const onSubmit = (values: TCounterpartyTypeFormData) => {
     startTransitionNoErrors(() => {
-      counterpartyType(values, id)
-        .then((data) => {
-          if (data?.error) {
-            toast.error(data.error);
-          }
-          if (data?.success) {
-            router.refresh();
-            if (!id) form.reset();
-            setloadingCounterpartyTypes(true);
-            toast.success(data.success);
-          }
-        })
-        .catch(() => toast.error('Что-то пошло не так!'));
+      handleCounterpartyTypeSubmit(values, id, () => {
+        router.refresh();
+        if (!id) form.reset();
+        setloadingCounterpartyTypes(true);
+      });
     });
   };
 
@@ -96,6 +59,7 @@ export const CounterpartyTypeForm = ({ id }: { id?: number }) => {
             name="comment"
             placeholder="Введите комментарий"
             translate={translateColumnsCounterpartyType}
+            isPending={isPending}
           />
         </div>
       </form>

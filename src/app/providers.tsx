@@ -5,7 +5,7 @@ import { SessionProvider } from 'next-auth/react';
 import { Toaster } from '@/components/ui/sonner';
 
 import { ThemeProvider } from '@/components/theme-provider';
-import ConfirmationDialog from '@/components/ConfirmationDialog';
+import ConfirmationDialog from '@/components/confirmation-dialog';
 
 export const Providers = ({ children }: PropsWithChildren) => {
   const [mounted, setMounted] = useState(false);
