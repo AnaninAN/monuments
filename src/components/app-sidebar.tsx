@@ -10,14 +10,10 @@ import {
   SidebarRail,
 } from '@/components/ui/sidebar';
 import { ModeToggle } from '@/components/mode-toggle';
-import { ExtendedUser } from '@/next-auth';
+
 import { navMain } from '@/consts/nav-main';
 
-interface AppSidebar extends React.ComponentProps<typeof Sidebar> {
-  user: ExtendedUser;
-}
-
-export function AppSidebar({ user, ...props }: AppSidebar) {
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader className="flex">
@@ -27,7 +23,7 @@ export function AppSidebar({ user, ...props }: AppSidebar) {
         <NavMain items={navMain} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={user} />
+        <NavUser />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

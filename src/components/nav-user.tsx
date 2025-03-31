@@ -19,15 +19,11 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { LogoutButton } from '@/components/auth/logout-button';
+import { useUserStore } from '@/store/user';
 
-import { ExtendedUser } from '@/next-auth';
-
-interface NavUserProps {
-  user?: ExtendedUser;
-}
-
-export const NavUser = ({ user }: NavUserProps) => {
+export const NavUser = () => {
   const { isMobile } = useSidebar();
+  const { user } = useUserStore();
 
   const CN =
     user?.name &&
@@ -76,12 +72,11 @@ export const NavUser = ({ user }: NavUserProps) => {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <LogoutButton>
-              <DropdownMenuItem>
-                <LogOut />
-                Выйти
-              </DropdownMenuItem>
-            </LogoutButton>
+            <DropdownMenuItem>
+              <LogoutButton>
+                <LogOut className="size-4" /> Выйти
+              </LogoutButton>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>

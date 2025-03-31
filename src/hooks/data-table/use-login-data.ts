@@ -20,8 +20,8 @@ const handleLoginSubmit = async (
     }
 
     if (data?.success) {
-      onSuccess?.();
       toast.success(data.success);
+      onSuccess?.();
     }
   } catch (error) {
     console.error('Ошибка при входе в систему:', error);

@@ -1,4 +1,6 @@
-import { PropsWithChildren } from 'react';
+'use client';
+
+import { PropsWithChildren, useEffect } from 'react';
 
 import {
   SidebarInset,
@@ -6,16 +8,26 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/app-sidebar';
-import { currentUser } from '@/lib/auth';
+import { ExtendedUser } from '@/next-auth';
+import { useUserStore } from '@/store/user';
 
-export const MainPage = async ({ children }: PropsWithChildren) => {
-  const user = await currentUser();
+interface MainPageProps {
+  user: ExtendedUser;
+}
 
-  if (!user) return;
+export const MainPage = ({
+  children,
+  user,
+}: PropsWithChildren<MainPageProps>) => {
+  const { setUser } = useUserStore();
+
+  useEffect(() => {
+    setUser(user);
+  }, [user, setUser]);
 
   return (
     <SidebarProvider>
-      <AppSidebar user={user} />
+      <AppSidebar />
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
           <div className="flex items-center gap-2 px-4">

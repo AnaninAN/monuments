@@ -1,7 +1,7 @@
 'use client';
 
 import { useTransition } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -14,6 +14,7 @@ import { translateColumnLogin } from '@/lib/data-table/translate-colums-header';
 
 export function LoginForm() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const callbackUrl = searchParams.get('callbackUrl');
   const [isPending, startTransition] = useTransition();
   const { form, handleLoginSubmit } = useLoginData();
@@ -27,6 +28,7 @@ export function LoginForm() {
     startTransition(() => {
       handleLoginSubmit(values, callbackUrl, urlError, () => {
         form.reset();
+        router.push(callbackUrl || '/');
       });
     });
   };

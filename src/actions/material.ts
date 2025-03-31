@@ -20,14 +20,16 @@ export const material = async (values: TMaterialFormData, id?: number) => {
     const dbMaterial = await getMaterialById(id);
 
     if (!dbMaterial) {
-      return { error: 'Контрагент не найден!' };
+      return { error: 'Материал не найден!' };
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { materialGroup, unit, warehouse, ...newValues } = values;
-    await db.material.update({
-      where: { id },
-      data: { ...newValues },
+    await db.$transaction(async (tx) => {
+      await tx.material.update({
+        where: { id },
+        data: { ...newValues },
+      });
     });
 
     return { success: 'Данные материала обновлены!' };
@@ -46,8 +48,10 @@ export const material = async (values: TMaterialFormData, id?: number) => {
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { materialGroup, unit, warehouse, ...newValues } = values;
-    await db.material.create({
-      data: { ...newValues },
+    await db.$transaction(async (tx) => {
+      await tx.material.create({
+        data: { ...newValues },
+      });
     });
 
     return { success: 'Материал создан!' };
@@ -61,7 +65,9 @@ export const delMaterial = async (id: number) => {
     return { error: 'Материала не существует!' };
   }
 
-  await db.material.delete({ where: { id } });
+  await db.$transaction(async (tx) => {
+    await tx.material.delete({ where: { id } });
+  });
 
   return { success: 'Материал удален!' };
 };

@@ -9,7 +9,6 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  useFormField,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import {
@@ -82,9 +81,6 @@ export function FormFieldInput<T extends FieldValues = FieldValues>({
       control={form.control}
       name={name}
       render={({ field }) => {
-        // eslint-disable-next-line react-hooks/rules-of-hooks
-        const { formItemId } = useFormField();
-
         return (
           <FormItem>
             <HoverCard>
@@ -97,7 +93,7 @@ export function FormFieldInput<T extends FieldValues = FieldValues>({
             </HoverCard>
             <FormControl>
               <Input
-                id={formItemId}
+                id={name}
                 placeholder={placeholder}
                 disabled={isPending}
                 type={type}

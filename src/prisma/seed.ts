@@ -9,7 +9,7 @@ async function up() {
       {
         idInt: 1,
         email: 'test_admin@monuments.ru',
-        password: hashSync('11111111', 10),
+        password: hashSync('1Q2w3e4r!', 10),
         role: 'ADMIN',
         emailVerified: new Date(),
         isTwoFactorEnabled: false,
@@ -20,7 +20,7 @@ async function up() {
       {
         idInt: 2,
         email: 'test_operator@monuments.ru',
-        password: hashSync('22222222', 10),
+        password: hashSync('2W3e4r5t!', 10),
         role: 'OPERATOR',
         emailVerified: new Date(),
         isTwoFactorEnabled: false,
