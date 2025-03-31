@@ -1,7 +1,0 @@
-{"email":"test_admin@monuments.ru","level":"info","message":"Пользователь успешно вошел в систему","timestamp":"31.03.2025, 20:15:30"}
-{"email":"test_admin@monuments.ru","level":"info","message":"Пользователь вышел из системы","timestamp":"31.03.2025, 20:15:42"}
-{"email":"test_admin@monuments.ru","level":"info","message":"Пользователь успешно вошел в систему","timestamp":"31.03.2025, 20:27:11"}
-{"email":"test_admin@monuments.ru","level":"info","message":"Пользователь вышел из системы","timestamp":"31.03.2025, 20:27:14"}
-{"email":"test_admin@monuments.ru","ip":"::1","level":"error","message":"Недействительные данные","timestamp":"31.03.2025, 20:27:21"}
-{"email":"test_admin@monuments.ru","level":"info","message":"Пользователь успешно вошел в систему","timestamp":"31.03.2025, 20:27:31"}
-{"email":"test_admin@monuments.ru","level":"info","message":"Пользователь вышел из системы","timestamp":"31.03.2025, 20:27:33"}
