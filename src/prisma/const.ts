@@ -38,7 +38,12 @@ export const warehous = [
 
 export const materialGroup = {
   name: 'Материалы',
-  parentGroup: 0,
+  parentId: 0,
+};
+
+export const warehouseGroup = {
+  name: 'Склады',
+  parentId: 0,
 };
 
 export const material = [

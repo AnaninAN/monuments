@@ -1,27 +1,42 @@
 import withAuth from '@/hoc/with-auth';
 
 import { menu } from '@/consts/menu';
-import { translateColumnsMaterials } from '@/lib/data-table/translate-colums-header';
+import { translateColumnsMaterial } from '@/lib/data-table/translate-colums-header';
 import { columns } from './columns';
 
 import { getAllMaterials } from '@/data/material';
+import {
+  getAllMaterialGroups,
+  getMaterialGroupById,
+} from '@/data/material-group';
 
-import { DataTable } from '@/components/data-table/data-table';
 import { MaterialForm } from '@/components/data-table/forms/material-form';
+import { ThreeTable, TThree } from '@/components/data-table/three-table';
+import { materialGroup } from '@/actions/material-group';
 
 async function MaterialsPage() {
-  const materials = await getAllMaterials();
+  const [materials, materialGroups] = await Promise.all([
+    getAllMaterials(),
+    getAllMaterialGroups(),
+  ]);
 
-  if (!materials) return null;
+  if (!materials || !materialGroups) return null;
+
+  const three: TThree = {
+    threeData: materialGroups,
+    getGroupById: getMaterialGroupById,
+    action: materialGroup,
+  };
 
   return (
-    <DataTable
+    <ThreeTable
       title={menu['MATERIALS'].title}
       columns={columns}
       data={materials}
       FormComponent={MaterialForm}
       filter="name"
-      translateColumns={translateColumnsMaterials}
+      translateColumns={translateColumnsMaterial}
+      three={three}
     />
   );
 }

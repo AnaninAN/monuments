@@ -6,7 +6,7 @@ import {
   KeyTMaterialFormData,
   TMaterialFormData,
 } from '@/schemas/material-form-schema';
-import { translateColumnsMaterials } from '@/lib/data-table/translate-colums-header';
+import { translateColumnsMaterial } from '@/lib/data-table/translate-colums-header';
 import {
   ColumnsType,
   dataTableColumns,
@@ -29,7 +29,7 @@ const cols: ColumnsType<KeyTMaterialFormData> = [
 export const columns: ColumnDef<TMaterialFormData>[] = dataTableColumns(
   'id',
   cols,
-  translateColumnsMaterials,
+  translateColumnsMaterial,
   delMaterial,
   MaterialForm
 );

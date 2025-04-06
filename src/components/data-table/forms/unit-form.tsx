@@ -2,19 +2,19 @@
 
 import { useRouter } from 'next/navigation';
 
+import { TUnitFormData } from '@/schemas/unit-form-schema';
+import { translateColumnsUnit } from '@/lib/data-table/translate-colums-header';
+import { useTransitionNoErrors } from '@/hooks/use-transition-no-errors';
+import { useUnitData } from '@/hooks/data-table/use-unit-data';
+import { useLoadingSelectStore } from '@/store/loading-select';
+
 import { Form } from '@/components/ui/form';
 import { FormHeader } from '@/components/data-table/forms/form-header';
 import {
   FormFieldInput,
   FormFieldTextarea,
 } from '@/components/data-table/forms/form-field';
-
-import { TUnitFormData } from '@/schemas/unit-form-schema';
-import { translateColumnsUnits } from '@/lib/data-table/translate-colums-header';
-import { useTransitionNoErrors } from '@/hooks/use-transition-no-errors';
-import { useUnitData } from '@/hooks/data-table/use-unit-data';
-
-import { useLoadingSelectStore } from '@/store/loading-select';
+import { LoadingFormHeader } from '@/components/loading/loading-form-header';
 
 interface UnitFormProps {
   id?: number;
@@ -22,7 +22,7 @@ interface UnitFormProps {
 
 export const UnitForm = ({ id }: UnitFormProps) => {
   const router = useRouter();
-  const { form, handleUnitSubmit } = useUnitData(id);
+  const { form, handleUnitSubmit, isLoading } = useUnitData(id);
   const { setLoadingUnits } = useLoadingSelectStore();
   const { isPending, startTransitionNoErrors } = useTransitionNoErrors(form);
 
@@ -35,6 +35,10 @@ export const UnitForm = ({ id }: UnitFormProps) => {
       });
     });
   };
+
+  if (isLoading) {
+    return <LoadingFormHeader />;
+  }
 
   return (
     <Form {...form}>
@@ -54,7 +58,7 @@ export const UnitForm = ({ id }: UnitFormProps) => {
             form={form}
             name="name"
             placeholder="Введите ед. измерения"
-            translate={translateColumnsUnits}
+            translate={translateColumnsUnit}
             isPending={isPending}
           />
         </div>
@@ -63,7 +67,7 @@ export const UnitForm = ({ id }: UnitFormProps) => {
             form={form}
             name="comment"
             placeholder="Введите комментарий"
-            translate={translateColumnsUnits}
+            translate={translateColumnsUnit}
             isPending={isPending}
           />
         </div>

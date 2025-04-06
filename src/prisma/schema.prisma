@@ -136,6 +136,13 @@ enum PriceType {
   OUT
 }
 
+enum ServiceTaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
 model User {
   id                  String                    @id @default(cuid())
   idInt               Int                       @unique
@@ -158,6 +165,7 @@ model User {
   
   notifications       Notification[]
   notificationPreferences NotificationPreference[]
+  assignedTasks      ServiceTask[]
   
   createdAt           DateTime                  @default(now())
   updatedAt           DateTime                  @updatedAt
@@ -284,6 +292,9 @@ model Warehouse {
   detail    Detail[]
   movements StockMovement[]
 
+  warehouseGroupId Int
+  warehouseGroup   WarehouseGroup @relation(fields: [warehouseGroupId], references: [id])
+
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
 }
@@ -359,6 +370,7 @@ model Service {
 
   details     DetailService[]
   products    ProductService[]
+  tasks       ServiceTask[]
 
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
@@ -504,9 +516,20 @@ model MaterialMovement {
 model MaterialGroup {
   id          Int        @id @default(autoincrement())
   name        String     @unique
-  parentGroup Int        @default(1)
+  parentId    Int        @default(1)
 
   material    Material[]
+
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model WarehouseGroup {
+  id          Int        @id @default(autoincrement())
+  name        String     @unique
+  parentId    Int        @default(1)
+
+  warehouse   Warehouse[]
 
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
@@ -863,4 +886,27 @@ model NotificationPreference {
 
   @@unique([userId, type, priority])
   @@index([userId])
+}
+
+model ServiceTask {
+  id              Int               @id @default(autoincrement())
+  name            String
+  description     String            @default("")
+  status          ServiceTaskStatus  @default(PENDING)
+  startDate       DateTime?
+  endDate         DateTime?
+  plannedDuration Int               
+  comment         String            @default("")
+
+  serviceId       Int
+  service         Service           @relation(fields: [serviceId], references: [id])
+  
+  assignedToId    String
+  assignedTo      User              @relation(fields: [assignedToId], references: [id])
+
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@index([serviceId])
+  @@index([assignedToId])
 }

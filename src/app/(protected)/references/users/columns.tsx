@@ -3,7 +3,7 @@
 import { ColumnDef } from '@tanstack/react-table';
 
 import { KeyTUserFormData, TUserFormData } from '@/schemas/user-form-schema';
-import { translateColumnsEmployees } from '@/lib/data-table/translate-colums-header';
+import { translateColumnsEmployee } from '@/lib/data-table/translate-colums-header';
 import {
   ColumnsType,
   dataTableColumns,
@@ -23,7 +23,7 @@ const cols: ColumnsType<KeyTUserFormData> = [
 export const columns: ColumnDef<TUserFormData>[] = dataTableColumns(
   'idInt',
   cols,
-  translateColumnsEmployees,
+  translateColumnsEmployee,
   undefined,
   UserForm
 );

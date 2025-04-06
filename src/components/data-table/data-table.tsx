@@ -13,6 +13,9 @@ import {
   useReactTable,
   VisibilityState,
 } from '@tanstack/react-table';
+import { ChevronDown } from 'lucide-react';
+
+import { translateColumnsAction } from '@/lib/data-table/translate-colums-header';
 
 import {
   Table,
@@ -22,7 +25,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { DataSheet } from './data-sheet';
+import { DataSheet } from '@/components/data-table/data-sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -31,14 +34,11 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { ChevronDown } from 'lucide-react';
-import { translateColumnActions } from '@/lib/data-table/translate-colums-header';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   FormComponent: React.ComponentType;
-  title: string;
   filter: string;
   translateColumns: Record<string, string>;
 }
@@ -47,7 +47,6 @@ export function DataTable<TData, TValue>({
   columns,
   data,
   FormComponent,
-  title,
   filter,
   translateColumns,
 }: DataTableProps<TData, TValue>) {
@@ -74,103 +73,102 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="w-full">
-      <div className="flex justify-between">
-        <h1 className="font-semibold self-center flex">{title}</h1>
-        <div className="flex items-center py-4">
-          <Input
-            placeholder={`Фильтр по ${translateColumns[filter]} ...`}
-            value={(table.getColumn(filter)?.getFilterValue() as string) ?? ''}
-            onChange={(event) =>
-              table.getColumn(filter)?.setFilterValue(event.target.value)
-            }
-            className="w-[350px] mr-2"
-          />
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="ml-auto">
-                Столбцы <ChevronDown />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {table
-                .getAllColumns()
-                .filter((column) => column.getCanHide())
-                .map((column) => {
-                  return (
-                    <DropdownMenuCheckboxItem
-                      key={column.id}
-                      checked={column.getIsVisible()}
-                      onCheckedChange={(value) =>
-                        column.toggleVisibility(!!value)
-                      }
-                    >
-                      {translateColumns
-                        ? { ...translateColumns, ...translateColumnActions }[
-                            column.id
-                          ]
-                        : column.id}
-                    </DropdownMenuCheckboxItem>
-                  );
-                })}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </div>
-      <div className="pb-4 flex justify-end">
-        <DataSheet
-          trigger={<Button>Добавить</Button>}
-          FormComponent={FormComponent}
+      <div className="flex py-4 justify-end">
+        <Input
+          placeholder={`Фильтр по ${translateColumns[filter]} ...`}
+          value={(table.getColumn(filter)?.getFilterValue() as string) ?? ''}
+          onChange={(event) =>
+            table.getColumn(filter)?.setFilterValue(event.target.value)
+          }
+          className="w-[350px] mr-2"
         />
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline">
+              Столбцы <ChevronDown />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {table
+              .getAllColumns()
+              .filter((column) => column.getCanHide())
+              .map((column) => {
+                return (
+                  <DropdownMenuCheckboxItem
+                    key={column.id}
+                    checked={column.getIsVisible()}
+                    onCheckedChange={(value) =>
+                      column.toggleVisibility(!!value)
+                    }
+                  >
+                    {translateColumns
+                      ? { ...translateColumns, ...translateColumnsAction }[
+                          column.id
+                        ]
+                      : column.id}
+                  </DropdownMenuCheckboxItem>
+                );
+              })}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && 'selected'}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
+      <div className="w-full">
+        <div className="pb-4 flex justify-end">
+          <DataSheet
+            trigger={<Button>Добавить</Button>}
+            FormComponent={FormComponent}
+          />
+        </div>
+        <div className="rounded-md border w-full">
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => {
+                    return (
+                      <TableHead key={header.id}>
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                      </TableHead>
+                    );
+                  })}
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  Данных нет.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && 'selected'}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center"
+                  >
+                    Данных нет.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
     </div>
   );

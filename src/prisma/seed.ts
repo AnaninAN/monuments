@@ -1,7 +1,7 @@
 import { hashSync } from 'bcryptjs';
 
 import { db } from '../lib/db';
-import { materialGroup } from './const';
+import { materialGroup, warehouseGroup } from './const';
 
 async function up() {
   await db.user.createMany({
@@ -31,6 +31,7 @@ async function up() {
     ],
   });
   await db.materialGroup.create({ data: materialGroup });
+  await db.warehouseGroup.create({ data: warehouseGroup });
   // await db.counterpartyType.createMany({
   //   data: [{ name: 'Поставщик' }, { name: 'Розничный клиент' }],
   // });
@@ -52,6 +53,8 @@ async function down() {
   await db.$executeRaw`SET FOREIGN_KEY_CHECKS=0`;
 
   await db.$executeRaw`TRUNCATE TABLE User`;
+  await db.$executeRaw`TRUNCATE TABLE MaterialGroup`;
+  await db.$executeRaw`TRUNCATE TABLE WarehouseGroup`;
 
   await db.$executeRaw`SET FOREIGN_KEY_CHECKS=1`;
 }

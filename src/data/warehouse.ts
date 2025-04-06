@@ -1,9 +1,23 @@
-import { db } from '@/lib/db';
+'use server';
 
-export const getWarehouseById = async (id: number | undefined) => {
+import { Warehouse } from '@prisma/client';
+
+import { db } from '@/lib/db';
+import { WarehouseWithAdd } from './dto/warehouse';
+
+export const getWarehouseById = async (
+  id?: number
+): Promise<WarehouseWithAdd | null> => {
   try {
     const warehouse = await db.warehouse.findUnique({
       where: { id },
+      include: {
+        warehouseGroup: {
+          select: {
+            name: true,
+          },
+        },
+      },
     });
 
     return warehouse;
@@ -12,9 +26,13 @@ export const getWarehouseById = async (id: number | undefined) => {
   }
 };
 
-export const getWarehouseByName = async (name: string) => {
+export const getWarehouseByName = async (
+  name: string
+): Promise<Warehouse | null> => {
   try {
-    const warehouse = await db.warehouse.findUnique({ where: { name } });
+    const warehouse = await db.warehouse.findUnique({
+      where: { name },
+    });
 
     return warehouse;
   } catch {
@@ -22,12 +40,20 @@ export const getWarehouseByName = async (name: string) => {
   }
 };
 
-export const getAllWarehouses = async () => {
+export const getAllWarehouses = async (): Promise<WarehouseWithAdd[] | []> => {
   try {
-    const warehouses = await db.warehouse.findMany();
+    const warehouses = await db.warehouse.findMany({
+      include: {
+        warehouseGroup: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
 
     return warehouses;
   } catch {
-    return null;
+    return [];
   }
 };

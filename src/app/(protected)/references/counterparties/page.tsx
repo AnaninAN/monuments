@@ -1,13 +1,13 @@
 import withAuth from '@/hoc/with-auth';
 
 import { menu } from '@/consts/menu';
-import { translateColumnsCounterparties } from '@/lib/data-table/translate-colums-header';
+import { translateColumnsCounterparty } from '@/lib/data-table/translate-colums-header';
 import { columns } from './columns';
 
 import { getAllCounterparties } from '@/data/counterparty';
 
-import { DataTable } from '@/components/data-table/data-table';
 import { CounterpartyForm } from '@/components/data-table/forms/counterparty-form';
+import { ThreeTable } from '@/components/data-table/three-table';
 
 async function CounterpartiesPage() {
   const counterparties = await getAllCounterparties();
@@ -15,13 +15,13 @@ async function CounterpartiesPage() {
   if (!counterparties) return null;
 
   return (
-    <DataTable
+    <ThreeTable
       title={menu['COUNTERPARTIES'].title}
       columns={columns}
       data={counterparties}
       FormComponent={CounterpartyForm}
       filter="name"
-      translateColumns={translateColumnsCounterparties}
+      translateColumns={translateColumnsCounterparty}
     />
   );
 }

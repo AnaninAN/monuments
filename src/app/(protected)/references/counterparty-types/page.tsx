@@ -6,15 +6,15 @@ import { columns } from './columns';
 
 import { getAllCounterpartyTypes } from '@/data/counterparty-type';
 
-import { DataTable } from '@/components/data-table/data-table';
 import { CounterpartyTypeForm } from '@/components/data-table/forms/counterparty-type-form';
+import { ThreeTable } from '@/components/data-table/three-table';
 
 async function CounterpartyTypesPage() {
   const counterpartyTypes = await getAllCounterpartyTypes();
   if (!counterpartyTypes) return null;
 
   return (
-    <DataTable
+    <ThreeTable
       title={menu['COUNTERPARTY_TYPES'].title}
       columns={columns}
       data={counterpartyTypes}

@@ -1,12 +1,10 @@
-'use server';
-
 import { Suspense } from 'react';
 import { Role } from '@prisma/client';
 
 import { auth } from '@/auth';
 
 import Unauthorized from '@/components/unauthorized';
-import Loading from '@/components/loading';
+import { LoadingDataTable } from '@/components/loading/loading-data-table';
 
 const withAuth = (
   Component: React.ComponentType,
@@ -23,7 +21,7 @@ const withAuth = (
     }
 
     return (
-      <Suspense fallback={<Loading title={title} />}>
+      <Suspense fallback={<LoadingDataTable title={title} />}>
         <Component {...props} />
       </Suspense>
     );

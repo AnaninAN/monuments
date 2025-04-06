@@ -1,10 +1,8 @@
-import { Role } from '@prisma/client';
-import { type DefaultSession } from 'next-auth';
+import { Role, User } from '@prisma/client';
 
-export type ExtendedUser = DefaultSession['user'] & {
+export type ExtendedUser = User & {
   role: Role;
   isTwoFactorEnabled: boolean;
-  isOAuth: boolean;
   lastname: string;
 };
 

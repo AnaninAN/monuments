@@ -16,8 +16,15 @@ export const WarehouseFormSchema = z.object({
     .string()
     .max(100, 'Комментарий не должен превышать 100 символов!')
     .trim(),
+  warehouseGroupId: z.number(),
+  warehouseGroup: z.object({
+    name: z.string().min(1, 'Необходимо выбрать группу!'),
+  }),
 });
 
 export type TWarehouseFormData = z.infer<typeof WarehouseFormSchema>;
 
-export type KeyTWarehouseFormData = keyof TWarehouseFormData | 'id';
+export type KeyTWarehouseFormData =
+  | keyof Omit<TWarehouseFormData, 'warehouseGroupId' | 'warehouseGroup'>
+  | 'warehouseGroup_name'
+  | 'id';

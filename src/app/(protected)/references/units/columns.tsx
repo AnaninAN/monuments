@@ -3,7 +3,7 @@
 import { ColumnDef } from '@tanstack/react-table';
 
 import { KeyTUnitFormData, TUnitFormData } from '@/schemas/unit-form-schema';
-import { translateColumnsUnits } from '@/lib/data-table/translate-colums-header';
+import { translateColumnsUnit } from '@/lib/data-table/translate-colums-header';
 import {
   ColumnsType,
   dataTableColumns,
@@ -21,7 +21,7 @@ const cols: ColumnsType<KeyTUnitFormData> = [
 export const columns: ColumnDef<TUnitFormData>[] = dataTableColumns(
   'id',
   cols,
-  translateColumnsUnits,
+  translateColumnsUnit,
   delUnit,
   UnitForm
 );

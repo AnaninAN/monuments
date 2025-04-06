@@ -215,6 +215,7 @@ export function FormFieldSelect<T extends FieldValues = FieldValues>({
                 disabled={isPending}
                 onValueChange={field.onChange}
                 value={field.value}
+                defaultValue={field.value}
               >
                 <FormControl>
                   <SelectTrigger>

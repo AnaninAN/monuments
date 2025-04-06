@@ -2,34 +2,48 @@
 
 import { useRouter } from 'next/navigation';
 
-import { Form } from '@/components/ui/form';
-import { FormHeader } from '@/components/data-table/forms/form-header';
-import {
-  FormFieldInput,
-  FormFieldTextarea,
-} from '@/components/data-table/forms/form-field';
-
 import { TWarehouseFormData } from '@/schemas/warehouse-form-schema';
-import { translateColumnsWarehouses } from '@/lib/data-table/translate-colums-header';
+import { translateColumnsWarehouse } from '@/lib/data-table/translate-colums-header';
 import { useTransitionNoErrors } from '@/hooks/use-transition-no-errors';
 import { useLoadingSelectStore } from '@/store/loading-select';
 import { useWarehouseData } from '@/hooks/data-table/use-warehouse-data';
 
+import { Form } from '@/components/ui/form';
+import { FormHeader } from '@/components/data-table/forms/form-header';
+import {
+  FormFieldInput,
+  FormFieldSelect,
+  FormFieldTextarea,
+} from '@/components/data-table/forms/form-field';
+import { LoadingFormHeader } from '@/components/loading/loading-form-header';
+
 export function WarehouseForm({ id }: { id?: number }) {
   const router = useRouter();
-  const { form, handleWarehouseSubmit } = useWarehouseData(id);
+  const {
+    form,
+    handleWarehouseSubmit,
+    isLoading,
+    transformFormData,
+    warehouseGroups,
+  } = useWarehouseData(id);
   const { setLoadingWarehouses } = useLoadingSelectStore();
   const { isPending, startTransitionNoErrors } = useTransitionNoErrors(form);
 
   const onSubmit = (values: TWarehouseFormData) => {
+    const transformedValues = transformFormData(values);
+
     startTransitionNoErrors(() => {
-      handleWarehouseSubmit(values, id, () => {
+      handleWarehouseSubmit(transformedValues, id, () => {
         router.refresh();
         if (!id) form.reset();
         setLoadingWarehouses(true);
       });
     });
   };
+
+  if (isLoading) {
+    return <LoadingFormHeader />;
+  }
 
   return (
     <Form {...form}>
@@ -50,7 +64,7 @@ export function WarehouseForm({ id }: { id?: number }) {
               form={form}
               name="name"
               placeholder="Введите наименование склада"
-              translate={translateColumnsWarehouses}
+              translate={translateColumnsWarehouse}
               isPending={isPending}
             />
           </div>
@@ -59,7 +73,17 @@ export function WarehouseForm({ id }: { id?: number }) {
               form={form}
               name="shortName"
               placeholder="Введите краткое наименование склада"
-              translate={translateColumnsWarehouses}
+              translate={translateColumnsWarehouse}
+              isPending={isPending}
+            />
+          </div>
+          <div className="grid gap-2">
+            <FormFieldSelect
+              form={form}
+              name="warehouseGroup.name"
+              placeholder="Выберите группу"
+              translate={translateColumnsWarehouse}
+              items={warehouseGroups}
               isPending={isPending}
             />
           </div>
@@ -68,7 +92,7 @@ export function WarehouseForm({ id }: { id?: number }) {
               form={form}
               name="comment"
               placeholder="Введите комментарий"
-              translate={translateColumnsWarehouses}
+              translate={translateColumnsWarehouse}
               isPending={isPending}
             />
           </div>

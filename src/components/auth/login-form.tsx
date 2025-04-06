@@ -10,7 +10,7 @@ import { Form } from '@/components/ui/form';
 import { type TLoginFormData } from '@/schemas/login-form-schema';
 import { useLoginData } from '@/hooks/data-table/use-login-data';
 import { FormFieldInput } from '../data-table/forms/form-field';
-import { translateColumnLogin } from '@/lib/data-table/translate-colums-header';
+import { translateColumnsLogin } from '@/lib/data-table/translate-colums-header';
 
 export function LoginForm() {
   const searchParams = useSearchParams();
@@ -51,7 +51,7 @@ export function LoginForm() {
                     form={form}
                     name="email"
                     placeholder="test@monuments.ru"
-                    translate={translateColumnLogin}
+                    translate={translateColumnsLogin}
                     isPending={isPending}
                   />
                 </div>
@@ -60,7 +60,7 @@ export function LoginForm() {
                     form={form}
                     name="password"
                     placeholder="Введите пароль"
-                    translate={translateColumnLogin}
+                    translate={translateColumnsLogin}
                     isPending={isPending}
                     type="password"
                   />

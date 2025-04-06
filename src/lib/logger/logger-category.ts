@@ -1,6 +1,12 @@
 import { createLogger, format, transports } from 'winston';
 
-export type LogCategory = 'auth' | 'user' | 'counterpartyType' | 'counterparty';
+export type LogCategory =
+  | 'auth'
+  | 'user'
+  | 'counterpartyType'
+  | 'counterparty'
+  | 'warehouseGroup'
+  | 'materialGroup';
 
 const createCategoryLogger = (category: LogCategory) => {
   const isDevelopment = process.env.NODE_ENV === 'development';
@@ -37,4 +43,6 @@ export const categoryLoggers: Record<
   user: createCategoryLogger('user'),
   counterpartyType: createCategoryLogger('counterpartyType'),
   counterparty: createCategoryLogger('counterparty'),
+  warehouseGroup: createCategoryLogger('warehouseGroup'),
+  materialGroup: createCategoryLogger('materialGroup'),
 };

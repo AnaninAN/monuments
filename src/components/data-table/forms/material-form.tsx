@@ -2,6 +2,12 @@
 
 import { useRouter } from 'next/navigation';
 
+import { TMaterialFormData } from '@/schemas/material-form-schema';
+import { translateColumnsMaterial } from '@/lib/data-table/translate-colums-header';
+import { useTransitionNoErrors } from '@/hooks/use-transition-no-errors';
+import { useStopPropagationStore } from '@/store/stop-propagation';
+import { useMaterialData } from '@/hooks/data-table/use-material-data';
+
 import { Form } from '@/components/ui/form';
 import { FormHeader } from '@/components/data-table/forms/form-header';
 import {
@@ -11,12 +17,7 @@ import {
 } from '@/components/data-table/forms/form-field';
 import { UnitForm } from '@/components/data-table/forms/unit-form';
 import { WarehouseForm } from '@/components/data-table/forms/warehouse-form';
-
-import { TMaterialFormData } from '@/schemas/material-form-schema';
-import { translateColumnsMaterials } from '@/lib/data-table/translate-colums-header';
-import { useTransitionNoErrors } from '@/hooks/use-transition-no-errors';
-import { useStopPropagationStore } from '@/store/stop-propagation';
-import { useMaterialData } from '@/hooks/data-table/use-material-data';
+import { LoadingFormHeader } from '@/components/loading/loading-form-header';
 
 interface MaterialFormProps {
   id?: number;
@@ -24,33 +25,20 @@ interface MaterialFormProps {
 
 export const MaterialForm = ({ id }: MaterialFormProps) => {
   const router = useRouter();
-  const { form, materialGroups, units, warehouses, handleMaterialSubmit } =
-    useMaterialData(id);
+  const {
+    form,
+    materialGroups,
+    units,
+    warehouses,
+    handleMaterialSubmit,
+    transformFormData,
+    isLoading,
+  } = useMaterialData(id);
   const { submit, setSubmit } = useStopPropagationStore();
   const { isPending, startTransitionNoErrors } = useTransitionNoErrors(
     form,
     submit
   );
-
-  const transformFormData = (values: TMaterialFormData): TMaterialFormData => {
-    const newMaterialGroupId =
-      materialGroups.find((groups) => groups.name === values.materialGroup.name)
-        ?.id || values.materialGroupId;
-    const newUnitId =
-      units.find((units) => units.name === values.unit.name)?.id ||
-      values.unitId;
-    const newWarehouseId =
-      warehouses.find(
-        (warehouses) => warehouses.name === values.warehouse?.name
-      )?.id || values?.warehouseId;
-
-    return {
-      ...values,
-      materialGroupId: newMaterialGroupId,
-      unitId: newUnitId,
-      warehouseId: newWarehouseId,
-    };
-  };
 
   const onSubmit = async (values: TMaterialFormData) => {
     const transformedValues = transformFormData(values);
@@ -62,6 +50,10 @@ export const MaterialForm = ({ id }: MaterialFormProps) => {
       });
     });
   };
+
+  if (isLoading) {
+    return <LoadingFormHeader />;
+  }
 
   return (
     <Form {...form}>
@@ -82,7 +74,7 @@ export const MaterialForm = ({ id }: MaterialFormProps) => {
               form={form}
               name="name"
               placeholder="Введите наименование материала"
-              translate={translateColumnsMaterials}
+              translate={translateColumnsMaterial}
               isPending={isPending}
             />
           </div>
@@ -91,7 +83,7 @@ export const MaterialForm = ({ id }: MaterialFormProps) => {
               form={form}
               name="article"
               placeholder="Введите артикул материала"
-              translate={translateColumnsMaterials}
+              translate={translateColumnsMaterial}
               isPending={isPending}
             />
           </div>
@@ -100,7 +92,7 @@ export const MaterialForm = ({ id }: MaterialFormProps) => {
               form={form}
               name="materialGroup.name"
               placeholder="Выберите группу"
-              translate={translateColumnsMaterials}
+              translate={translateColumnsMaterial}
               items={materialGroups}
               isPending={isPending}
             />
@@ -110,7 +102,7 @@ export const MaterialForm = ({ id }: MaterialFormProps) => {
               form={form}
               name="unit.name"
               placeholder="Выберите единицу измерения"
-              translate={translateColumnsMaterials}
+              translate={translateColumnsMaterial}
               items={units}
               isPending={isPending}
               ButtonOpenForm={UnitForm}
@@ -121,7 +113,7 @@ export const MaterialForm = ({ id }: MaterialFormProps) => {
               form={form}
               name="warehouse.name"
               placeholder="Выберите склад хранения"
-              translate={translateColumnsMaterials}
+              translate={translateColumnsMaterial}
               items={warehouses}
               isPending={isPending}
               ButtonOpenForm={WarehouseForm}
@@ -132,7 +124,7 @@ export const MaterialForm = ({ id }: MaterialFormProps) => {
               form={form}
               name="priceIn"
               placeholder="Введите закупочную цену"
-              translate={translateColumnsMaterials}
+              translate={translateColumnsMaterial}
               isPending={isPending}
               type="number"
             />
@@ -142,7 +134,7 @@ export const MaterialForm = ({ id }: MaterialFormProps) => {
               form={form}
               name="minBalance"
               placeholder="Введите минимальный остаток"
-              translate={translateColumnsMaterials}
+              translate={translateColumnsMaterial}
               isPending={isPending}
               type="number"
             />
@@ -152,7 +144,7 @@ export const MaterialForm = ({ id }: MaterialFormProps) => {
               form={form}
               name="comment"
               placeholder="Введите комментарий"
-              translate={translateColumnsMaterials}
+              translate={translateColumnsMaterial}
               isPending={isPending}
             />
           </div>

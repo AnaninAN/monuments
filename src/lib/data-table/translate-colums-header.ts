@@ -5,7 +5,7 @@ import { KeyTUnitFormData } from '@/schemas/unit-form-schema';
 import { KeyTUserFormData } from '@/schemas/user-form-schema';
 import { KeyTWarehouseFormData } from '@/schemas/warehouse-form-schema';
 
-export const translateColumnsEmployees: Record<KeyTUserFormData, string> = {
+export const translateColumnsEmployee: Record<KeyTUserFormData, string> = {
   idInt: '№',
   name: 'Имя',
   lastname: 'Фамилия',
@@ -15,11 +15,12 @@ export const translateColumnsEmployees: Record<KeyTUserFormData, string> = {
   status: 'Статус',
 };
 
-export const translateColumnsWarehouses: Record<KeyTWarehouseFormData, string> =
+export const translateColumnsWarehouse: Record<KeyTWarehouseFormData, string> =
   {
     id: '№',
     name: 'Наименование',
     shortName: 'Краткое наименование',
+    warehouseGroup_name: 'Группа',
     comment: 'Комментарий',
     status: 'Статус',
   };
@@ -34,7 +35,7 @@ export const translateColumnsCounterpartyType: Record<
   status: 'Статус',
 };
 
-export const translateColumnsCounterparties: Record<
+export const translateColumnsCounterparty: Record<
   KeyTCounterpartyFormData,
   string
 > = {
@@ -45,14 +46,14 @@ export const translateColumnsCounterparties: Record<
   status: 'Статус',
 };
 
-export const translateColumnsUnits: Record<KeyTUnitFormData, string> = {
+export const translateColumnsUnit: Record<KeyTUnitFormData, string> = {
   id: '№',
   name: 'Наименование',
   status: 'Статус',
   comment: 'Коментарий',
 };
 
-export const translateColumnsMaterials: Record<KeyTMaterialFormData, string> = {
+export const translateColumnsMaterial: Record<KeyTMaterialFormData, string> = {
   id: '№',
   name: 'Наименование',
   image: 'Изображение',
@@ -65,11 +66,16 @@ export const translateColumnsMaterials: Record<KeyTMaterialFormData, string> = {
   comment: 'Коментарий',
 };
 
-export const translateColumnActions: Record<string, string> = {
+export const translateColumnsAction: Record<string, string> = {
   actions: 'Действия',
 };
 
-export const translateColumnLogin: Record<string, string> = {
+export const translateColumnsLogin: Record<string, string> = {
   email: 'Email',
   password: 'Пароль',
+};
+
+export const translateColumnsGroup: Record<string, string> = {
+  parentId: 'Родительская группа',
+  name: 'Наименование',
 };

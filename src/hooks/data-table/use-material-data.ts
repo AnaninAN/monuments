@@ -1,16 +1,19 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
 import { MaterialGroup, Unit, Warehouse } from '@prisma/client';
 
-import { Api } from '@/services/api-client';
 import {
   MaterialFormSchema,
   TMaterialFormData,
 } from '@/schemas/material-form-schema';
 import { material } from '@/actions/material';
 import { useLoadingSelectStore } from '@/store/loading-select';
+import { getAllMaterialGroups } from '@/data/material-group';
+import { getAllUnits } from '@/data/unit';
+import { getAllWarehouses } from '@/data/warehouse';
+import { getMaterialById } from '@/data/material';
 
 const handleMaterialSubmit = async (
   values: TMaterialFormData,
@@ -30,8 +33,8 @@ const handleMaterialSubmit = async (
       toast.success(data.success);
     }
   } catch (error) {
-    toast.error('Произошла ошибка при сохранении склада!');
-    console.error('Ошибка отправки склада:', error);
+    toast.error('Произошла ошибка при сохранении материала!');
+    console.error('Ошибка отправки материала:', error);
   }
 };
 
@@ -39,14 +42,15 @@ export const useMaterialData = (id?: number) => {
   const [materialGroups, setMaterialGroups] = useState<MaterialGroup[]>([]);
   const [units, setUnits] = useState<Unit[]>([]);
   const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const {
-    loadingUnits,
-    loadingMaterialGroups,
-    loadingWarehouses,
     setLoadingMaterialGroups,
     setLoadingUnits,
     setLoadingWarehouses,
+    loadingMaterialGroups,
+    loadingUnits,
+    loadingWarehouses,
   } = useLoadingSelectStore();
 
   const form = useForm<TMaterialFormData>({
@@ -57,107 +61,138 @@ export const useMaterialData = (id?: number) => {
       article: '',
       minBalance: 0,
       priceIn: 0,
-      materialGroupId: 0,
+      materialGroupId: 1,
       materialGroup: {
-        name: '',
+        name: 'Материалы',
       },
       unitId: 0,
       unit: {
         name: '',
       },
       warehouseId: null,
-      warehouse: { name: '' },
+      warehouse: {
+        name: '',
+      },
     },
   });
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (loadingMaterialGroups) {
+    if (loadingMaterialGroups) {
+      const fetchMaterialGroups = async () => {
         try {
-          const data = await Api.materialGroups.fetchAllMaterialGroups();
+          const data = await getAllMaterialGroups();
           setMaterialGroups(data);
         } catch (error) {
-          console.error(
-            'Ошибка при получении данных об группах материалов:',
-            error
-          );
+          console.error('Ошибка при загрузке групп материалов:', error);
           toast.error('Ошибка при загрузке групп материалов!');
         } finally {
           setLoadingMaterialGroups(false);
         }
-      }
+      };
+      fetchMaterialGroups();
+    }
+  }, [loadingMaterialGroups, setLoadingMaterialGroups]);
 
-      if (loadingUnits) {
+  useEffect(() => {
+    if (loadingUnits) {
+      const fetchUnits = async () => {
         try {
-          const data = await Api.units.fetchAllUnits();
+          const data = await getAllUnits();
           setUnits(data);
         } catch (error) {
-          console.error(
-            'Ошибка при получении данных об единицах измерения:',
-            error
-          );
+          console.error('Ошибка при загрузке единиц измерения:', error);
           toast.error('Ошибка при загрузке единиц измерения!');
         } finally {
           setLoadingUnits(false);
         }
-      }
+      };
+      fetchUnits();
+    }
+  }, [loadingUnits, setLoadingUnits]);
 
-      if (loadingWarehouses) {
+  useEffect(() => {
+    if (loadingWarehouses) {
+      const fetchWarehouses = async () => {
         try {
-          const data = await Api.warehouses.fetchAllWarehouses();
+          const data = await getAllWarehouses();
           setWarehouses(data);
         } catch (error) {
-          console.error('Ошибка при получении данных об складах:', error);
+          console.error('Ошибка при загрузке складов:', error);
           toast.error('Ошибка при загрузке складов!');
         } finally {
           setLoadingWarehouses(false);
         }
-      }
-    };
+      };
+      fetchWarehouses();
+    }
+  }, [loadingWarehouses, setLoadingWarehouses]);
 
-    fetchData();
-  }, [
-    loadingMaterialGroups,
-    loadingUnits,
-    loadingWarehouses,
-    setLoadingMaterialGroups,
-    setLoadingUnits,
-    setLoadingWarehouses,
-  ]);
+  const fetchData = useCallback(async () => {
+    try {
+      setIsLoading(true);
+
+      const [materialGroupsData, unitsData, warehousesData] = await Promise.all(
+        [getAllMaterialGroups(), getAllUnits(), getAllWarehouses()]
+      );
+
+      setMaterialGroups(materialGroupsData);
+      setUnits(unitsData);
+      setWarehouses(warehousesData);
+
+      if (id) {
+        const materialData = await getMaterialById(id);
+
+        form.setValue('name', materialData?.name ?? '');
+        form.setValue('comment', materialData?.comment ?? '');
+        form.setValue('article', materialData?.article ?? '');
+        form.setValue('priceIn', materialData?.priceIn ?? 0);
+        form.setValue('minBalance', materialData?.minBalance ?? 0);
+        form.setValue(
+          'materialGroup.name',
+          materialData?.materialGroup.name ?? ''
+        );
+        form.setValue('unit.name', materialData?.unit.name ?? '');
+        form.setValue('warehouse.name', materialData?.warehouse?.name ?? '');
+      }
+    } catch (error) {
+      console.error('Ошибка при загрузке данных:', error);
+      toast.error('Ошибка при загрузке данных!');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [form, id]);
 
   useEffect(() => {
-    if (id) {
-      const fetchMaterialData = async () => {
-        try {
-          const data = await Api.materials.fetchMaterialById(id);
-          form.setValue('name', data.name);
-          form.setValue('comment', data.comment);
-          form.setValue('article', data.article);
-          form.setValue('priceIn', data.priceIn);
-          form.setValue('minBalance', data.minBalance);
-          form.setValue('materialGroup.name', data.materialGroup.name);
-          form.setValue('unit.name', data.unit.name);
-          form.setValue('warehouse.name', data.warehouse?.name);
-        } catch (error) {
-          console.error('Ошибка при получении данных об материале:', error);
-          toast.error('Ошибка при загрузке данных материала!');
-        }
-      };
-      fetchMaterialData();
-    }
+    fetchData();
+  }, [fetchData]);
 
-    return () => {
-      setLoadingMaterialGroups(true);
-      setLoadingUnits(true);
-      setLoadingWarehouses(true);
+  const transformFormData = (values: TMaterialFormData): TMaterialFormData => {
+    const newMaterialGroupId =
+      materialGroups.find((groups) => groups.name === values.materialGroup.name)
+        ?.id || values.materialGroupId;
+    const newUnitId =
+      units.find((units) => units.name === values.unit.name)?.id ||
+      values.unitId;
+    const newWarehouseId =
+      warehouses.find(
+        (warehouses) => warehouses.name === values.warehouse?.name
+      )?.id || values?.warehouseId;
+
+    return {
+      ...values,
+      materialGroupId: newMaterialGroupId,
+      unitId: newUnitId,
+      warehouseId: newWarehouseId,
     };
-  }, [
-    form,
-    id,
-    setLoadingMaterialGroups,
-    setLoadingUnits,
-    setLoadingWarehouses,
-  ]);
+  };
 
-  return { form, handleMaterialSubmit, materialGroups, units, warehouses };
+  return {
+    form,
+    handleMaterialSubmit,
+    materialGroups,
+    units,
+    warehouses,
+    transformFormData,
+    isLoading,
+  };
 };

@@ -1,11 +1,11 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
 
 import { TUnitFormData, UnitFormSchema } from '@/schemas/unit-form-schema';
-import { Api } from '@/services/api-client';
 import { unit } from '@/actions/unit';
+import { getUnitById } from '@/data/unit';
 
 const handleUnitSubmit = async (
   values: TUnitFormData,
@@ -31,6 +31,8 @@ const handleUnitSubmit = async (
 };
 
 export const useUnitData = (id?: number) => {
+  const [isLoading, setIsLoading] = useState(true);
+
   const form = useForm<TUnitFormData>({
     resolver: zodResolver(UnitFormSchema),
     defaultValues: {
@@ -40,25 +42,28 @@ export const useUnitData = (id?: number) => {
     },
   });
 
-  useEffect(() => {
-    if (id) {
-      const fetchUnitData = async () => {
-        try {
-          const data = await Api.units.fetchUnitById(id);
-          form.setValue('name', data.name);
-          form.setValue('status', data.status);
-          form.setValue('comment', data.comment);
-        } catch (error) {
-          console.error(
-            'Ошибка при получении данных об единице измерения:',
-            error
-          );
-          toast.error('Ошибка при загрузке данных единицы измерения!');
-        }
-      };
-      fetchUnitData();
+  const fetchData = useCallback(async () => {
+    try {
+      setIsLoading(true);
+
+      if (id) {
+        const data = await getUnitById(id);
+
+        form.setValue('name', data?.name ?? '');
+        form.setValue('status', data?.status ?? 'ACTIVE');
+        form.setValue('comment', data?.comment ?? '');
+      }
+    } catch (error) {
+      console.error('Ошибка при получении данных об единице измерения:', error);
+      toast.error('Ошибка при загрузке данных единицы измерения!');
+    } finally {
+      setIsLoading(false);
     }
   }, [form, id]);
 
-  return { form, handleUnitSubmit };
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  return { form, handleUnitSubmit, isLoading };
 };

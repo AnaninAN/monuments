@@ -129,8 +129,6 @@ export const login = async (
       password,
       redirectTo: callbackUrl || DEFAULT_LOGIN_REDIRECT,
     });
-
-    logger.info('user', 'Успешный вход', { email, ip });
     return { success: 'Успешный вход!' };
   } catch (error) {
     if (error instanceof AuthError) {

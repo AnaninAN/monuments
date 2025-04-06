@@ -1,6 +1,12 @@
+'use server';
+
+import { MaterialGroup } from '@prisma/client';
+
 import { db } from '@/lib/db';
 
-export const getMaterialGroupById = async (id: number) => {
+export const getMaterialGroupById = async (
+  id?: number
+): Promise<MaterialGroup | null> => {
   try {
     const materialGroup = await db.materialGroup.findUnique({
       where: { id },
@@ -12,7 +18,9 @@ export const getMaterialGroupById = async (id: number) => {
   }
 };
 
-export const getMaterialGroupByName = async (name: string) => {
+export const getMaterialGroupByName = async (
+  name: string
+): Promise<MaterialGroup | null> => {
   try {
     const materialGroup = await db.materialGroup.findUnique({
       where: { name },
@@ -24,12 +32,12 @@ export const getMaterialGroupByName = async (name: string) => {
   }
 };
 
-export const getAllMaterialGroups = async () => {
+export const getAllMaterialGroups = async (): Promise<MaterialGroup[] | []> => {
   try {
     const materialGroups = await db.materialGroup.findMany();
 
     return materialGroups;
   } catch {
-    return null;
+    return [];
   }
 };

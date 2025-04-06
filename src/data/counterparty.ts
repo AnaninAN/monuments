@@ -1,6 +1,13 @@
-import { db } from '@/lib/db';
+'use server';
 
-export const getCounterpartyById = async (id: number) => {
+import { Counterparty } from '@prisma/client';
+
+import { db } from '@/lib/db';
+import { CounterpartyWithAdd } from './dto/counterparty';
+
+export const getCounterpartyById = async (
+  id?: number
+): Promise<CounterpartyWithAdd | null> => {
   try {
     const counterparty = await db.counterparty.findUnique({
       where: { id },
@@ -19,7 +26,9 @@ export const getCounterpartyById = async (id: number) => {
   }
 };
 
-export const getCounterpartyByName = async (name: string) => {
+export const getCounterpartyByName = async (
+  name: string
+): Promise<Counterparty | null> => {
   try {
     const counterparty = await db.counterparty.findUnique({
       where: { name },
@@ -31,7 +40,9 @@ export const getCounterpartyByName = async (name: string) => {
   }
 };
 
-export const getAllCounterparties = async () => {
+export const getAllCounterparties = async (): Promise<
+  CounterpartyWithAdd[] | []
+> => {
   try {
     const counterparties = await db.counterparty.findMany({
       include: {
@@ -45,6 +56,6 @@ export const getAllCounterparties = async () => {
 
     return counterparties;
   } catch {
-    return null;
+    return [];
   }
 };

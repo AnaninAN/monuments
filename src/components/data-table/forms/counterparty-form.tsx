@@ -2,6 +2,12 @@
 
 import { useRouter } from 'next/navigation';
 
+import { TCounterpartyFormData } from '@/schemas/counterparty-form-schema';
+import { translateColumnsCounterparty } from '@/lib/data-table/translate-colums-header';
+import { useTransitionNoErrors } from '@/hooks/use-transition-no-errors';
+import { useStopPropagationStore } from '@/store/stop-propagation';
+import { useCounterpartyData } from '@/hooks/data-table/use-counterparty-data';
+
 import { Form } from '@/components/ui/form';
 import { FormHeader } from '@/components/data-table/forms/form-header';
 import {
@@ -10,12 +16,7 @@ import {
   FormFieldTextarea,
 } from '@/components/data-table/forms/form-field';
 import { CounterpartyTypeForm } from '@/components/data-table/forms/counterparty-type-form';
-
-import { TCounterpartyFormData } from '@/schemas/counterparty-form-schema';
-import { translateColumnsCounterparties } from '@/lib/data-table/translate-colums-header';
-import { useTransitionNoErrors } from '@/hooks/use-transition-no-errors';
-import { useStopPropagationStore } from '@/store/stop-propagation';
-import { useCounterpartyData } from '@/hooks/data-table/use-counterparty-data';
+import { LoadingFormHeader } from '@/components/loading/loading-form-header';
 
 interface CounterpartyFormProps {
   id?: number;
@@ -23,7 +24,7 @@ interface CounterpartyFormProps {
 
 export const CounterpartyForm = ({ id }: CounterpartyFormProps) => {
   const router = useRouter();
-  const { form, handleCounterpartySubmit, counterpartyTypes } =
+  const { form, handleCounterpartySubmit, counterpartyTypes, isLoading } =
     useCounterpartyData(id);
   const { submit, setSubmit } = useStopPropagationStore();
   const { isPending, startTransitionNoErrors } = useTransitionNoErrors(
@@ -56,6 +57,10 @@ export const CounterpartyForm = ({ id }: CounterpartyFormProps) => {
     });
   };
 
+  if (isLoading) {
+    return <LoadingFormHeader />;
+  }
+
   return (
     <Form {...form}>
       <form
@@ -75,7 +80,7 @@ export const CounterpartyForm = ({ id }: CounterpartyFormProps) => {
             form={form}
             name="name"
             placeholder="Введите наименование контрагента"
-            translate={translateColumnsCounterparties}
+            translate={translateColumnsCounterparty}
             isPending={isPending}
           />
         </div>
@@ -84,7 +89,7 @@ export const CounterpartyForm = ({ id }: CounterpartyFormProps) => {
             form={form}
             name="counterpartyType.name"
             placeholder="Выберите тип контрагента"
-            translate={translateColumnsCounterparties}
+            translate={translateColumnsCounterparty}
             items={counterpartyTypes}
             isPending={isPending}
             ButtonOpenForm={CounterpartyTypeForm}
@@ -95,7 +100,7 @@ export const CounterpartyForm = ({ id }: CounterpartyFormProps) => {
             form={form}
             name="comment"
             placeholder="Введите комментарий"
-            translate={translateColumnsCounterparties}
+            translate={translateColumnsCounterparty}
             isPending={isPending}
           />
         </div>

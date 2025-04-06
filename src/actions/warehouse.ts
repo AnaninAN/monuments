@@ -21,9 +21,13 @@ export const warehouse = async (values: TWarehouseFormData, id?: number) => {
       return { error: 'Склад не найден!' };
     }
 
-    await db.warehouse.update({
-      where: { id },
-      data: { ...values },
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { warehouseGroup, ...newValues } = values;
+    await db.$transaction(async (tx) => {
+      await tx.warehouse.update({
+        where: { id },
+        data: { ...newValues },
+      });
     });
 
     return { success: 'Данные склада обновлены!' };
@@ -42,10 +46,14 @@ export const warehouse = async (values: TWarehouseFormData, id?: number) => {
       return { error: 'Такое наименование уже используется!' };
     }
 
-    await db.warehouse.create({
-      data: {
-        ...validatedFields.data,
-      },
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { warehouseGroup, ...newValues } = validatedFields.data;
+    await db.$transaction(async (tx) => {
+      await tx.warehouse.create({
+        data: {
+          ...newValues,
+        },
+      });
     });
 
     return { success: 'Склад создан!' };

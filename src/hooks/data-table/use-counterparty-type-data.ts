@@ -1,14 +1,14 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
 
-import { Api } from '@/services/api-client';
 import {
   CounterpartyTypeFormSchema,
   TCounterpartyTypeFormData,
 } from '@/schemas/counterparty-type-form-schema';
 import { counterpartyType } from '@/actions/counterparty-type';
+import { getCounterpartyTypeById } from '@/data/counterparty-type';
 
 const handleCounterpartyTypeSubmit = async (
   values: TCounterpartyTypeFormData,
@@ -34,6 +34,8 @@ const handleCounterpartyTypeSubmit = async (
 };
 
 export const useCounterpartyTypeData = (id?: number) => {
+  const [isLoading, setIsLoading] = useState(false);
+
   const form = useForm<TCounterpartyTypeFormData>({
     resolver: zodResolver(CounterpartyTypeFormSchema),
     defaultValues: {
@@ -43,26 +45,28 @@ export const useCounterpartyTypeData = (id?: number) => {
     },
   });
 
-  useEffect(() => {
-    if (id) {
-      const fetchCounterpartyTypeData = async () => {
-        try {
-          const data =
-            await Api.counterpartyTypes.fetchCounterpartyTypeById(id);
-          form.setValue('name', data.name);
-          form.setValue('comment', data.comment);
-          form.setValue('status', data.status);
-        } catch (error) {
-          console.error(
-            'Ошибка при получении данных об типе контрагента:',
-            error
-          );
-          toast.error('Ошибка при загрузке данных типа контрагента!');
-        }
-      };
-      fetchCounterpartyTypeData();
+  const fetchCounterpartyTypeData = useCallback(async () => {
+    try {
+      setIsLoading(true);
+
+      if (id) {
+        const data = await getCounterpartyTypeById(id);
+
+        form.setValue('name', data?.name ?? '');
+        form.setValue('comment', data?.comment ?? '');
+        form.setValue('status', data?.status ?? 'ACTIVE');
+      }
+    } catch (error) {
+      console.error('Ошибка при получении данных об типе контрагента:', error);
+      toast.error('Ошибка при загрузке данных типа контрагента!');
+    } finally {
+      setIsLoading(false);
     }
   }, [form, id]);
 
-  return { form, handleCounterpartyTypeSubmit };
+  useEffect(() => {
+    fetchCounterpartyTypeData();
+  }, [fetchCounterpartyTypeData]);
+
+  return { form, handleCounterpartyTypeSubmit, isLoading };
 };

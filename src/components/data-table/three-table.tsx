@@ -1,0 +1,68 @@
+'use client';
+
+import { ColumnDef } from '@tanstack/react-table';
+import { useState } from 'react';
+
+import { TGroupFormData } from '@/schemas/group-form-schema';
+
+import { DataTable } from '@/components/data-table/data-table';
+import { TreeNode } from '@/components/types/types';
+import { TreeGroupView } from '@/components/data-table/tree-group-view';
+
+export type GetGroupById = (
+  id?: number | undefined
+) => Promise<TGroupFormData | null>;
+
+export type Action = (
+  values: TGroupFormData,
+  id?: number
+) => Promise<{ error?: string; success?: string }>;
+
+export interface TThree {
+  threeData: TreeNode[];
+  getGroupById: GetGroupById;
+  action: Action;
+}
+
+interface ThreeTableProps<TData, TValue> {
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
+  FormComponent: React.ComponentType;
+  title: string;
+  filter: string;
+  translateColumns: Record<string, string>;
+  three?: TThree;
+}
+
+export function ThreeTable<TData, TValue>({
+  columns,
+  data,
+  FormComponent,
+  title,
+  filter,
+  translateColumns,
+  three,
+}: ThreeTableProps<TData, TValue>) {
+  return (
+    <div>
+      <h1 className="font-semibold self-center flex mb-4">{title}</h1>
+      <div className="flex">
+        {three && (
+          <TreeGroupView
+            data={three.threeData}
+            getGroupById={three.getGroupById}
+            action={three.action}
+            className="w-1/6"
+          />
+        )}
+        <DataTable
+          columns={columns}
+          data={data}
+          FormComponent={FormComponent}
+          filter={filter}
+          translateColumns={translateColumns}
+        />
+      </div>
+    </div>
+  );
+}

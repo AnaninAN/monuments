@@ -1,14 +1,21 @@
-import { useEffect } from 'react';
+'use client';
+
+import { useEffect, useState, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
+import { WarehouseGroup } from '@prisma/client';
 
-import { Api } from '@/services/api-client';
 import {
   TWarehouseFormData,
   WarehouseFormSchema,
 } from '@/schemas/warehouse-form-schema';
 import { warehouse } from '@/actions/warehouse';
+
+import { getAllWarehouseGroups } from '@/data/warehouse-group';
+import { getWarehouseById } from '@/data/warehouse';
+
+import { useLoadingSelectStore } from '@/store/loading-select';
 
 const handleWarehouseSubmit = async (
   values: TWarehouseFormData,
@@ -34,6 +41,12 @@ const handleWarehouseSubmit = async (
 };
 
 export const useWarehouseData = (id?: number) => {
+  const [warehouseGroups, setWarehouseGroups] = useState<WarehouseGroup[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const { setLoadingWarehouseGroups, loadingWarehouseGroups } =
+    useLoadingSelectStore();
+
   const form = useForm<TWarehouseFormData>({
     resolver: zodResolver(WarehouseFormSchema),
     defaultValues: {
@@ -41,26 +54,78 @@ export const useWarehouseData = (id?: number) => {
       shortName: '',
       comment: '',
       status: 'ACTIVE',
+      warehouseGroupId: 1,
+      warehouseGroup: {
+        name: 'Склады',
+      },
     },
   });
 
   useEffect(() => {
-    if (id) {
-      const fetchWarehouseData = async () => {
+    if (loadingWarehouseGroups) {
+      const fetchWarehouseGroups = async () => {
         try {
-          const data = await Api.warehouses.fetchWarehouseById(id);
-          form.setValue('name', data.name);
-          form.setValue('shortName', data.shortName);
-          form.setValue('status', data.status);
-          form.setValue('comment', data.comment);
+          const data = await getAllWarehouseGroups();
+          setWarehouseGroups(data);
         } catch (error) {
-          console.error('Ошибка при получении данных об складе:', error);
-          toast.error('Ошибка при загрузке данных склада!');
+          console.error('Ошибка при загрузке групп складов:', error);
+          toast.error('Ошибка при загрузке групп складов!');
+        } finally {
+          setLoadingWarehouseGroups(false);
         }
       };
-      fetchWarehouseData();
+      fetchWarehouseGroups();
+    }
+  }, [loadingWarehouseGroups, setLoadingWarehouseGroups]);
+
+  const fetchWarehouseData = useCallback(async () => {
+    try {
+      setIsLoading(true);
+
+      const warehouseGroupsData = await getAllWarehouseGroups();
+
+      setWarehouseGroups(warehouseGroupsData);
+
+      if (id) {
+        const data = await getWarehouseById(id);
+
+        form.setValue('name', data?.name ?? '');
+        form.setValue('shortName', data?.shortName ?? '');
+        form.setValue('status', data?.status ?? 'ACTIVE');
+        form.setValue('comment', data?.comment ?? '');
+        form.setValue('warehouseGroup.name', data?.warehouseGroup.name ?? '');
+      }
+    } catch (error) {
+      console.error('Ошибка при загрузке данных склада:', error);
+      toast.error('Ошибка при загрузке данных склада!');
+    } finally {
+      setIsLoading(false);
     }
   }, [form, id]);
 
-  return { form, handleWarehouseSubmit };
+  useEffect(() => {
+    fetchWarehouseData();
+  }, [fetchWarehouseData]);
+
+  const transformFormData = (
+    values: TWarehouseFormData
+  ): TWarehouseFormData => {
+    const newWarehouseGroupId =
+      warehouseGroups.find(
+        (groups) => groups.name === values.warehouseGroup.name
+      )?.id || values.warehouseGroupId;
+
+    return {
+      ...values,
+      warehouseGroupId: newWarehouseGroupId,
+    };
+  };
+
+  return {
+    form,
+    handleWarehouseSubmit,
+    isLoading,
+    transformFormData,
+    warehouseGroups,
+  };
 };

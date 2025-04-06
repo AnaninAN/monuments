@@ -6,7 +6,7 @@ import {
   KeyTWarehouseFormData,
   TWarehouseFormData,
 } from '@/schemas/warehouse-form-schema';
-import { translateColumnsWarehouses } from '@/lib/data-table/translate-colums-header';
+import { translateColumnsWarehouse } from '@/lib/data-table/translate-colums-header';
 import {
   ColumnsType,
   dataTableColumns,
@@ -26,7 +26,7 @@ const cols: ColumnsType<KeyTWarehouseFormData> = [
 export const columns: ColumnDef<TWarehouseFormData>[] = dataTableColumns(
   'id',
   cols,
-  translateColumnsWarehouses,
+  translateColumnsWarehouse,
   delWarehouse,
   WarehouseForm
 );

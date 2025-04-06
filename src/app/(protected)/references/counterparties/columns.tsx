@@ -6,7 +6,7 @@ import {
   KeyTCounterpartyFormData,
   TCounterpartyFormData,
 } from '@/schemas/counterparty-form-schema';
-import { translateColumnsCounterparties } from '@/lib/data-table/translate-colums-header';
+import { translateColumnsCounterparty } from '@/lib/data-table/translate-colums-header';
 import {
   ColumnsType,
   dataTableColumns,
@@ -26,7 +26,7 @@ const cols: ColumnsType<KeyTCounterpartyFormData> = [
 export const columns: ColumnDef<TCounterpartyFormData>[] = dataTableColumns(
   'id',
   cols,
-  translateColumnsCounterparties,
+  translateColumnsCounterparty,
   delCounterparty,
   CounterpartyForm
 );

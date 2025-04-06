@@ -1,3 +1,6 @@
+import * as fs from 'fs';
+import * as path from 'path';
+
 import { categoryLoggers, LogCategory } from './logger-category';
 
 type LogLevel = 'info' | 'warn' | 'error';
@@ -11,9 +14,16 @@ interface LogEntry {
   category: LogCategory;
 }
 
+interface WinstonLogData {
+  timestamp: string;
+  level: string;
+  message: string;
+  userId?: string;
+  [key: string]: unknown;
+}
+
 class Logger {
   private static instance: Logger;
-  private logs: LogEntry[] = [];
 
   private constructor() {}
 
@@ -39,8 +49,6 @@ class Logger {
       userId,
       category,
     };
-
-    this.logs.push(entry);
 
     console.log(
       `[${entry.timestamp}] [${category.toUpperCase()}] ${level.toUpperCase()}: ${message}`,
@@ -95,12 +103,53 @@ class Logger {
     this.log(logCategory, 'error', message, data, userId);
   }
 
-  getLogs(): LogEntry[] {
-    return [...this.logs];
+  getLogs(category: LogCategory): LogEntry[] {
+    const logFile = path.join(process.cwd(), 'logs', `${category}.log`);
+
+    try {
+      if (!fs.existsSync(logFile)) {
+        return [];
+      }
+
+      const logContent = fs.readFileSync(logFile, 'utf-8');
+      return logContent
+        .split('\n')
+        .filter((line: string) => line.trim())
+        .map((line: string): LogEntry | null => {
+          try {
+            const logData = JSON.parse(line) as WinstonLogData;
+            return {
+              timestamp: logData.timestamp,
+              level: logData.level.toLowerCase() as LogLevel,
+              message: logData.message,
+              data: logData,
+              category: category,
+            };
+          } catch {
+            return null;
+          }
+        })
+        .filter((entry: LogEntry | null): entry is LogEntry => entry !== null);
+    } catch (error) {
+      console.error(`Ошибка чтения журнала для категории ${category}:`, error);
+      return [];
+    }
   }
 
-  clearLogs() {
-    this.logs = [];
+  clearLogs(category: LogCategory): boolean {
+    const logFile = path.join(process.cwd(), 'logs', `${category}.log`);
+
+    try {
+      if (!fs.existsSync(logFile)) {
+        return false;
+      }
+
+      fs.writeFileSync(logFile, '');
+      return true;
+    } catch (error) {
+      console.error(`Ошибка очистки журнала для категории ${category}:`, error);
+      return false;
+    }
   }
 }
 

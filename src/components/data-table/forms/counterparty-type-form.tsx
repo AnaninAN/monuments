@@ -2,22 +2,24 @@
 
 import { useRouter } from 'next/navigation';
 
-import { Form } from '@/components/ui/form';
-import { FormHeader } from '@/components/data-table/forms/form-header';
-import {
-  FormFieldInput,
-  FormFieldTextarea,
-} from '@/components/data-table/forms/form-field';
-
 import { TCounterpartyTypeFormData } from '@/schemas/counterparty-type-form-schema';
 import { translateColumnsCounterpartyType } from '@/lib/data-table/translate-colums-header';
 import { useLoadingSelectStore } from '@/store/loading-select';
 import { useTransitionNoErrors } from '@/hooks/use-transition-no-errors';
 import { useCounterpartyTypeData } from '@/hooks/data-table/use-counterparty-type-data';
 
+import { Form } from '@/components/ui/form';
+import { FormHeader } from '@/components/data-table/forms/form-header';
+import {
+  FormFieldInput,
+  FormFieldTextarea,
+} from '@/components/data-table/forms/form-field';
+import { LoadingFormHeader } from '@/components/loading/loading-form-header';
+
 export const CounterpartyTypeForm = ({ id }: { id?: number }) => {
   const router = useRouter();
-  const { form, handleCounterpartyTypeSubmit } = useCounterpartyTypeData(id);
+  const { form, handleCounterpartyTypeSubmit, isLoading } =
+    useCounterpartyTypeData(id);
   const { setloadingCounterpartyTypes } = useLoadingSelectStore();
   const { isPending, startTransitionNoErrors } = useTransitionNoErrors(form);
 
@@ -30,6 +32,10 @@ export const CounterpartyTypeForm = ({ id }: { id?: number }) => {
       });
     });
   };
+
+  if (isLoading) {
+    return <LoadingFormHeader />;
+  }
 
   return (
     <Form {...form}>

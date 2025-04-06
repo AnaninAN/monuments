@@ -1,6 +1,11 @@
+'use server';
+
+import { ExtendedUser } from '@/next-auth';
+import { User } from '@prisma/client';
+
 import { db } from '@/lib/db';
 
-export const getUserByEmail = async (email: string) => {
+export const getUserByEmail = async (email: string): Promise<User | null> => {
   try {
     const user = await db.user.findUnique({ where: { email } });
 
@@ -10,7 +15,7 @@ export const getUserByEmail = async (email: string) => {
   }
 };
 
-export const getUserById = async (id: string) => {
+export const getUserById = async (id: string): Promise<User | null> => {
   try {
     const user = await db.user.findUnique({
       where: { id },
@@ -22,7 +27,9 @@ export const getUserById = async (id: string) => {
   }
 };
 
-export const getUserByIdInt = async (idInt: number) => {
+export const getUserByIdInt = async (
+  idInt?: number
+): Promise<ExtendedUser | null> => {
   try {
     const user = await db.user.findUnique({
       where: { idInt },
@@ -34,7 +41,7 @@ export const getUserByIdInt = async (idInt: number) => {
   }
 };
 
-export const getUserMaxIdInt = async () => {
+export const getUserMaxIdInt = async (): Promise<number | null> => {
   try {
     const maxIdInt = await db.user.aggregate({
       _max: {
@@ -48,7 +55,7 @@ export const getUserMaxIdInt = async () => {
   }
 };
 
-export const getAllUsers = async () => {
+export const getAllUsers = async (): Promise<ExtendedUser[] | []> => {
   try {
     const users = await db.user.findMany({
       select: {
@@ -65,8 +72,8 @@ export const getAllUsers = async () => {
       },
     });
 
-    return users;
+    return users as ExtendedUser[];
   } catch {
-    return null;
+    return [];
   }
 };

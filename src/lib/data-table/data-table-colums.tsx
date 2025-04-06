@@ -5,7 +5,7 @@ import { CellStatus } from '@/components/data-table/cell-status';
 import { RowActions } from '@/components/data-table/row-actions';
 
 import { dataTableColumnHeader } from '@/lib/data-table/data-table-column-header';
-import { translateColumnActions } from '@/lib/data-table/translate-colums-header';
+import { translateColumnsAction } from '@/lib/data-table/translate-colums-header';
 
 export type ColumnsType<K> = { key: K; sort: boolean }[];
 
@@ -20,6 +20,9 @@ const renderColumns = <T extends Record<string, unknown>, K extends string>(
         accessorKey: key.replace('_', '.'),
         header: ({ column }) =>
           dataTableColumnHeader<T, K>(column, translateColumns, sort),
+        cell: ({ row }) => {
+          return row.getValue(key) === undefined ? '-' : row.getValue(key);
+        },
       });
     } else {
       col.push({
@@ -63,7 +66,7 @@ export function dataTableColumns<
     {
       id: 'actions',
       header: ({ column }) =>
-        dataTableColumnHeader<T, K>(column, translateColumnActions),
+        dataTableColumnHeader<T, K>(column, translateColumnsAction),
       cell: ({ row }) => (
         <RowActions
           id={row.getValue(key)}

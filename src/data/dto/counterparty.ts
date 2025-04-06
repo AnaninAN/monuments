@@ -1,5 +1,5 @@
 import { Counterparty, CounterpartyType } from '@prisma/client';
 
-export type CounterpartyWithType = Counterparty & {
+export type CounterpartyWithAdd = Counterparty & {
   counterpartyType: Pick<CounterpartyType, 'name'>;
 };

@@ -1,6 +1,13 @@
-import { db } from '@/lib/db';
+'use server';
 
-export const getMaterialById = async (id: number) => {
+import { Material } from '@prisma/client';
+
+import { db } from '@/lib/db';
+import { MaterialWithAdd } from './dto/material';
+
+export const getMaterialById = async (
+  id?: number
+): Promise<MaterialWithAdd | null> => {
   try {
     const material = await db.material.findUnique({
       where: { id },
@@ -29,7 +36,9 @@ export const getMaterialById = async (id: number) => {
   }
 };
 
-export const getMaterialByName = async (name: string) => {
+export const getMaterialByName = async (
+  name: string
+): Promise<Material | null> => {
   try {
     const material = await db.material.findUnique({
       where: { name },
@@ -41,7 +50,7 @@ export const getMaterialByName = async (name: string) => {
   }
 };
 
-export const getAllMaterials = async () => {
+export const getAllMaterials = async (): Promise<MaterialWithAdd[] | []> => {
   try {
     const materials = await db.material.findMany({
       include: {
@@ -65,6 +74,6 @@ export const getAllMaterials = async () => {
 
     return materials;
   } catch {
-    return null;
+    return [];
   }
 };
