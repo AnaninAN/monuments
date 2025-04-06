@@ -8,9 +8,7 @@ import { DataTable } from '@/components/data-table/data-table';
 import { TreeNode } from '@/components/types/types';
 import { TreeGroupView } from '@/components/data-table/tree-group-view';
 
-export type GetGroupById = (
-  id?: number | undefined
-) => Promise<TGroupFormData | null>;
+export type GetGroupById = (id?: number) => Promise<TGroupFormData | null>;
 
 export type Action = (
   values: TGroupFormData,

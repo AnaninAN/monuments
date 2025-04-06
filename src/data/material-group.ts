@@ -3,16 +3,26 @@
 import { MaterialGroup } from '@prisma/client';
 
 import { db } from '@/lib/db';
+import { TGroupFormData } from '@/schemas/group-form-schema';
 
 export const getMaterialGroupById = async (
   id?: number
-): Promise<MaterialGroup | null> => {
+): Promise<TGroupFormData | null> => {
   try {
     const materialGroup = await db.materialGroup.findUnique({
       where: { id },
     });
 
-    return materialGroup;
+    const parentGroup = materialGroup?.parentId
+      ? await db.materialGroup.findUnique({
+          where: { id: materialGroup.parentId },
+        })
+      : null;
+
+    return {
+      name: materialGroup?.name || '',
+      parentname: parentGroup?.name || '',
+    };
   } catch {
     return null;
   }
