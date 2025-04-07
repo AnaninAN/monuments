@@ -2,24 +2,9 @@
 
 import { ColumnDef } from '@tanstack/react-table';
 
-import { TGroupFormData } from '@/schemas/group-form-schema';
-
 import { DataTable } from '@/components/data-table/data-table';
-import { TreeNode } from '@/components/types/types';
+import { TThree } from '@/components/types/types';
 import { TreeGroupView } from '@/components/data-table/tree-group-view';
-
-export type GetGroupById = (id?: number) => Promise<TGroupFormData | null>;
-
-export type Action = (
-  values: TGroupFormData,
-  id?: number
-) => Promise<{ error?: string; success?: string }>;
-
-export interface TThree {
-  threeData: TreeNode[];
-  getGroupById: GetGroupById;
-  action: Action;
-}
 
 interface ThreeTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -49,6 +34,7 @@ export function ThreeTable<TData, TValue>({
             data={three.threeData}
             getGroupById={three.getGroupById}
             action={three.action}
+            actionDel={three.actionDel}
             className="w-1/6"
           />
         )}

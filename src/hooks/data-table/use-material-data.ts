@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
-import { MaterialGroup, Unit, Warehouse } from '@prisma/client';
+import { Unit, Warehouse } from '@prisma/client';
 
 import {
   MaterialFormSchema,
@@ -14,6 +14,7 @@ import { getAllMaterialGroups } from '@/data/material-group';
 import { getAllUnits } from '@/data/unit';
 import { getAllWarehouses } from '@/data/warehouse';
 import { getMaterialById } from '@/data/material';
+import { EntityGroup } from '@/data/dto/entity-group';
 
 const handleMaterialSubmit = async (
   values: TMaterialFormData,
@@ -39,7 +40,7 @@ const handleMaterialSubmit = async (
 };
 
 export const useMaterialData = (id?: number) => {
-  const [materialGroups, setMaterialGroups] = useState<MaterialGroup[]>([]);
+  const [materialGroups, setMaterialGroups] = useState<EntityGroup[]>([]);
   const [units, setUnits] = useState<Unit[]>([]);
   const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
   const [isLoading, setIsLoading] = useState(true);

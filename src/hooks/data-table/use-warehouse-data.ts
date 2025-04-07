@@ -4,7 +4,6 @@ import { useEffect, useState, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
-import { WarehouseGroup } from '@prisma/client';
 
 import {
   TWarehouseFormData,
@@ -16,6 +15,7 @@ import { getAllWarehouseGroups } from '@/data/warehouse-group';
 import { getWarehouseById } from '@/data/warehouse';
 
 import { useLoadingSelectStore } from '@/store/loading-select';
+import { EntityGroup } from '@/data/dto/entity-group';
 
 const handleWarehouseSubmit = async (
   values: TWarehouseFormData,
@@ -41,7 +41,7 @@ const handleWarehouseSubmit = async (
 };
 
 export const useWarehouseData = (id?: number) => {
-  const [warehouseGroups, setWarehouseGroups] = useState<WarehouseGroup[]>([]);
+  const [warehouseGroups, setWarehouseGroups] = useState<EntityGroup[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const { setLoadingWarehouseGroups, loadingWarehouseGroups } =

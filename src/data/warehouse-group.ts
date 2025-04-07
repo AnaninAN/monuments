@@ -4,6 +4,7 @@ import { WarehouseGroup } from '@prisma/client';
 
 import { db } from '@/lib/db';
 import { TGroupFormData } from '@/schemas/group-form-schema';
+import { EntityGroup } from './dto/entity-group';
 
 export const getWarehouseGroupById = async (
   id?: number | undefined
@@ -22,6 +23,7 @@ export const getWarehouseGroupById = async (
     return {
       name: warehouseGroup?.name || '',
       parentname: parentGroup?.name || '',
+      parentId: warehouseGroup?.parentId || 0,
     };
   } catch {
     return null;
@@ -42,13 +44,28 @@ export const getWarehouseGroupByName = async (
   }
 };
 
-export const getAllWarehouseGroups = async (): Promise<
-  WarehouseGroup[] | []
-> => {
+export const getAllWarehouseGroups = async (): Promise<EntityGroup[] | []> => {
   try {
-    const warehouseGroups = await db.warehouseGroup.findMany();
+    const warehouseGroups = await db.warehouseGroup.findMany({
+      include: {
+        _count: {
+          select: {
+            warehouse: true,
+          },
+        },
+      },
+    });
 
-    return warehouseGroups;
+    const countAll = warehouseGroups.reduce(
+      (acc, group) => acc + group._count.warehouse,
+      0
+    );
+
+    return warehouseGroups.map((group) => ({
+      ...group,
+      count: group._count.warehouse,
+      countAll,
+    }));
   } catch {
     return [];
   }

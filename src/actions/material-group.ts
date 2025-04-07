@@ -28,10 +28,13 @@ export const materialGroup = async (values: TGroupFormData, id?: number) => {
       return { error: 'Категория материала не найдена!' };
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { parentname, ...newValues } = values;
+
     await db.$transaction(async (tx) => {
       await tx.materialGroup.update({
         where: { id },
-        data: { ...values },
+        data: { ...newValues },
       });
     });
 
@@ -60,10 +63,12 @@ export const materialGroup = async (values: TGroupFormData, id?: number) => {
       return { error: 'Такое наименование уже используется!' };
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { parentname, ...newValues } = validatedFields.data;
     await db.$transaction(async (tx) => {
       await tx.materialGroup.create({
         data: {
-          ...validatedFields.data,
+          ...newValues,
         },
       });
     });
@@ -75,7 +80,8 @@ export const materialGroup = async (values: TGroupFormData, id?: number) => {
   }
 };
 
-export const delMaterialGroup = async (id: number) => {
+export const delMaterialGroup = async (id?: number) => {
+  console.log('delMaterialGroup', id);
   const existingMaterialGroup = await getMaterialGroupById(id);
 
   if (!existingMaterialGroup) {
@@ -86,7 +92,7 @@ export const delMaterialGroup = async (id: number) => {
   }
 
   await db.$transaction(async (tx) => {
-    await tx.warehouseGroup.delete({ where: { id } });
+    await tx.materialGroup.delete({ where: { id } });
   });
 
   logger.info('materialGroup', 'Категория материала удалена!', { id });

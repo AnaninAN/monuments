@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 export const GroupFormSchema = z.object({
+  parentId: z.number(),
   parentname: z.string(),
   name: z
     .string()

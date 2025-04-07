@@ -9,11 +9,11 @@ import {
   getAllWarehouseGroups,
   getWarehouseGroupById,
 } from '@/data/warehouse-group';
-import type { TThree } from '@/components/data-table/three-table';
 
 import { WarehouseForm } from '@/components/data-table/forms/warehouse-form';
 import { ThreeTable } from '@/components/data-table/three-table';
-import { warehouseGroup } from '@/actions/warehouse-group';
+import { delWarehouseGroup, warehouseGroup } from '@/actions/warehouse-group';
+import { TThree } from '@/components/types/types';
 
 async function WarehousesPage() {
   const [warehouses, warehouseGroups] = await Promise.all([
@@ -27,6 +27,7 @@ async function WarehousesPage() {
     threeData: warehouseGroups,
     getGroupById: getWarehouseGroupById,
     action: warehouseGroup,
+    actionDel: delWarehouseGroup,
   };
 
   return (

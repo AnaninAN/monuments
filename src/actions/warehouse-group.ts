@@ -28,10 +28,12 @@ export const warehouseGroup = async (values: TGroupFormData, id?: number) => {
       return { error: 'Категория склада не найдена!' };
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { parentname, ...newValues } = values;
     await db.$transaction(async (tx) => {
       await tx.warehouseGroup.update({
         where: { id },
-        data: { ...values },
+        data: { ...newValues },
       });
     });
 
@@ -60,10 +62,13 @@ export const warehouseGroup = async (values: TGroupFormData, id?: number) => {
       return { error: 'Такое наименование уже используется!' };
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { parentname, ...newValues } = validatedFields.data;
+
     await db.$transaction(async (tx) => {
       await tx.warehouseGroup.create({
         data: {
-          ...validatedFields.data,
+          ...newValues,
         },
       });
     });

@@ -9,26 +9,33 @@ import { useRouter } from 'next/navigation';
 import { translateColumnsGroup } from '@/lib/data-table/translate-colums-header';
 import { useTransitionNoErrors } from '@/hooks/use-transition-no-errors';
 import { GroupFormSchema, TGroupFormData } from '@/schemas/group-form-schema';
+import { Action, GetGroupById, TreeNode } from '@/components/types/types';
 
 import { Form } from '@/components/ui/form';
 import { FormFieldInput } from '@/components/data-table/forms/form-field';
 import { Button } from '@/components/ui/button';
-import { Action, GetGroupById } from '@/components/data-table/three-table';
 
 interface GroupFormProps {
+  parent?: TreeNode;
   id?: number;
   getGroupById?: GetGroupById;
   action?: Action;
 }
 
-export const GroupForm = ({ id, getGroupById, action }: GroupFormProps) => {
+export const GroupForm = ({
+  parent,
+  id,
+  getGroupById,
+  action,
+}: GroupFormProps) => {
   const router = useRouter();
 
   const form = useForm<TGroupFormData>({
     resolver: zodResolver(GroupFormSchema),
     defaultValues: {
       name: '',
-      parentname: parent.name,
+      parentname: parent?.name ?? '',
+      parentId: parent?.id ?? 0,
     },
   });
 
@@ -39,8 +46,10 @@ export const GroupForm = ({ id, getGroupById, action }: GroupFormProps) => {
       const fetchGroupData = async () => {
         try {
           const data = await getGroupById?.(id);
+
           form.setValue('parentname', data?.parentname ?? '');
           form.setValue('name', data?.name ?? '');
+          form.setValue('parentId', data?.parentId ?? 1);
         } catch (error) {
           console.error('Ошибка при получении данных об группе:', error);
           toast.error('Ошибка при загрузке данных группы!');
@@ -56,18 +65,19 @@ export const GroupForm = ({ id, getGroupById, action }: GroupFormProps) => {
         const data = await action?.(values, id);
 
         if (data?.error) {
-          router.refresh();
-          if (!id) form.reset();
           toast.error(data.error);
           return;
         }
 
         if (data?.success) {
+          router.refresh();
           toast.success(data.success);
         }
       } catch (error) {
         toast.error('Произошла ошибка при сохранении группы!');
         console.error('Ошибка отправки группы:', error);
+      } finally {
+        if (!id) form.reset();
       }
     });
   };

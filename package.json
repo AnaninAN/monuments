@@ -11,7 +11,9 @@
     "prisma:generate": "prisma generate",
     "prisma:push": "prisma db push",
     "prisma:studio": "prisma studio",
-    "prisma:seed": "prisma db seed"
+    "prisma:seed": "prisma db seed",
+    "backup": "node --loader ts-node/esm scripts/backup.ts",
+    "restore": "node --loader ts-node/esm scripts/restore.ts"
   },
   "prisma": {
     "schema": "./src/prisma/schema.prisma",
@@ -74,6 +76,7 @@
     "postcss": "^8.5.3",
     "prisma": "^6.5.0",
     "tailwindcss": "^3.4.17",
+    "ts-node": "^10.9.2",
     "typescript": "^5"
   }
 }

@@ -9,10 +9,11 @@ import {
   getAllMaterialGroups,
   getMaterialGroupById,
 } from '@/data/material-group';
+import type { TThree } from '@/components/types/types';
 
 import { MaterialForm } from '@/components/data-table/forms/material-form';
-import { ThreeTable, TThree } from '@/components/data-table/three-table';
-import { materialGroup } from '@/actions/material-group';
+import { ThreeTable } from '@/components/data-table/three-table';
+import { delMaterialGroup, materialGroup } from '@/actions/material-group';
 
 async function MaterialsPage() {
   const [materials, materialGroups] = await Promise.all([
@@ -26,6 +27,7 @@ async function MaterialsPage() {
     threeData: materialGroups,
     getGroupById: getMaterialGroupById,
     action: materialGroup,
+    actionDel: delMaterialGroup,
   };
 
   return (
