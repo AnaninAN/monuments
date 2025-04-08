@@ -1,7 +1,11 @@
 'use server';
 
 import { db } from '@/lib/db';
-import { getWarehouseByName, getWarehouseById } from '@/data/warehouse';
+import {
+  getWarehouseByName,
+  getWarehouseById,
+  getAllWarehouses,
+} from '@/data/warehouse';
 import {
   TWarehouseFormData,
   WarehouseFormSchema,
@@ -70,4 +74,12 @@ export const delWarehouse = async (id: number) => {
   await db.warehouse.delete({ where: { id } });
 
   return { success: 'Склад удален!' };
+};
+
+export const filterWarehouse = async (id: number) => {
+  const filterWarehouse = await getAllWarehouses(id);
+  if (!filterWarehouse) {
+    return [];
+  }
+  return filterWarehouse;
 };

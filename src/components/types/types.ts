@@ -20,9 +20,12 @@ export type ActionDel = (
   id: number
 ) => Promise<{ error?: string; success?: string }>;
 
-export type TThree = {
+export type ActionFilter<TData> = (id: number) => Promise<TData[]>;
+
+export type TThree<TData> = {
   threeData: TreeNode[];
   getGroupById: GetGroupById;
   action: Action;
   actionDel: ActionDel;
+  actionFilter: ActionFilter<TData>;
 };

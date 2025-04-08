@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import type {
   Action,
   ActionDel,
+  ActionFilter,
   GetGroupById,
   TreeNode,
 } from '@/components/types/types';
@@ -30,21 +31,22 @@ import useConfirmationStore from '@/store/confirmation';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 
-interface TreeViewProps {
+interface TreeViewProps<TData> {
   data: TreeNode[];
   className?: string;
   getGroupById?: GetGroupById;
   action: Action;
   actionDel: ActionDel;
+  actionFilter?: ActionFilter<TData>;
 }
 
-export function TreeGroupView({
+export function TreeGroupView<TData>({
   data,
   className,
   getGroupById,
   action,
   actionDel,
-}: TreeViewProps) {
+}: TreeViewProps<TData>) {
   const [selectedId, setSelectedId] = useState<number>(1);
   const { openConfirmation } = useConfirmationStore();
   const router = useRouter();

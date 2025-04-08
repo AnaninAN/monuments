@@ -40,19 +40,36 @@ export const getWarehouseByName = async (
   }
 };
 
-export const getAllWarehouses = async (): Promise<WarehouseWithAdd[] | []> => {
+export const getAllWarehouses = async (
+  idGroup?: number
+): Promise<WarehouseWithAdd[] | []> => {
   try {
-    const warehouses = await db.warehouse.findMany({
-      include: {
-        warehouseGroup: {
-          select: {
-            name: true,
+    if (idGroup && idGroup !== 1) {
+      const warehouses = await db.warehouse.findMany({
+        where: {
+          warehouseGroupId: idGroup,
+        },
+        include: {
+          warehouseGroup: {
+            select: {
+              name: true,
+            },
           },
         },
-      },
-    });
-
-    return warehouses;
+      });
+      return warehouses;
+    } else {
+      const warehouses = await db.warehouse.findMany({
+        include: {
+          warehouseGroup: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      });
+      return warehouses;
+    }
   } catch {
     return [];
   }

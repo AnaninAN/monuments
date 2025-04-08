@@ -13,7 +13,7 @@ interface ThreeTableProps<TData, TValue> {
   title: string;
   filter: string;
   translateColumns: Record<string, string>;
-  three?: TThree;
+  three?: TThree<TData>;
 }
 
 export function ThreeTable<TData, TValue>({
@@ -35,6 +35,7 @@ export function ThreeTable<TData, TValue>({
             getGroupById={three.getGroupById}
             action={three.action}
             actionDel={three.actionDel}
+            actionFilter={three.actionFilter}
             className="w-1/6"
           />
         )}
