@@ -14,19 +14,19 @@ import {
 
 import { WarehouseForm } from '@/components/data-table/forms/warehouse-form';
 
-import { delWarehouse } from '@/actions/warehouse';
+import { delWarehouseAction } from '@/actions/warehouse';
 
-const cols: ColumnsType<KeyTWarehouseFormData> = [
+const columnsWarehouse: ColumnsType<KeyTWarehouseFormData> = [
   { key: 'name', sort: true },
   { key: 'shortName', sort: false },
   { key: 'comment', sort: false },
   { key: 'status', sort: false },
 ];
 
-export const columns: ColumnDef<TWarehouseFormData>[] = dataTableColumns(
-  'id',
-  cols,
-  translateColumnsWarehouse,
-  delWarehouse,
-  WarehouseForm
-);
+export const columns: ColumnDef<TWarehouseFormData>[] = dataTableColumns({
+  key: 'id',
+  columns: columnsWarehouse,
+  translateColumns: translateColumnsWarehouse,
+  delRowDataTableAction: delWarehouseAction,
+  FormComponent: WarehouseForm,
+});

@@ -1,13 +1,22 @@
 import { ColumnDef } from '@tanstack/react-table';
 
+import { dataTableColumnHeader } from '@/lib/data-table/data-table-column-header';
+import { translateColumnsAction } from '@/lib/data-table/translate-colums-header';
+import { TDataTableAction } from '@/types/types';
+
 import { DataSheet } from '@/components/data-table/data-sheet';
 import { CellStatus } from '@/components/data-table/cell-status';
 import { RowActions } from '@/components/data-table/row-actions';
 
-import { dataTableColumnHeader } from '@/lib/data-table/data-table-column-header';
-import { translateColumnsAction } from '@/lib/data-table/translate-colums-header';
-
 export type ColumnsType<K> = { key: K; sort: boolean }[];
+
+type DataTableColumnsProps<K extends string> = {
+  key: K;
+  columns: ColumnsType<K>;
+  translateColumns: Record<K, string>;
+  delRowDataTableAction?: TDataTableAction;
+  FormComponent?: React.ComponentType<{ id?: number }>;
+};
 
 const renderColumns = <T extends Record<string, unknown>, K extends string>(
   columns: ColumnsType<K>,
@@ -39,13 +48,13 @@ const renderColumns = <T extends Record<string, unknown>, K extends string>(
 export function dataTableColumns<
   T extends Record<string, unknown>,
   K extends string,
->(
-  key: K,
-  columns: ColumnsType<K>,
-  translateColumns: Record<K, string>,
-  actionDel?: (id: number) => Promise<{ success?: string; error?: string }>,
-  FormComponent?: React.ComponentType<{ id?: number }>
-): ColumnDef<T>[] {
+>({
+  key,
+  columns,
+  translateColumns,
+  delRowDataTableAction,
+  FormComponent,
+}: DataTableColumnsProps<K>): ColumnDef<T>[] {
   return [
     {
       accessorKey: key,
@@ -71,7 +80,7 @@ export function dataTableColumns<
         <RowActions
           id={row.getValue(key)}
           name={row.getValue('name')}
-          actionDel={actionDel}
+          delRowDataTableAction={delRowDataTableAction}
         />
       ),
     },

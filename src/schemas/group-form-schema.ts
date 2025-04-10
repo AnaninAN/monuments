@@ -11,3 +11,5 @@ export const GroupFormSchema = z.object({
 });
 
 export type TGroupFormData = z.infer<typeof GroupFormSchema>;
+
+export type TGroup = Omit<TGroupFormData, 'parentname'>;

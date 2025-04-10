@@ -14,19 +14,19 @@ import {
 
 import { CounterpartyForm } from '@/components/data-table/forms/counterparty-form';
 
-import { delCounterparty } from '@/actions/counterparty';
+import { delCounterpartyAction } from '@/actions/counterparty';
 
-const cols: ColumnsType<KeyTCounterpartyFormData> = [
+const columnsCounterparty: ColumnsType<KeyTCounterpartyFormData> = [
   { key: 'name', sort: true },
   { key: 'counterpartyType_name', sort: false },
   { key: 'comment', sort: false },
   { key: 'status', sort: false },
 ];
 
-export const columns: ColumnDef<TCounterpartyFormData>[] = dataTableColumns(
-  'id',
-  cols,
-  translateColumnsCounterparty,
-  delCounterparty,
-  CounterpartyForm
-);
+export const columns: ColumnDef<TCounterpartyFormData>[] = dataTableColumns({
+  key: 'id',
+  columns: columnsCounterparty,
+  translateColumns: translateColumnsCounterparty,
+  delRowDataTableAction: delCounterpartyAction,
+  FormComponent: CounterpartyForm,
+});

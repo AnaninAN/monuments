@@ -1,17 +1,22 @@
 'use server';
 
-import { db } from '@/lib/db';
 import {
-  getWarehouseByName,
-  getWarehouseById,
-  getAllWarehouses,
+  getWarehouseByNameData,
+  getWarehouseByIdData,
+  updateWarehouseData,
+  addWarehouseData,
+  delWarehouseData,
 } from '@/data/warehouse';
 import {
   TWarehouseFormData,
   WarehouseFormSchema,
 } from '@/schemas/warehouse-form-schema';
+import { TDataTableActionResult } from '@/types/types';
 
-export const warehouse = async (values: TWarehouseFormData, id?: number) => {
+export const warehouseAction = async (
+  values: TWarehouseFormData,
+  id?: number
+) => {
   if (id) {
     const validatedFields = WarehouseFormSchema.safeParse(values);
 
@@ -19,7 +24,7 @@ export const warehouse = async (values: TWarehouseFormData, id?: number) => {
       return { error: 'Поля с ошибками' };
     }
 
-    const dbWarehouse = await getWarehouseById(id);
+    const dbWarehouse = await getWarehouseByIdData(id);
 
     if (!dbWarehouse) {
       return { error: 'Склад не найден!' };
@@ -27,14 +32,13 @@ export const warehouse = async (values: TWarehouseFormData, id?: number) => {
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { warehouseGroup, ...newValues } = values;
-    await db.$transaction(async (tx) => {
-      await tx.warehouse.update({
-        where: { id },
-        data: { ...newValues },
-      });
-    });
+    const count = await updateWarehouseData(id, newValues);
 
-    return { success: 'Данные склада обновлены!' };
+    if (count === null) {
+      return { error: 'Склад не обновлен!' };
+    }
+
+    return { success: 'Данные склада обновлены!', count };
   } else {
     const validatedFields = WarehouseFormSchema.safeParse(values);
 
@@ -42,7 +46,7 @@ export const warehouse = async (values: TWarehouseFormData, id?: number) => {
       return { error: 'Поля с ошибками' };
     }
 
-    const existingWarehouse = await getWarehouseByName(
+    const existingWarehouse = await getWarehouseByNameData(
       validatedFields.data.name
     );
 
@@ -52,34 +56,30 @@ export const warehouse = async (values: TWarehouseFormData, id?: number) => {
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { warehouseGroup, ...newValues } = validatedFields.data;
-    await db.$transaction(async (tx) => {
-      await tx.warehouse.create({
-        data: {
-          ...newValues,
-        },
-      });
-    });
+    const count = await addWarehouseData(newValues);
 
-    return { success: 'Склад создан!' };
+    if (count === null) {
+      return { error: 'Склад не создан!' };
+    }
+
+    return { success: 'Склад создан!', count };
   }
 };
 
-export const delWarehouse = async (id: number) => {
-  const existingWarehouse = await getWarehouseById(id);
+export const delWarehouseAction = async (
+  id: number
+): TDataTableActionResult => {
+  const existingWarehouse = await getWarehouseByIdData(id);
 
   if (!existingWarehouse) {
     return { error: 'Склада не существует!' };
   }
 
-  await db.warehouse.delete({ where: { id } });
+  const count = await delWarehouseData(id);
 
-  return { success: 'Склад удален!' };
-};
-
-export const filterWarehouse = async (id: number) => {
-  const filterWarehouse = await getAllWarehouses(id);
-  if (!filterWarehouse) {
-    return [];
+  if (count === null) {
+    return { error: 'Склад не удален!' };
   }
-  return filterWarehouse;
+
+  return { success: 'Склад удален!', count };
 };

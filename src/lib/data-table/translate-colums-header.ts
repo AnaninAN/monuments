@@ -5,7 +5,7 @@ import { KeyTUnitFormData } from '@/schemas/unit-form-schema';
 import { KeyTUserFormData } from '@/schemas/user-form-schema';
 import { KeyTWarehouseFormData } from '@/schemas/warehouse-form-schema';
 
-export const translateColumnsEmployee: Record<KeyTUserFormData, string> = {
+export const translateColumnsUser: Record<KeyTUserFormData, string> = {
   idInt: '№',
   name: 'Имя',
   lastname: 'Фамилия',
@@ -44,6 +44,12 @@ export const translateColumnsCounterparty: Record<
   counterpartyType_name: 'Категория',
   comment: 'Коментарий',
   status: 'Статус',
+  email: 'Email',
+  legalAddress: 'Юридический адрес',
+  phone: 'Телефон',
+  INN: 'ИНН',
+  KPP: 'КПП',
+  OGRN: 'ОГРН',
 };
 
 export const translateColumnsUnit: Record<KeyTUnitFormData, string> = {

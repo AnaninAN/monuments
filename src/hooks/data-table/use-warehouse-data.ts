@@ -9,21 +9,22 @@ import {
   TWarehouseFormData,
   WarehouseFormSchema,
 } from '@/schemas/warehouse-form-schema';
-import { warehouse } from '@/actions/warehouse';
+import { warehouseAction } from '@/actions/warehouse';
 
-import { getAllWarehouseGroups } from '@/data/warehouse-group';
-import { getWarehouseById } from '@/data/warehouse';
+import { getAllEntityGroupsData } from '@/data/entity-group';
+import { getWarehouseByIdData } from '@/data/warehouse';
+import { EntityGroupWithAdd } from '@/types/types';
 
 import { useLoadingSelectStore } from '@/store/loading-select';
-import { EntityGroup } from '@/data/dto/entity-group';
+import { useDataTableStore } from '@/store/data-table';
 
 const handleWarehouseSubmit = async (
   values: TWarehouseFormData,
   id?: number,
-  onSuccess?: () => void
+  onSuccess?: (count: number) => void
 ) => {
   try {
-    const data = await warehouse(values, id);
+    const data = await warehouseAction(values, id);
 
     if (data?.error) {
       toast.error(data.error);
@@ -31,7 +32,7 @@ const handleWarehouseSubmit = async (
     }
 
     if (data?.success) {
-      onSuccess?.();
+      onSuccess?.(data.count ?? 0);
       toast.success(data.success);
     }
   } catch (error) {
@@ -41,8 +42,12 @@ const handleWarehouseSubmit = async (
 };
 
 export const useWarehouseData = (id?: number) => {
-  const [warehouseGroups, setWarehouseGroups] = useState<EntityGroup[]>([]);
+  const [warehouseGroups, setWarehouseGroups] = useState<EntityGroupWithAdd[]>(
+    []
+  );
   const [isLoading, setIsLoading] = useState(true);
+
+  const { selectedIdGroup, selectedNameGroup } = useDataTableStore();
 
   const { setLoadingWarehouseGroups, loadingWarehouseGroups } =
     useLoadingSelectStore();
@@ -54,9 +59,9 @@ export const useWarehouseData = (id?: number) => {
       shortName: '',
       comment: '',
       status: 'ACTIVE',
-      warehouseGroupId: 1,
+      warehouseGroupId: selectedIdGroup,
       warehouseGroup: {
-        name: 'Склады',
+        name: selectedNameGroup,
       },
     },
   });
@@ -65,7 +70,7 @@ export const useWarehouseData = (id?: number) => {
     if (loadingWarehouseGroups) {
       const fetchWarehouseGroups = async () => {
         try {
-          const data = await getAllWarehouseGroups();
+          const data = await getAllEntityGroupsData('warehouseGroup');
           setWarehouseGroups(data);
         } catch (error) {
           console.error('Ошибка при загрузке групп складов:', error);
@@ -76,23 +81,29 @@ export const useWarehouseData = (id?: number) => {
       };
       fetchWarehouseGroups();
     }
-  }, [loadingWarehouseGroups, setLoadingWarehouseGroups]);
+  }, [
+    loadingWarehouseGroups,
+    selectedIdGroup,
+    setLoadingWarehouseGroups,
+    warehouseGroups,
+  ]);
 
   const fetchWarehouseData = useCallback(async () => {
     try {
       setIsLoading(true);
 
-      const warehouseGroupsData = await getAllWarehouseGroups();
-
+      const warehouseGroupsData =
+        await getAllEntityGroupsData('warehouseGroup');
       setWarehouseGroups(warehouseGroupsData);
 
       if (id) {
-        const data = await getWarehouseById(id);
+        const data = await getWarehouseByIdData(id);
 
         form.setValue('name', data?.name ?? '');
         form.setValue('shortName', data?.shortName ?? '');
         form.setValue('status', data?.status ?? 'ACTIVE');
         form.setValue('comment', data?.comment ?? '');
+        form.setValue('warehouseGroupId', data?.warehouseGroupId ?? 0);
         form.setValue('warehouseGroup.name', data?.warehouseGroup.name ?? '');
       }
     } catch (error) {

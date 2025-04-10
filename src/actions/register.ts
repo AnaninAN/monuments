@@ -7,7 +7,7 @@ import {
   RegisterFormSchema,
   TRegisterFormData,
 } from '@/schemas/register-form-schema';
-import { getUserByEmail, getUserMaxIdInt } from '@/data/user';
+import { getUserByEmailData, getUserMaxIdIntData } from '@/data/user';
 import { generateVerificationToken } from '@/lib/tokens';
 import { sendVerificationEmail } from '@/lib/mail';
 
@@ -20,9 +20,9 @@ export const register = async (values: TRegisterFormData) => {
 
   const { email, password, name, lastname } = validatedFields.data;
   const hashedPassword = await bcrypt.hash(password, 10);
-  const idInt = (await getUserMaxIdInt()) || 0 + 1;
+  const idInt = (await getUserMaxIdIntData()) || 0 + 1;
 
-  const existingUser = await getUserByEmail(email);
+  const existingUser = await getUserByEmailData(email);
 
   if (existingUser) {
     return { error: 'Такой email уже используется!' };

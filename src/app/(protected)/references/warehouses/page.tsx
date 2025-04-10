@@ -1,51 +1,57 @@
+'use client';
+
+import { useState } from 'react';
+
 import withAuth from '@/hoc/with-auth';
 
 import { menu } from '@/consts/menu';
 import { translateColumnsWarehouse } from '@/lib/data-table/translate-colums-header';
 import { columns } from './columns';
-
-import { getAllWarehouses } from '@/data/warehouse';
-import {
-  getAllWarehouseGroups,
-  getWarehouseGroupById,
-} from '@/data/warehouse-group';
-
-import { TThree } from '@/components/types/types';
-import { WarehouseWithAdd } from '@/data/dto/warehouse';
-import { filterWarehouse } from '@/actions/warehouse';
+import { getAllWarehousesData } from '@/data/warehouse';
+import { getAllEntityGroupsData } from '@/data/entity-group';
+import { useLoadingPageDataTable } from '@/hooks/use-loading-page-data-table';
+import type {
+  EntityGroupWithAdd,
+  TDataTable,
+  TThree,
+  WarehouseWithAdd,
+} from '@/types/types';
 
 import { WarehouseForm } from '@/components/data-table/forms/warehouse-form';
 import { ThreeTable } from '@/components/data-table/three-table';
-import { delWarehouseGroup, warehouseGroup } from '@/actions/warehouse-group';
 
-async function WarehousesPage() {
-  const [warehouses, warehouseGroups] = await Promise.all([
-    getAllWarehouses(),
-    getAllWarehouseGroups(),
-  ]);
+const WarehousesPage = () => {
+  const [warehouses, setWarehouses] = useState<WarehouseWithAdd[]>([]);
+  const [warehouseGroups, setWarehouseGroups] = useState<EntityGroupWithAdd[]>(
+    []
+  );
 
-  if (!warehouses || !warehouseGroups) return null;
+  const { isLoadingDataTable, isLoadingDataGroup } =
+    useLoadingPageDataTable<WarehouseWithAdd>({
+      getDataTable: getAllWarehousesData,
+      setDataTable: setWarehouses,
+      entity: 'warehouseGroup',
+      getDataGroup: getAllEntityGroupsData,
+      setDataGroup: setWarehouseGroups,
+    });
 
-  const three: TThree<WarehouseWithAdd> = {
-    threeData: warehouseGroups,
-    getGroupById: getWarehouseGroupById,
-    action: warehouseGroup,
-    actionDel: delWarehouseGroup,
-    actionFilter: filterWarehouse,
+  const dataTable: TDataTable<WarehouseWithAdd> = {
+    data: warehouses,
+    FormComponent: WarehouseForm,
+    filter: 'name',
+    translateColumns: translateColumnsWarehouse,
+    isLoadingDataTable,
+    title: menu['WAREHOUSES'].title,
   };
 
-  return (
-    <ThreeTable
-      columns={columns}
-      data={warehouses}
-      FormComponent={WarehouseForm}
-      title={menu['WAREHOUSES'].title}
-      filter="name"
-      translateColumns={translateColumnsWarehouse}
-      three={three}
-    />
-  );
-}
+  const three: TThree = {
+    entity: 'warehouseGroup',
+    threeData: warehouseGroups,
+    isLoadingDataGroup,
+  };
+
+  return <ThreeTable columns={columns} dataTable={dataTable} three={three} />;
+};
 
 export default withAuth(
   WarehousesPage,

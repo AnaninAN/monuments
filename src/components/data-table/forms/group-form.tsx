@@ -4,31 +4,27 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
-import { useRouter } from 'next/navigation';
 
 import { translateColumnsGroup } from '@/lib/data-table/translate-colums-header';
 import { useTransitionNoErrors } from '@/hooks/use-transition-no-errors';
 import { GroupFormSchema, TGroupFormData } from '@/schemas/group-form-schema';
-import { Action, GetGroupById, TreeNode } from '@/components/types/types';
+import { Entity, TreeNode } from '@/types/types';
 
 import { Form } from '@/components/ui/form';
 import { FormFieldInput } from '@/components/data-table/forms/form-field';
 import { Button } from '@/components/ui/button';
+import { useDataTableStore } from '@/store/data-table';
+import { getEntityGroupByIdData } from '@/data/entity-group';
+import { entityGroupAction } from '@/actions/entity-group';
 
 interface GroupFormProps {
   parent?: TreeNode;
   id?: number;
-  getGroupById?: GetGroupById;
-  action?: Action;
+  entity: Entity;
 }
 
-export const GroupForm = ({
-  parent,
-  id,
-  getGroupById,
-  action,
-}: GroupFormProps) => {
-  const router = useRouter();
+export const GroupForm = ({ parent, id, entity }: GroupFormProps) => {
+  const { setCountGroup } = useDataTableStore();
 
   const form = useForm<TGroupFormData>({
     resolver: zodResolver(GroupFormSchema),
@@ -45,7 +41,7 @@ export const GroupForm = ({
     if (id) {
       const fetchGroupData = async () => {
         try {
-          const data = await getGroupById?.(id);
+          const data = await getEntityGroupByIdData(entity, id);
 
           form.setValue('parentname', data?.parentname ?? '');
           form.setValue('name', data?.name ?? '');
@@ -57,12 +53,12 @@ export const GroupForm = ({
       };
       fetchGroupData();
     }
-  }, [getGroupById, form, id]);
+  }, [form, id, entity]);
 
   const onSubmit = (values: TGroupFormData) => {
     startTransitionNoErrors(async () => {
       try {
-        const data = await action?.(values, id);
+        const data = await entityGroupAction(entity, values, id);
 
         if (data?.error) {
           toast.error(data.error);
@@ -70,7 +66,7 @@ export const GroupForm = ({
         }
 
         if (data?.success) {
-          router.refresh();
+          setCountGroup(data.count ?? 0);
           toast.success(data.success);
         }
       } catch (error) {

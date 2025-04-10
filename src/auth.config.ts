@@ -3,7 +3,7 @@ import Credentials from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 
 import { LoginFormSchema } from '@/schemas/login-form-schema';
-import { getUserByEmail } from '@/data/user';
+import { getUserByEmailData } from '@/data/user';
 
 export default {
   providers: [
@@ -14,7 +14,7 @@ export default {
         if (validatedFields.success) {
           const { email, password } = validatedFields.data;
 
-          const user = await getUserByEmail(email);
+          const user = await getUserByEmailData(email);
           if (!user || !user.password) return null;
 
           const passwordMatch = await bcrypt.compare(password, user.password);

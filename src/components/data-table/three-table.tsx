@@ -3,48 +3,39 @@
 import { ColumnDef } from '@tanstack/react-table';
 
 import { DataTable } from '@/components/data-table/data-table';
-import { TThree } from '@/components/types/types';
+import { TDataTable, TThree } from '@/types/types';
 import { TreeGroupView } from '@/components/data-table/tree-group-view';
 
 interface ThreeTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
-  data: TData[];
-  FormComponent: React.ComponentType;
-  title: string;
-  filter: string;
-  translateColumns: Record<string, string>;
-  three?: TThree<TData>;
+  dataTable: TDataTable<TData>;
+  three?: TThree;
 }
 
 export function ThreeTable<TData, TValue>({
   columns,
-  data,
-  FormComponent,
-  title,
-  filter,
-  translateColumns,
+  dataTable,
   three,
 }: ThreeTableProps<TData, TValue>) {
   return (
     <div>
-      <h1 className="font-semibold self-center flex mb-4">{title}</h1>
+      <h1 className="font-semibold self-center flex mb-4">{dataTable.title}</h1>
       <div className="flex">
         {three && (
           <TreeGroupView
             data={three.threeData}
-            getGroupById={three.getGroupById}
-            action={three.action}
-            actionDel={three.actionDel}
-            actionFilter={three.actionFilter}
             className="w-1/6"
+            isLoadingDataGroup={three.isLoadingDataGroup}
+            entity={three.entity}
           />
         )}
         <DataTable
           columns={columns}
-          data={data}
-          FormComponent={FormComponent}
-          filter={filter}
-          translateColumns={translateColumns}
+          data={dataTable.data}
+          FormComponent={dataTable.FormComponent}
+          filter={dataTable.filter}
+          translateColumns={dataTable.translateColumns}
+          isLoadingDataTable={dataTable.isLoadingDataTable}
         />
       </div>
     </div>

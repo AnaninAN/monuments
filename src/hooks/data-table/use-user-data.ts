@@ -4,16 +4,16 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
 
 import { TUserFormData, UserFormSchema } from '@/schemas/user-form-schema';
-import { user } from '@/actions/user';
-import { getUserByIdInt } from '@/data/user';
+import { userAction } from '@/actions/user';
+import { getUserByIdIntData } from '@/data/user';
 
 const handleUserSubmit = async (
   values: TUserFormData,
   id?: number,
-  onSuccess?: () => void
+  onSuccess?: (count: number) => void
 ) => {
   try {
-    const data = await user(values, id);
+    const data = await userAction(values, id);
 
     if (data?.error) {
       toast.error(data.error);
@@ -21,7 +21,7 @@ const handleUserSubmit = async (
     }
 
     if (data?.success) {
-      onSuccess?.();
+      onSuccess?.(data.count ?? 0);
       toast.success(data.success);
     }
   } catch (error) {
@@ -50,7 +50,7 @@ export const useUserData = (id?: number) => {
       setIsLoading(true);
 
       if (id) {
-        const data = await getUserByIdInt(id);
+        const data = await getUserByIdIntData(id);
 
         form.setValue('email', data?.email ?? '');
         form.setValue('name', data?.name ?? '');

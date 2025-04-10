@@ -1,6 +1,6 @@
 'use server';
 
-import { getUserByEmail } from '@/data/user';
+import { getUserByEmailData } from '@/data/user';
 import { sendPasswordResetEmail } from '@/lib/mail';
 import { generatePasswordResetToken } from '@/lib/tokens';
 import { ResetFormSchema, TResetFormData } from '@/schemas/reset-form-schema';
@@ -14,7 +14,7 @@ export const reset = async (values: TResetFormData) => {
 
   const { email } = validatedFields.data;
 
-  const existingUser = await getUserByEmail(email);
+  const existingUser = await getUserByEmailData(email);
 
   if (!existingUser) return { error: 'email не найден!' };
 

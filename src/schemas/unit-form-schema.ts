@@ -16,4 +16,6 @@ export const UnitFormSchema = z.object({
 
 export type TUnitFormData = z.infer<typeof UnitFormSchema>;
 
+export type TUnit = TUnitFormData;
+
 export type KeyTUnitFormData = keyof TUnitFormData | 'id';

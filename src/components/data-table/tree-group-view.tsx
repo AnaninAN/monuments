@@ -1,16 +1,10 @@
 'use client';
 
-import { useState } from 'react';
 import { ChevronRight, Minus, Pencil, Plus } from 'lucide-react';
+import { toast } from 'sonner';
 
 import { cn } from '@/lib/utils';
-import type {
-  Action,
-  ActionDel,
-  ActionFilter,
-  GetGroupById,
-  TreeNode,
-} from '@/components/types/types';
+import type { TreeNode } from '@/types/types';
 
 import {
   Collapsible,
@@ -27,47 +21,51 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { GroupForm } from '@/components/data-table/forms/group-form';
-import useConfirmationStore from '@/store/confirmation';
-import { toast } from 'sonner';
-import { useRouter } from 'next/navigation';
+import { Spin } from '@/components/ui/spin';
 
-interface TreeViewProps<TData> {
+import useConfirmationStore from '@/store/confirmation';
+import { useDataTableStore } from '@/store/data-table';
+import { Entity } from '@/types/types';
+import { delEntityGroupAction } from '@/actions/entity-group';
+
+interface TreeViewProps {
   data: TreeNode[];
   className?: string;
-  getGroupById?: GetGroupById;
-  action: Action;
-  actionDel: ActionDel;
-  actionFilter?: ActionFilter<TData>;
+  isLoadingDataGroup?: boolean;
+  entity: Entity;
 }
 
-export function TreeGroupView<TData>({
+export function TreeGroupView({
   data,
   className,
-  getGroupById,
-  action,
-  actionDel,
-}: TreeViewProps<TData>) {
-  const [selectedId, setSelectedId] = useState<number>(1);
+  isLoadingDataGroup,
+  entity,
+}: TreeViewProps) {
   const { openConfirmation } = useConfirmationStore();
-  const router = useRouter();
+
+  const {
+    selectedIdGroup,
+    setSelectedIdGroup,
+    setCountGroup,
+    setSelectedNameGroup,
+  } = useDataTableStore();
 
   const delClick = () => {
     openConfirmation({
       title: `Удалить группу ${
-        data.find((item) => item.id === selectedId)?.name
+        data.find((item) => item.id === selectedIdGroup)?.name
       }?`,
       description: '',
       cancelLabel: 'Отмена',
       actionLabel: 'Удалить',
       onAction: () => {
-        console.log('delClick', selectedId);
-        actionDel(selectedId)
+        delEntityGroupAction(entity, selectedIdGroup)
           .then((data) => {
             if (data?.error) {
               toast.error(data.error);
             }
             if (data?.success) {
-              router.refresh();
+              setCountGroup(data.count ?? 0);
               toast.success(data.success);
             }
           })
@@ -95,7 +93,7 @@ export function TreeGroupView<TData>({
 
   const renderNode = (node: TreeNode) => {
     const hasChildren = node.children && node.children.length > 0;
-    const isSelected = selectedId === node.id;
+    const isSelected = selectedIdGroup === node.id;
 
     return (
       <div key={node.id}>
@@ -107,17 +105,14 @@ export function TreeGroupView<TData>({
               isSelected && 'bg-white text-blue-700 font-semibold'
             )}
             onClick={() => {
-              setSelectedId(node.id);
+              setSelectedIdGroup(node.id);
+              setSelectedNameGroup(node.name);
             }}
           >
             {hasChildren && (
               <ChevronRight className="h-4 w-4 mr-2 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90 group-data-[state=closed]/collapsible:rotate-0" />
             )}
-            {node.id === 1 ? (
-              <span>{`${node.name} [${node.countAll}]`}</span>
-            ) : (
-              <span>{`${node.name} [${node.count}]`}</span>
-            )}
+            <span>{`${node.name}`}</span>
           </CollapsibleTrigger>
           {hasChildren && (
             <CollapsibleContent className="pl-4">
@@ -133,7 +128,7 @@ export function TreeGroupView<TData>({
 
   return (
     <div className={cn('w-full', className)}>
-      <div className="pb-4 flex gap-2 justify-start pt-[68px]">
+      <div className="pb-4 flex gap-2 justify-start pt-[68px] relative">
         <Dialog>
           <DialogTrigger asChild>
             <Button variant="outline">
@@ -146,9 +141,8 @@ export function TreeGroupView<TData>({
               <DialogDescription />
             </DialogHeader>
             <GroupForm
-              parent={data.find((item) => item.id === selectedId)}
-              getGroupById={getGroupById}
-              action={action}
+              entity={entity}
+              parent={data.find((item) => item.id === selectedIdGroup)}
             />
           </DialogContent>
         </Dialog>
@@ -164,10 +158,9 @@ export function TreeGroupView<TData>({
               <DialogDescription />
             </DialogHeader>
             <GroupForm
-              parent={data.find((item) => item.id === selectedId)}
-              getGroupById={getGroupById}
-              action={action}
-              id={selectedId}
+              entity={entity}
+              parent={data.find((item) => item.id === selectedIdGroup)}
+              id={selectedIdGroup}
             />
           </DialogContent>
         </Dialog>
@@ -175,7 +168,14 @@ export function TreeGroupView<TData>({
           <Minus className="text-red-500" />
         </Button>
       </div>
-      <div className="border mr-2">{tree.map((node) => renderNode(node))}</div>
+      <div className="border mr-2 relative min-h-[43px]">
+        {isLoadingDataGroup && (
+          <div className="w-full h-full bg-gray-100/50 absolute top-0 left-0">
+            <Spin />
+          </div>
+        )}
+        {tree.map((node) => renderNode(node))}
+      </div>
     </div>
   );
 }

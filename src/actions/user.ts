@@ -2,24 +2,30 @@
 
 import bcrypt from 'bcryptjs';
 
-import { getUserByEmail, getUserByIdInt, getUserMaxIdInt } from '@/data/user';
+import {
+  getUserByEmailData,
+  getUserByIdIntData,
+  getUserMaxIdIntData,
+  updateUserData,
+} from '@/data/user';
 import { db } from '@/lib/db';
 import { TUserFormData, UserFormSchema } from '@/schemas/user-form-schema';
 
-export const user = async (values: TUserFormData, idInt?: number) => {
+export const userAction = async (values: TUserFormData, idInt?: number) => {
   if (idInt) {
-    const dbUser = await getUserByIdInt(idInt);
+    const dbUser = await getUserByIdIntData(idInt);
 
     if (!dbUser) {
       return { error: 'Пользователь не найден!' };
     }
 
-    await db.user.update({
-      where: { idInt },
-      data: { ...values },
-    });
+    const count = await updateUserData(idInt, values);
 
-    return { success: 'Данные пользователя обновлены!' };
+    if (count === null) {
+      return { error: 'Пользователь не обновлен!' };
+    }
+
+    return { success: 'Данные пользователя обновлены!', count };
   } else {
     const validatedFields = UserFormSchema.safeParse(values);
 
@@ -28,7 +34,7 @@ export const user = async (values: TUserFormData, idInt?: number) => {
     }
 
     const hashedPassword = await bcrypt.hash('11111111', 10);
-    const idInt = (await getUserMaxIdInt()) || 0 + 1;
+    const idInt = (await getUserMaxIdIntData()) || 0 + 1;
 
     const valuesWithPassword = {
       ...validatedFields.data,
@@ -36,7 +42,7 @@ export const user = async (values: TUserFormData, idInt?: number) => {
       idInt,
     };
 
-    const existingUser = await getUserByEmail(validatedFields.data.email);
+    const existingUser = await getUserByEmailData(validatedFields.data.email);
 
     if (existingUser) {
       return { error: 'Такой email уже используется!' };

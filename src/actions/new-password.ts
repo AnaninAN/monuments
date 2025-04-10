@@ -3,7 +3,7 @@
 import bcrypt from 'bcryptjs';
 
 import { getPasswordResetTokenByToken } from '@/data/password-reset-token';
-import { getUserByEmail } from '@/data/user';
+import { getUserByEmailData } from '@/data/user';
 import {
   NewPasswordFormSchema,
   TNewPasswordFormData,
@@ -56,7 +56,7 @@ export const newPassword = async (
       return { error: 'Срок действие токена истек!' };
     }
 
-    const existingUser = await getUserByEmail(existingToken.email);
+    const existingUser = await getUserByEmailData(existingToken.email);
 
     if (!existingUser) {
       logger.warn(

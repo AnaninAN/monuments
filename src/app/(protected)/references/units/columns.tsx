@@ -13,15 +13,15 @@ import { UnitForm } from '@/components/data-table/forms/unit-form';
 
 import { delUnit } from '@/actions/unit';
 
-const cols: ColumnsType<KeyTUnitFormData> = [
+const columnsUnit: ColumnsType<KeyTUnitFormData> = [
   { key: 'name', sort: true },
   { key: 'status', sort: false },
 ];
 
-export const columns: ColumnDef<TUnitFormData>[] = dataTableColumns(
-  'id',
-  cols,
-  translateColumnsUnit,
-  delUnit,
-  UnitForm
-);
+export const columns: ColumnDef<TUnitFormData>[] = dataTableColumns({
+  key: 'id',
+  columns: columnsUnit,
+  translateColumns: translateColumnsUnit,
+  delRowDataTableAction: delUnit,
+  FormComponent: UnitForm,
+});

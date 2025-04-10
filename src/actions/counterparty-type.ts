@@ -1,17 +1,19 @@
 'use server';
 
-import { db } from '@/lib/db';
 import {
   TCounterpartyTypeFormData,
   CounterpartyTypeFormSchema,
 } from '@/schemas/counterparty-type-form-schema';
 import {
-  getCounterpartyTypeById,
-  getCounterpartyTypeByName,
+  addCounterpartyTypeData,
+  delCounterpartyTypeData,
+  getCounterpartyTypeByIdData,
+  getCounterpartyTypeByNameData,
+  updateCounterpartyTypeData,
 } from '@/data/counterparty-type';
 import { logger } from '@/lib/logger/logger';
 
-export const counterpartyType = async (
+export const counterpartyTypeAction = async (
   values: TCounterpartyTypeFormData,
   id?: number
 ) => {
@@ -25,7 +27,7 @@ export const counterpartyType = async (
       return { error: 'Поля с ошибками' };
     }
 
-    const dbCounterpartyType = await getCounterpartyTypeById(id);
+    const dbCounterpartyType = await getCounterpartyTypeByIdData(id);
 
     if (!dbCounterpartyType) {
       logger.error('counterpartyType', 'Категория контрагента не найдена', {
@@ -34,17 +36,19 @@ export const counterpartyType = async (
       return { error: 'Категория контрагента не найдена!' };
     }
 
-    await db.$transaction(async (tx) => {
-      await tx.counterpartyType.update({
-        where: { id },
-        data: { ...values },
+    const count = await updateCounterpartyTypeData(id, values);
+
+    if (count === null) {
+      logger.error('counterpartyType', 'Категория контрагента не обновлена', {
+        id,
       });
-    });
+      return { error: 'Категория контрагента не обновлена!' };
+    }
 
     logger.info('counterpartyType', 'Данные категории контрагента обновлены', {
       id,
     });
-    return { success: 'Данные категории контрагента обновлены!' };
+    return { success: 'Данные категории контрагента обновлены!', count };
   } else {
     const validatedFields = CounterpartyTypeFormSchema.safeParse(values);
 
@@ -55,7 +59,7 @@ export const counterpartyType = async (
       return { error: 'Поля с ошибками' };
     }
 
-    const existingCounterpartyType = await getCounterpartyTypeByName(
+    const existingCounterpartyType = await getCounterpartyTypeByNameData(
       validatedFields.data.name
     );
 
@@ -66,23 +70,24 @@ export const counterpartyType = async (
       return { error: 'Такое наименование уже используется!' };
     }
 
-    await db.$transaction(async (tx) => {
-      await tx.counterpartyType.create({
-        data: {
-          ...validatedFields.data,
-        },
+    const count = await addCounterpartyTypeData(validatedFields.data);
+
+    if (count === null) {
+      logger.error('counterpartyType', 'Категория контрагента не создана', {
+        name: validatedFields.data.name,
       });
-    });
+      return { error: 'Категория контрагента не создана!' };
+    }
 
     logger.info('counterpartyType', 'Категория контрагента создана!', {
       name: validatedFields.data.name,
     });
-    return { success: 'Категория контрагента создана!' };
+    return { success: 'Категория контрагента создана!', count };
   }
 };
 
-export const delCounterpartyType = async (id: number) => {
-  const existingCounterpartyType = await getCounterpartyTypeById(id);
+export const delCounterpartyTypeAction = async (id: number) => {
+  const existingCounterpartyType = await getCounterpartyTypeByIdData(id);
 
   if (!existingCounterpartyType) {
     logger.warn('counterpartyType', 'Категория контрагента не существует!', {
@@ -91,10 +96,15 @@ export const delCounterpartyType = async (id: number) => {
     return { error: 'Категория контрагента не существует!' };
   }
 
-  await db.$transaction(async (tx) => {
-    await tx.counterpartyType.delete({ where: { id } });
-  });
+  const count = await delCounterpartyTypeData(id);
+
+  if (count === null) {
+    logger.error('counterpartyType', 'Категория контрагента не удалена!', {
+      id,
+    });
+    return { error: 'Категория контрагента не удалена!' };
+  }
 
   logger.info('counterpartyType', 'Категория контрагента удалена!', { id });
-  return { success: 'Категория контрагента удалена!' };
+  return { success: 'Категория контрагента удалена!', count };
 };

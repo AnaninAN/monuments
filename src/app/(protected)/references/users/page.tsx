@@ -1,32 +1,38 @@
+'use client';
+
+import { useState } from 'react';
+
 import withAuth from '@/hoc/with-auth';
 
 import { menu } from '@/consts/menu';
-import { translateColumnsEmployee } from '@/lib/data-table/translate-colums-header';
+import { translateColumnsUser } from '@/lib/data-table/translate-colums-header';
 import { columns } from './columns';
-
-import { getAllUsers } from '@/data/user';
+import { ThreeTable } from '@/components/data-table/three-table';
+import { TUserFormData } from '@/schemas/user-form-schema';
+import { useLoadingPageDataTable } from '@/hooks/use-loading-page-data-table';
+import { TDataTable } from '@/types/types';
+import { getAllUsersData } from '@/data/user';
 
 import { UserForm } from '@/components/data-table/forms/user-form';
-import { ThreeTable } from '@/components/data-table/three-table';
 
-async function EmployeesPage() {
-  const users = await getAllUsers();
-  if (!users) return null;
+export const UsersPage = () => {
+  const [users, setUsers] = useState<TUserFormData[]>([]);
 
-  return (
-    <ThreeTable
-      columns={columns}
-      data={users}
-      FormComponent={UserForm}
-      title={menu['USERS'].title}
-      filter="email"
-      translateColumns={translateColumnsEmployee}
-    />
-  );
-}
+  const { isLoadingDataTable } = useLoadingPageDataTable<TUserFormData>({
+    getDataTable: getAllUsersData,
+    setDataTable: setUsers,
+  });
 
-export default withAuth(
-  EmployeesPage,
-  menu['USERS'].roles,
-  menu['USERS'].title
-);
+  const dataTable: TDataTable<TUserFormData> = {
+    data: users,
+    FormComponent: UserForm,
+    filter: 'name',
+    translateColumns: translateColumnsUser,
+    isLoadingDataTable,
+    title: menu['USERS'].title,
+  };
+
+  return <ThreeTable columns={columns} dataTable={dataTable} />;
+};
+
+export default withAuth(UsersPage, menu['USERS'].roles, menu['USERS'].title);

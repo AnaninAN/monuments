@@ -4,16 +4,16 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
 
 import { TUnitFormData, UnitFormSchema } from '@/schemas/unit-form-schema';
-import { unit } from '@/actions/unit';
-import { getUnitById } from '@/data/unit';
+import { unitAction } from '@/actions/unit';
+import { getUnitByIdData } from '@/data/unit';
 
 const handleUnitSubmit = async (
   values: TUnitFormData,
   id?: number,
-  onSuccess?: () => void
+  onSuccess?: (count: number) => void
 ) => {
   try {
-    const data = await unit(values, id);
+    const data = await unitAction(values, id);
 
     if (data?.error) {
       toast.error(data.error);
@@ -21,7 +21,7 @@ const handleUnitSubmit = async (
     }
 
     if (data?.success) {
-      onSuccess?.();
+      onSuccess?.(data.count ?? 0);
       toast.success(data.success);
     }
   } catch (error) {
@@ -47,7 +47,7 @@ export const useUnitData = (id?: number) => {
       setIsLoading(true);
 
       if (id) {
-        const data = await getUnitById(id);
+        const data = await getUnitByIdData(id);
 
         form.setValue('name', data?.name ?? '');
         form.setValue('status', data?.status ?? 'ACTIVE');

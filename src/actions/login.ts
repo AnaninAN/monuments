@@ -5,7 +5,7 @@ import { AuthError } from 'next-auth';
 import { LoginFormSchema, TLoginFormData } from '@/schemas/login-form-schema';
 import { signIn } from '@/auth';
 import { DEFAULT_LOGIN_REDIRECT } from '@/routes';
-import { getUserByEmail } from '@/data/user';
+import { getUserByEmailData } from '@/data/user';
 import {
   generateTwoFactorToken,
   generateVerificationToken,
@@ -42,7 +42,7 @@ export const login = async (
 
   const { email, password, code } = validatedFields.data;
 
-  const exitingUser = await getUserByEmail(email);
+  const exitingUser = await getUserByEmailData(email);
 
   if (!exitingUser || !exitingUser.email) {
     logger.error('user', 'Недействительные данные', { email, ip });

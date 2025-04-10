@@ -9,7 +9,7 @@ import { logger } from '@/lib/logger/logger';
 import { getUserFromCache, setUserInCache } from '@/lib/cache';
 import authConfig from '@/auth.config';
 import { db } from '@/lib/db';
-import { getUserById } from '@/data/user';
+import { getUserByIdData } from '@/data/user';
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
   pages: {
@@ -50,7 +50,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           return false;
         }
 
-        const existingUser = await getUserById(user.id);
+        const existingUser = await getUserByIdData(user.id);
         if (!existingUser?.emailVerified) {
           logger.error('auth', 'Неподтвержденный адрес электронной почты', {
             userId: user.id,
@@ -103,7 +103,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         }
 
         if (SessionManager.shouldRefreshToken(token.jti as string)) {
-          const existingUser = await getUserById(token.sub);
+          const existingUser = await getUserByIdData(token.sub);
           if (!existingUser) return token;
 
           const userData = {

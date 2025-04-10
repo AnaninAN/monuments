@@ -7,16 +7,16 @@ import {
   CounterpartyTypeFormSchema,
   TCounterpartyTypeFormData,
 } from '@/schemas/counterparty-type-form-schema';
-import { counterpartyType } from '@/actions/counterparty-type';
-import { getCounterpartyTypeById } from '@/data/counterparty-type';
+import { counterpartyTypeAction } from '@/actions/counterparty-type';
+import { getCounterpartyTypeByIdData } from '@/data/counterparty-type';
 
 const handleCounterpartyTypeSubmit = async (
   values: TCounterpartyTypeFormData,
   id?: number,
-  onSuccess?: () => void
+  onSuccess?: (count: number) => void
 ) => {
   try {
-    const data = await counterpartyType(values, id);
+    const data = await counterpartyTypeAction(values, id);
 
     if (data?.error) {
       toast.error(data.error);
@@ -24,7 +24,7 @@ const handleCounterpartyTypeSubmit = async (
     }
 
     if (data?.success) {
-      onSuccess?.();
+      onSuccess?.(data.count ?? 0);
       toast.success(data.success);
     }
   } catch (error) {
@@ -50,7 +50,7 @@ export const useCounterpartyTypeData = (id?: number) => {
       setIsLoading(true);
 
       if (id) {
-        const data = await getCounterpartyTypeById(id);
+        const data = await getCounterpartyTypeByIdData(id);
 
         form.setValue('name', data?.name ?? '');
         form.setValue('comment', data?.comment ?? '');

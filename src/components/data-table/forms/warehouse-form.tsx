@@ -1,7 +1,5 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-
 import { TWarehouseFormData } from '@/schemas/warehouse-form-schema';
 import { translateColumnsWarehouse } from '@/lib/data-table/translate-colums-header';
 import { useTransitionNoErrors } from '@/hooks/use-transition-no-errors';
@@ -17,8 +15,10 @@ import {
 } from '@/components/data-table/forms/form-field';
 import { LoadingFormHeader } from '@/components/loading/loading-form-header';
 
+import { useDataTableStore } from '@/store/data-table';
+
 export function WarehouseForm({ id }: { id?: number }) {
-  const router = useRouter();
+  const { setCountDataTable } = useDataTableStore();
   const {
     form,
     handleWarehouseSubmit,
@@ -33,8 +33,8 @@ export function WarehouseForm({ id }: { id?: number }) {
     const transformedValues = transformFormData(values);
 
     startTransitionNoErrors(() => {
-      handleWarehouseSubmit(transformedValues, id, () => {
-        router.refresh();
+      handleWarehouseSubmit(transformedValues, id, (count) => {
+        setCountDataTable(count);
         if (!id) form.reset();
         setLoadingWarehouses(true);
       });

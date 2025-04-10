@@ -1,7 +1,5 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-
 import { TCounterpartyFormData } from '@/schemas/counterparty-form-schema';
 import { translateColumnsCounterparty } from '@/lib/data-table/translate-colums-header';
 import { useTransitionNoErrors } from '@/hooks/use-transition-no-errors';
@@ -18,12 +16,14 @@ import {
 import { CounterpartyTypeForm } from '@/components/data-table/forms/counterparty-type-form';
 import { LoadingFormHeader } from '@/components/loading/loading-form-header';
 
+import { useDataTableStore } from '@/store/data-table';
+
 interface CounterpartyFormProps {
   id?: number;
 }
 
 export const CounterpartyForm = ({ id }: CounterpartyFormProps) => {
-  const router = useRouter();
+  const { setCountDataTable } = useDataTableStore();
   const { form, handleCounterpartySubmit, counterpartyTypes, isLoading } =
     useCounterpartyData(id);
   const { submit, setSubmit } = useStopPropagationStore();
@@ -50,8 +50,8 @@ export const CounterpartyForm = ({ id }: CounterpartyFormProps) => {
     const transformedValues = transformFormData(values);
 
     startTransitionNoErrors(() => {
-      handleCounterpartySubmit(transformedValues, id, () => {
-        router.refresh();
+      handleCounterpartySubmit(transformedValues, id, (count) => {
+        setCountDataTable(count);
         if (!id) form.reset();
       });
     });

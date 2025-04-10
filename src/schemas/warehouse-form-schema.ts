@@ -24,6 +24,8 @@ export const WarehouseFormSchema = z.object({
 
 export type TWarehouseFormData = z.infer<typeof WarehouseFormSchema>;
 
+export type TWarehouse = Omit<TWarehouseFormData, 'warehouseGroup'>;
+
 export type KeyTWarehouseFormData =
   | keyof Omit<TWarehouseFormData, 'warehouseGroupId' | 'warehouseGroup'>
   | 'warehouseGroup_name'

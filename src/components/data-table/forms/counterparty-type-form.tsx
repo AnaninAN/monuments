@@ -1,7 +1,5 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-
 import { TCounterpartyTypeFormData } from '@/schemas/counterparty-type-form-schema';
 import { translateColumnsCounterpartyType } from '@/lib/data-table/translate-colums-header';
 import { useLoadingSelectStore } from '@/store/loading-select';
@@ -16,8 +14,10 @@ import {
 } from '@/components/data-table/forms/form-field';
 import { LoadingFormHeader } from '@/components/loading/loading-form-header';
 
+import { useDataTableStore } from '@/store/data-table';
+
 export const CounterpartyTypeForm = ({ id }: { id?: number }) => {
-  const router = useRouter();
+  const { setCountDataTable } = useDataTableStore();
   const { form, handleCounterpartyTypeSubmit, isLoading } =
     useCounterpartyTypeData(id);
   const { setloadingCounterpartyTypes } = useLoadingSelectStore();
@@ -25,8 +25,8 @@ export const CounterpartyTypeForm = ({ id }: { id?: number }) => {
 
   const onSubmit = (values: TCounterpartyTypeFormData) => {
     startTransitionNoErrors(() => {
-      handleCounterpartyTypeSubmit(values, id, () => {
-        router.refresh();
+      handleCounterpartyTypeSubmit(values, id, (count) => {
+        setCountDataTable(count);
         if (!id) form.reset();
         setloadingCounterpartyTypes(true);
       });

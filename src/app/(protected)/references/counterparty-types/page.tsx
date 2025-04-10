@@ -1,29 +1,44 @@
+'use client';
+
+import { useState } from 'react';
+
 import withAuth from '@/hoc/with-auth';
 
 import { menu } from '@/consts/menu';
 import { translateColumnsCounterpartyType } from '@/lib/data-table/translate-colums-header';
 import { columns } from './columns';
-
-import { getAllCounterpartyTypes } from '@/data/counterparty-type';
+import { getAllCounterpartyTypesData } from '@/data/counterparty-type';
+import { useLoadingPageDataTable } from '@/hooks/use-loading-page-data-table';
+import { TDataTable } from '@/types/types';
 
 import { CounterpartyTypeForm } from '@/components/data-table/forms/counterparty-type-form';
 import { ThreeTable } from '@/components/data-table/three-table';
+import { TCounterpartyTypeFormData } from '@/schemas/counterparty-type-form-schema';
 
-async function CounterpartyTypesPage() {
-  const counterpartyTypes = await getAllCounterpartyTypes();
+export const CounterpartyTypesPage = () => {
+  const [counterpartyTypes, setCounterpartyTypes] = useState<
+    TCounterpartyTypeFormData[]
+  >([]);
+
+  const { isLoadingDataTable } =
+    useLoadingPageDataTable<TCounterpartyTypeFormData>({
+      getDataTable: getAllCounterpartyTypesData,
+      setDataTable: setCounterpartyTypes,
+    });
+
   if (!counterpartyTypes) return null;
 
-  return (
-    <ThreeTable
-      title={menu['COUNTERPARTY_TYPES'].title}
-      columns={columns}
-      data={counterpartyTypes}
-      FormComponent={CounterpartyTypeForm}
-      filter="name"
-      translateColumns={translateColumnsCounterpartyType}
-    />
-  );
-}
+  const dataTable: TDataTable<TCounterpartyTypeFormData> = {
+    data: counterpartyTypes,
+    FormComponent: CounterpartyTypeForm,
+    filter: 'name',
+    translateColumns: translateColumnsCounterpartyType,
+    isLoadingDataTable,
+    title: menu['COUNTERPARTY_TYPES'].title,
+  };
+
+  return <ThreeTable columns={columns} dataTable={dataTable} />;
+};
 
 export default withAuth(
   CounterpartyTypesPage,

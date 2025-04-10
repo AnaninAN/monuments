@@ -1,11 +1,19 @@
 'use server';
 
-import { db } from '@/lib/db';
-
 import { TUnitFormData, UnitFormSchema } from '@/schemas/unit-form-schema';
-import { getUnitById, getUnitByName } from '@/data/unit';
+import {
+  addUnitData,
+  delUnitData,
+  getUnitByIdData,
+  getUnitByNameData,
+  updateUnitData,
+} from '@/data/unit';
+import { TDataTableActionResult } from '@/types/types';
 
-export const unit = async (values: TUnitFormData, id?: number) => {
+export const unitAction = async (
+  values: TUnitFormData,
+  id?: number
+): Promise<TDataTableActionResult> => {
   if (id) {
     const validatedFields = UnitFormSchema.safeParse(values);
 
@@ -13,18 +21,19 @@ export const unit = async (values: TUnitFormData, id?: number) => {
       return { error: 'Поля с ошибками' };
     }
 
-    const dbUnit = await getUnitById(id);
+    const dbUnit = await getUnitByIdData(id);
 
     if (!dbUnit) {
       return { error: 'Еденица измерения не найдена!' };
     }
 
-    await db.unit.update({
-      where: { id },
-      data: { ...values },
-    });
+    const count = await updateUnitData(id, validatedFields.data);
 
-    return { success: 'Данные единицы измерения обновлены!' };
+    if (count === null) {
+      return { error: 'Единицы измерения не обновлены!' };
+    }
+
+    return { success: 'Данные единицы измерения обновлены!', count };
   } else {
     const validatedFields = UnitFormSchema.safeParse(values);
 
@@ -32,30 +41,34 @@ export const unit = async (values: TUnitFormData, id?: number) => {
       return { error: 'Поля с ошибками' };
     }
 
-    const existingUnit = await getUnitByName(validatedFields.data.name);
+    const existingUnit = await getUnitByNameData(validatedFields.data.name);
 
     if (existingUnit) {
       return { error: 'Такое наименование уже используется!' };
     }
 
-    await db.unit.create({
-      data: {
-        ...validatedFields.data,
-      },
-    });
+    const count = await addUnitData(validatedFields.data);
 
-    return { success: 'Единица измерения создана!' };
+    if (count === null) {
+      return { error: 'Единица измерения не создана!' };
+    }
+
+    return { success: 'Единица измерения создана!', count };
   }
 };
 
 export const delUnit = async (id: number) => {
-  const existingUnit = await getUnitById(id);
+  const existingUnit = await getUnitByIdData(id);
 
   if (!existingUnit) {
     return { error: 'Единицы измерения не существует!' };
   }
 
-  await db.unit.delete({ where: { id } });
+  const count = await delUnitData(id);
 
-  return { success: 'Единица измерения удалена!' };
+  if (count === null) {
+    return { error: 'Единица измерения не удалена!' };
+  }
+
+  return { success: 'Единица измерения удалена!', count };
 };

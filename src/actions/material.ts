@@ -1,15 +1,22 @@
 'use server';
 
-import { db } from '@/lib/db';
-
 import {
   MaterialFormSchema,
   TMaterialFormData,
 } from '@/schemas/material-form-schema';
+import {
+  getMaterialByIdData,
+  getMaterialByNameData,
+  updateMaterialData,
+  addMaterialData,
+  delMaterialData,
+} from '@/data/material';
+import { TDataTableActionResult } from '@/types/types';
 
-import { getMaterialById, getMaterialByName } from '@/data/material';
-
-export const material = async (values: TMaterialFormData, id?: number) => {
+export const materialAction = async (
+  values: TMaterialFormData,
+  id?: number
+): TDataTableActionResult => {
   if (id) {
     const validatedFields = MaterialFormSchema.safeParse(values);
 
@@ -17,7 +24,7 @@ export const material = async (values: TMaterialFormData, id?: number) => {
       return { error: 'Поля с ошибками' };
     }
 
-    const dbMaterial = await getMaterialById(id);
+    const dbMaterial = await getMaterialByIdData(id);
 
     if (!dbMaterial) {
       return { error: 'Материал не найден!' };
@@ -25,14 +32,16 @@ export const material = async (values: TMaterialFormData, id?: number) => {
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { materialGroup, unit, warehouse, ...newValues } = values;
-    await db.$transaction(async (tx) => {
-      await tx.material.update({
-        where: { id },
-        data: { ...newValues },
-      });
-    });
+    const count = await updateMaterialData(id, newValues);
 
-    return { success: 'Данные материала обновлены!' };
+    if (count === null) {
+      return { error: 'Материал не обновлен!' };
+    }
+
+    return {
+      success: 'Данные материала обновлены!',
+      count,
+    };
   } else {
     const validatedFields = MaterialFormSchema.safeParse(values);
 
@@ -40,7 +49,9 @@ export const material = async (values: TMaterialFormData, id?: number) => {
       return { error: 'Поля с ошибками' };
     }
 
-    const existingMaterial = await getMaterialByName(validatedFields.data.name);
+    const existingMaterial = await getMaterialByNameData(
+      validatedFields.data.name
+    );
 
     if (existingMaterial) {
       return { error: 'Такое наименование уже используется!' };
@@ -48,26 +59,28 @@ export const material = async (values: TMaterialFormData, id?: number) => {
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { materialGroup, unit, warehouse, ...newValues } = values;
-    await db.$transaction(async (tx) => {
-      await tx.material.create({
-        data: { ...newValues },
-      });
-    });
+    const count = await addMaterialData(newValues);
 
-    return { success: 'Материал создан!' };
+    if (count === null) {
+      return { error: 'Материал не создан!' };
+    }
+
+    return { success: 'Материал создан!', count };
   }
 };
 
-export const delMaterial = async (id: number) => {
-  const existingMaterial = await getMaterialById(id);
+export const delMaterialAction = async (id: number): TDataTableActionResult => {
+  const existingMaterial = await getMaterialByIdData(id);
 
   if (!existingMaterial) {
     return { error: 'Материала не существует!' };
   }
 
-  await db.$transaction(async (tx) => {
-    await tx.material.delete({ where: { id } });
-  });
+  const count = await delMaterialData(id);
 
-  return { success: 'Материал удален!' };
+  if (count === null) {
+    return { error: 'Материал не удален!' };
+  }
+
+  return { success: 'Материал удален!', count };
 };

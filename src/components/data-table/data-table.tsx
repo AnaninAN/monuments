@@ -34,6 +34,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Spin } from '../ui/spin';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -41,6 +42,7 @@ interface DataTableProps<TData, TValue> {
   FormComponent: React.ComponentType;
   filter: string;
   translateColumns: Record<string, string>;
+  isLoadingDataTable: boolean;
 }
 
 export function DataTable<TData, TValue>({
@@ -49,6 +51,7 @@ export function DataTable<TData, TValue>({
   FormComponent,
   filter,
   translateColumns,
+  isLoadingDataTable,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -119,7 +122,8 @@ export function DataTable<TData, TValue>({
             FormComponent={FormComponent}
           />
         </div>
-        <div className="rounded-md border w-full">
+
+        <div className="rounded-md border w-full relative">
           <Table>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
@@ -168,6 +172,11 @@ export function DataTable<TData, TValue>({
               )}
             </TableBody>
           </Table>
+          {isLoadingDataTable && (
+            <div className="rounded-md w-full h-full bg-gray-100/50 absolute top-0 left-0">
+              <Spin />
+            </div>
+          )}
         </div>
       </div>
     </div>

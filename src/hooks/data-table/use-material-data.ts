@@ -8,21 +8,22 @@ import {
   MaterialFormSchema,
   TMaterialFormData,
 } from '@/schemas/material-form-schema';
-import { material } from '@/actions/material';
+import { materialAction } from '@/actions/material';
 import { useLoadingSelectStore } from '@/store/loading-select';
-import { getAllMaterialGroups } from '@/data/material-group';
-import { getAllUnits } from '@/data/unit';
-import { getAllWarehouses } from '@/data/warehouse';
-import { getMaterialById } from '@/data/material';
-import { EntityGroup } from '@/data/dto/entity-group';
+import { getAllUnitsData } from '@/data/unit';
+import { getAllWarehousesData } from '@/data/warehouse';
+import { getMaterialByIdData } from '@/data/material';
+import { getAllEntityGroupsData } from '@/data/entity-group';
+import { EntityGroupWithAdd } from '@/types/types';
+import { useDataTableStore } from '@/store/data-table';
 
 const handleMaterialSubmit = async (
   values: TMaterialFormData,
   id?: number,
-  onSuccess?: () => void
+  onSuccess?: (count: number) => void
 ) => {
   try {
-    const data = await material(values, id);
+    const data = await materialAction(values, id);
 
     if (data?.error) {
       toast.error(data.error);
@@ -30,7 +31,7 @@ const handleMaterialSubmit = async (
     }
 
     if (data?.success) {
-      onSuccess?.();
+      onSuccess?.(data.count ?? 0);
       toast.success(data.success);
     }
   } catch (error) {
@@ -40,10 +41,14 @@ const handleMaterialSubmit = async (
 };
 
 export const useMaterialData = (id?: number) => {
-  const [materialGroups, setMaterialGroups] = useState<EntityGroup[]>([]);
+  const [materialGroups, setMaterialGroups] = useState<EntityGroupWithAdd[]>(
+    []
+  );
   const [units, setUnits] = useState<Unit[]>([]);
   const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  const { selectedIdGroup, selectedNameGroup } = useDataTableStore();
 
   const {
     setLoadingMaterialGroups,
@@ -62,9 +67,9 @@ export const useMaterialData = (id?: number) => {
       article: '',
       minBalance: 0,
       priceIn: 0,
-      materialGroupId: 1,
+      materialGroupId: selectedIdGroup,
       materialGroup: {
-        name: 'Материалы',
+        name: selectedNameGroup,
       },
       unitId: 0,
       unit: {
@@ -81,7 +86,7 @@ export const useMaterialData = (id?: number) => {
     if (loadingMaterialGroups) {
       const fetchMaterialGroups = async () => {
         try {
-          const data = await getAllMaterialGroups();
+          const data = await getAllEntityGroupsData('materialGroup');
           setMaterialGroups(data);
         } catch (error) {
           console.error('Ошибка при загрузке групп материалов:', error);
@@ -98,7 +103,7 @@ export const useMaterialData = (id?: number) => {
     if (loadingUnits) {
       const fetchUnits = async () => {
         try {
-          const data = await getAllUnits();
+          const data = await getAllUnitsData();
           setUnits(data);
         } catch (error) {
           console.error('Ошибка при загрузке единиц измерения:', error);
@@ -115,7 +120,7 @@ export const useMaterialData = (id?: number) => {
     if (loadingWarehouses) {
       const fetchWarehouses = async () => {
         try {
-          const data = await getAllWarehouses();
+          const data = await getAllWarehousesData();
           setWarehouses(data);
         } catch (error) {
           console.error('Ошибка при загрузке складов:', error);
@@ -133,7 +138,11 @@ export const useMaterialData = (id?: number) => {
       setIsLoading(true);
 
       const [materialGroupsData, unitsData, warehousesData] = await Promise.all(
-        [getAllMaterialGroups(), getAllUnits(), getAllWarehouses()]
+        [
+          getAllEntityGroupsData('materialGroup'),
+          getAllUnitsData(),
+          getAllWarehousesData(),
+        ]
       );
 
       setMaterialGroups(materialGroupsData);
@@ -141,18 +150,21 @@ export const useMaterialData = (id?: number) => {
       setWarehouses(warehousesData);
 
       if (id) {
-        const materialData = await getMaterialById(id);
+        const materialData = await getMaterialByIdData(id);
 
         form.setValue('name', materialData?.name ?? '');
         form.setValue('comment', materialData?.comment ?? '');
         form.setValue('article', materialData?.article ?? '');
         form.setValue('priceIn', materialData?.priceIn ?? 0);
         form.setValue('minBalance', materialData?.minBalance ?? 0);
+        form.setValue('materialGroupId', materialData?.materialGroupId ?? 0);
         form.setValue(
           'materialGroup.name',
-          materialData?.materialGroup.name ?? ''
+          materialData?.materialGroup.name ?? selectedNameGroup
         );
+        form.setValue('unitId', materialData?.unitId ?? 0);
         form.setValue('unit.name', materialData?.unit.name ?? '');
+        form.setValue('warehouseId', materialData?.warehouseId ?? null);
         form.setValue('warehouse.name', materialData?.warehouse?.name ?? '');
       }
     } catch (error) {
@@ -161,7 +173,7 @@ export const useMaterialData = (id?: number) => {
     } finally {
       setIsLoading(false);
     }
-  }, [form, id]);
+  }, [form, id, selectedNameGroup]);
 
   useEffect(() => {
     fetchData();

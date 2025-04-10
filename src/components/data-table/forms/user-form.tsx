@@ -1,9 +1,7 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-
 import { TUserFormData } from '@/schemas/user-form-schema';
-import { translateColumnsEmployee } from '@/lib/data-table/translate-colums-header';
+import { translateColumnsUser } from '@/lib/data-table/translate-colums-header';
 import { useTransitionNoErrors } from '@/hooks/use-transition-no-errors';
 import { useUserData } from '@/hooks/data-table/use-user-data';
 
@@ -15,6 +13,7 @@ import {
   FormFieldRoleSelect,
 } from '@/components/data-table/forms/form-field';
 import { LoadingFormHeader } from '@/components/loading/loading-form-header';
+import { useDataTableStore } from '@/store/data-table';
 
 const primaryPhoneOptions = {
   mask: '+7 (___) ___-__-__',
@@ -26,14 +25,14 @@ interface UserFormProps {
 }
 
 export function UserForm({ id }: UserFormProps) {
-  const router = useRouter();
+  const { setCountDataTable } = useDataTableStore();
   const { form, handleUserSubmit, isLoading } = useUserData(id);
   const { isPending, startTransitionNoErrors } = useTransitionNoErrors(form);
 
   const onSubmit = (values: TUserFormData) => {
     startTransitionNoErrors(() => {
-      handleUserSubmit(values, id, () => {
-        router.refresh();
+      handleUserSubmit(values, id, (count) => {
+        setCountDataTable(count);
         if (!id) form.reset();
       });
     });
@@ -62,7 +61,7 @@ export function UserForm({ id }: UserFormProps) {
               form={form}
               name="email"
               placeholder="test@monuments.ru"
-              translate={translateColumnsEmployee}
+              translate={translateColumnsUser}
               isPending={isPending}
             />
           </div>
@@ -71,7 +70,7 @@ export function UserForm({ id }: UserFormProps) {
               form={form}
               name="name"
               placeholder="Введите имя пользователя"
-              translate={translateColumnsEmployee}
+              translate={translateColumnsUser}
               isPending={isPending}
             />
           </div>
@@ -80,7 +79,7 @@ export function UserForm({ id }: UserFormProps) {
               form={form}
               name="lastname"
               placeholder="Введите фамилию пользователя"
-              translate={translateColumnsEmployee}
+              translate={translateColumnsUser}
               isPending={isPending}
             />
           </div>
@@ -89,7 +88,7 @@ export function UserForm({ id }: UserFormProps) {
               form={form}
               name="phoneNumber"
               placeholder="+7 (___) ___-__-__"
-              translate={translateColumnsEmployee}
+              translate={translateColumnsUser}
               isPending={isPending}
               options={primaryPhoneOptions}
             />
@@ -97,7 +96,7 @@ export function UserForm({ id }: UserFormProps) {
           <div className="grid gap-2">
             <FormFieldRoleSelect
               form={form}
-              translate={translateColumnsEmployee}
+              translate={translateColumnsUser}
               isPending={isPending}
             />
           </div>

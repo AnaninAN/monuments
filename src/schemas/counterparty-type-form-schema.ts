@@ -18,6 +18,8 @@ export type TCounterpartyTypeFormData = z.infer<
   typeof CounterpartyTypeFormSchema
 >;
 
+export type TCounterpartyType = TCounterpartyTypeFormData;
+
 export type KeyTCounterpartyTypeFormData =
   | keyof TCounterpartyTypeFormData
   | 'id';

@@ -32,6 +32,11 @@ export const MaterialFormSchema = z.object({
 
 export type TMaterialFormData = z.infer<typeof MaterialFormSchema>;
 
+export type TMaterial = Omit<
+  TMaterialFormData,
+  'materialGroup' | 'unit' | 'warehouse'
+>;
+
 export type KeyTMaterialFormData =
   | keyof Omit<
       TMaterialFormData,

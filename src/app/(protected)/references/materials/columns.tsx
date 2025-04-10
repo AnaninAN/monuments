@@ -14,22 +14,21 @@ import {
 
 import { MaterialForm } from '@/components/data-table/forms/material-form';
 
-import { delMaterial } from '@/actions/material';
+import { delMaterialAction } from '@/actions/material';
 
-const cols: ColumnsType<KeyTMaterialFormData> = [
+const columnsMaterial: ColumnsType<KeyTMaterialFormData> = [
   { key: 'image', sort: false },
   { key: 'name', sort: true },
   { key: 'article', sort: true },
   { key: 'unit_name', sort: false },
-  { key: 'warehouse_name', sort: false },
   { key: 'priceIn', sort: true },
   { key: 'minBalance', sort: true },
 ];
 
-export const columns: ColumnDef<TMaterialFormData>[] = dataTableColumns(
-  'id',
-  cols,
-  translateColumnsMaterial,
-  delMaterial,
-  MaterialForm
-);
+export const columns: ColumnDef<TMaterialFormData>[] = dataTableColumns({
+  key: 'id',
+  columns: columnsMaterial,
+  translateColumns: translateColumnsMaterial,
+  delRowDataTableAction: delMaterialAction,
+  FormComponent: MaterialForm,
+});

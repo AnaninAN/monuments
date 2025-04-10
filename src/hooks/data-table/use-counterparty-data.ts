@@ -7,19 +7,19 @@ import {
   CounterpartyFormSchema,
   TCounterpartyFormData,
 } from '@/schemas/counterparty-form-schema';
-import { counterparty } from '@/actions/counterparty';
+import { counterpartyAction } from '@/actions/counterparty';
 import { useLoadingSelectStore } from '@/store/loading-select';
 import { CounterpartyType } from '@prisma/client';
-import { getAllCounterpartyTypes } from '@/data/counterparty-type';
-import { getCounterpartyById } from '@/data/counterparty';
+import { getAllCounterpartyTypesData } from '@/data/counterparty-type';
+import { getCounterpartyByIdData } from '@/data/counterparty';
 
 const handleCounterpartySubmit = async (
   values: TCounterpartyFormData,
   id?: number,
-  onSuccess?: () => void
+  onSuccess?: (count: number) => void
 ) => {
   try {
-    const data = await counterparty(values, id);
+    const data = await counterpartyAction(values, id);
 
     if (data?.error) {
       toast.error(data.error);
@@ -27,7 +27,7 @@ const handleCounterpartySubmit = async (
     }
 
     if (data?.success) {
-      onSuccess?.();
+      onSuccess?.(data.count ?? 0);
       toast.success(data.success);
     }
   } catch (error) {
@@ -54,6 +54,12 @@ export const useCounterpartyData = (id?: number) => {
         name: '',
       },
       counterpartyTypeId: 0,
+      legalAddress: '',
+      phone: '',
+      email: '',
+      INN: '',
+      KPP: '',
+      OGRN: '',
     },
   });
 
@@ -61,7 +67,7 @@ export const useCounterpartyData = (id?: number) => {
     if (loadingCounterpartyTypes) {
       const fetchCounterpartyTypesData = async () => {
         try {
-          const data = await getAllCounterpartyTypes();
+          const data = await getAllCounterpartyTypesData();
           setCounterpartyTypes(data);
         } catch (error) {
           console.error(
@@ -81,19 +87,26 @@ export const useCounterpartyData = (id?: number) => {
     try {
       setIsLoading(true);
 
-      const data = await getAllCounterpartyTypes();
+      const data = await getAllCounterpartyTypesData();
       setCounterpartyTypes(data);
 
       if (id) {
-        const data = await getCounterpartyById(id);
+        const data = await getCounterpartyByIdData(id);
 
         form.setValue('name', data?.name ?? '');
         form.setValue('comment', data?.comment ?? '');
         form.setValue('status', data?.status ?? 'ACTIVE');
+        form.setValue('counterpartyTypeId', data?.counterpartyTypeId ?? 0);
         form.setValue(
           'counterpartyType.name',
           data?.counterpartyType.name ?? ''
         );
+        form.setValue('legalAddress', data?.legalAddress ?? '');
+        form.setValue('phone', data?.phone ?? '');
+        form.setValue('email', data?.email ?? '');
+        form.setValue('INN', data?.INN ?? '');
+        form.setValue('KPP', data?.KPP ?? '');
+        form.setValue('OGRN', data?.OGRN ?? '');
       }
     } catch (error) {
       console.error(

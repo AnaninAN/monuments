@@ -1,7 +1,5 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-
 import { TUnitFormData } from '@/schemas/unit-form-schema';
 import { translateColumnsUnit } from '@/lib/data-table/translate-colums-header';
 import { useTransitionNoErrors } from '@/hooks/use-transition-no-errors';
@@ -15,21 +13,22 @@ import {
   FormFieldTextarea,
 } from '@/components/data-table/forms/form-field';
 import { LoadingFormHeader } from '@/components/loading/loading-form-header';
+import { useDataTableStore } from '@/store/data-table';
 
 interface UnitFormProps {
   id?: number;
 }
 
 export const UnitForm = ({ id }: UnitFormProps) => {
-  const router = useRouter();
+  const { setCountDataTable } = useDataTableStore();
   const { form, handleUnitSubmit, isLoading } = useUnitData(id);
   const { setLoadingUnits } = useLoadingSelectStore();
   const { isPending, startTransitionNoErrors } = useTransitionNoErrors(form);
 
   const onSubmit = (values: TUnitFormData) => {
     startTransitionNoErrors(() => {
-      handleUnitSubmit(values, id, () => {
-        router.refresh();
+      handleUnitSubmit(values, id, (count) => {
+        setCountDataTable(count);
         if (!id) form.reset();
         setLoadingUnits(true);
       });

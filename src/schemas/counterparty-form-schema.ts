@@ -16,9 +16,20 @@ export const CounterpartyFormSchema = z.object({
     .string()
     .max(100, 'Комментарий не должен превышать 100 символов!')
     .trim(),
+  legalAddress: z
+    .string()
+    .max(100, 'Юридический адрес не должен превышать 100 символов!')
+    .trim(),
+  phone: z.string(),
+  email: z.string(),
+  INN: z.string(),
+  KPP: z.string(),
+  OGRN: z.string(),
 });
 
 export type TCounterpartyFormData = z.infer<typeof CounterpartyFormSchema>;
+
+export type TCounterparty = Omit<TCounterpartyFormData, 'counterpartyType'>;
 
 export type KeyTCounterpartyFormData =
   | keyof Omit<TCounterpartyFormData, 'counterpartyTypeId' | 'counterpartyType'>

@@ -1,7 +1,5 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-
 import { TMaterialFormData } from '@/schemas/material-form-schema';
 import { translateColumnsMaterial } from '@/lib/data-table/translate-colums-header';
 import { useTransitionNoErrors } from '@/hooks/use-transition-no-errors';
@@ -19,12 +17,14 @@ import { UnitForm } from '@/components/data-table/forms/unit-form';
 import { WarehouseForm } from '@/components/data-table/forms/warehouse-form';
 import { LoadingFormHeader } from '@/components/loading/loading-form-header';
 
+import { useDataTableStore } from '@/store/data-table';
+
 interface MaterialFormProps {
   id?: number;
 }
 
 export const MaterialForm = ({ id }: MaterialFormProps) => {
-  const router = useRouter();
+  const { setCountDataTable } = useDataTableStore();
   const {
     form,
     materialGroups,
@@ -44,8 +44,8 @@ export const MaterialForm = ({ id }: MaterialFormProps) => {
     const transformedValues = transformFormData(values);
 
     startTransitionNoErrors(() => {
-      handleMaterialSubmit(transformedValues, id, () => {
-        router.refresh();
+      handleMaterialSubmit(transformedValues, id, (count) => {
+        setCountDataTable(count);
         if (!id) form.reset();
       });
     });

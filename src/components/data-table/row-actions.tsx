@@ -1,5 +1,4 @@
 import { MoreHorizontal } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 import {
@@ -11,16 +10,22 @@ import {
 import { Button } from '@/components/ui/button';
 
 import useConfirmationStore from '@/store/confirmation';
+import { TDataTableAction } from '@/types/types';
+import { useDataTableStore } from '@/store/data-table';
 
 type RowActionsProps = {
   id: number;
-  actionDel?: (id: number) => Promise<{ success?: string; error?: string }>;
+  delRowDataTableAction?: TDataTableAction;
   name: string;
 };
 
-export const RowActions = ({ id, name, actionDel }: RowActionsProps) => {
+export const RowActions = ({
+  id,
+  name,
+  delRowDataTableAction,
+}: RowActionsProps) => {
   const { openConfirmation } = useConfirmationStore();
-  const router = useRouter();
+  const { setCountDataTable } = useDataTableStore();
 
   const delClick = () => {
     openConfirmation({
@@ -29,13 +34,13 @@ export const RowActions = ({ id, name, actionDel }: RowActionsProps) => {
       cancelLabel: 'Отмена',
       actionLabel: 'Удалить',
       onAction: () => {
-        actionDel?.(id)
+        delRowDataTableAction?.(id)
           .then((data) => {
             if (data?.error) {
               toast.error(data.error);
             }
             if (data?.success) {
-              router.refresh();
+              setCountDataTable(data.count ?? 0);
               toast.success(data.success);
             }
           })
@@ -45,7 +50,7 @@ export const RowActions = ({ id, name, actionDel }: RowActionsProps) => {
     });
   };
 
-  if (actionDel) {
+  if (delRowDataTableAction) {
     return (
       <div className="flex justify-end pr-3">
         <DropdownMenu>
