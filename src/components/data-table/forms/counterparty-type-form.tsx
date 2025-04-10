@@ -12,7 +12,7 @@ import {
   FormFieldInput,
   FormFieldTextarea,
 } from '@/components/data-table/forms/form-field';
-import { LoadingFormHeader } from '@/components/loading/loading-form-header';
+import { Spin } from '@/components/ui/spin';
 
 import { useDataTableStore } from '@/store/data-table';
 
@@ -33,15 +33,11 @@ export const CounterpartyTypeForm = ({ id }: { id?: number }) => {
     });
   };
 
-  if (isLoading) {
-    return <LoadingFormHeader />;
-  }
-
   return (
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-4 px-8 py-2"
+        className="space-y-4 px-8 py-2 relative"
       >
         <FormHeader
           id={id}
@@ -69,6 +65,11 @@ export const CounterpartyTypeForm = ({ id }: { id?: number }) => {
           />
         </div>
       </form>
+      {isLoading && (
+        <div className="space-y-4 px-8 py-2 w-full h-full bg-gray-100/50 absolute top-0 left-0">
+          <Spin />
+        </div>
+      )}
     </Form>
   );
 };

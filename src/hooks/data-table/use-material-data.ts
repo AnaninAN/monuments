@@ -69,7 +69,7 @@ export const useMaterialData = (id?: number) => {
       priceIn: 0,
       materialGroupId: selectedIdGroup,
       materialGroup: {
-        name: selectedNameGroup,
+        name: selectedNameGroup || 'Материалы',
       },
       unitId: 0,
       unit: {

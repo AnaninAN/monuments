@@ -1,6 +1,8 @@
 'use client';
 
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
+
+import { FormComponent } from '@/types/types';
 
 import {
   Sheet,
@@ -14,9 +16,7 @@ import {
 interface DataSheetProps {
   trigger: string | ReactNode;
   className?: string;
-  FormComponent?: React.ComponentType<{
-    id?: number;
-  }>;
+  FormComponent?: FormComponent;
   id?: number;
 }
 
@@ -26,8 +26,10 @@ export function DataSheet({
   id,
   className,
 }: DataSheetProps) {
+  const [open, setOpen] = useState(false);
+
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <span className={className}>{trigger}</span>
       </SheetTrigger>
@@ -36,7 +38,9 @@ export function DataSheet({
           <SheetTitle></SheetTitle>
           <SheetDescription></SheetDescription>
         </SheetHeader>
-        {FormComponent && <FormComponent id={id} />}
+        {FormComponent && (
+          <FormComponent id={id} closeSheet={() => setOpen(false)} />
+        )}
       </SheetContent>
     </Sheet>
   );

@@ -28,6 +28,7 @@ export const useLoadingPageDataTable = <T>({
     setCountDataTable,
     setCountGroup,
     setSelectedIdGroup,
+    setSelectedNameGroup,
   } = useDataTableStore();
 
   useEffect(() => {
@@ -35,6 +36,7 @@ export const useLoadingPageDataTable = <T>({
       setCountDataTable(0);
       setCountGroup(0);
       setSelectedIdGroup(1);
+      setSelectedNameGroup('');
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

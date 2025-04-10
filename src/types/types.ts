@@ -46,6 +46,13 @@ export type CounterpartyWithAdd = Counterparty & {
   counterpartyType: Pick<CounterpartyType, 'name'>;
 };
 
+export type FormComponentProps = {
+  id?: number;
+  closeSheet?: () => void;
+};
+
+export type FormComponent = React.ComponentType<FormComponentProps>;
+
 export type TreeNode = {
   id: number;
   name: string;

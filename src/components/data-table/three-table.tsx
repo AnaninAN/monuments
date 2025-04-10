@@ -19,7 +19,9 @@ export function ThreeTable<TData, TValue>({
 }: ThreeTableProps<TData, TValue>) {
   return (
     <div>
-      <h1 className="font-semibold self-center flex mb-4">{dataTable.title}</h1>
+      <h1 className="text-xl font-semibold self-center flex mb-4">
+        {dataTable.title}
+      </h1>
       <div className="flex">
         {three && (
           <TreeGroupView

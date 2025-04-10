@@ -2,7 +2,7 @@ import { ColumnDef } from '@tanstack/react-table';
 
 import { dataTableColumnHeader } from '@/lib/data-table/data-table-column-header';
 import { translateColumnsAction } from '@/lib/data-table/translate-colums-header';
-import { TDataTableAction } from '@/types/types';
+import { FormComponent, TDataTableAction } from '@/types/types';
 
 import { DataSheet } from '@/components/data-table/data-sheet';
 import { CellStatus } from '@/components/data-table/cell-status';
@@ -15,7 +15,7 @@ type DataTableColumnsProps<K extends string> = {
   columns: ColumnsType<K>;
   translateColumns: Record<K, string>;
   delRowDataTableAction?: TDataTableAction;
-  FormComponent?: React.ComponentType<{ id?: number }>;
+  FormComponent?: FormComponent;
 };
 
 const renderColumns = <T extends Record<string, unknown>, K extends string>(

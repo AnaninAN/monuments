@@ -99,7 +99,7 @@ export const GroupForm = ({ parent, id, entity }: GroupFormProps) => {
             name="name"
             placeholder="Введите наименование группы"
             translate={translateColumnsGroup}
-            isPending={isPending}
+            isPending={parent?.id === 1 ? true : isPending}
           />
         </div>
         <div className="flex justify-end">

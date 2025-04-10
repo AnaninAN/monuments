@@ -61,7 +61,7 @@ export const useWarehouseData = (id?: number) => {
       status: 'ACTIVE',
       warehouseGroupId: selectedIdGroup,
       warehouseGroup: {
-        name: selectedNameGroup,
+        name: selectedNameGroup || 'Склады',
       },
     },
   });
