@@ -15,7 +15,7 @@ import { getAllUsersData } from '@/data/user';
 
 import { UserForm } from '@/components/data-table/forms/user-form';
 
-export const UsersPage = () => {
+const UsersPage = () => {
   const [users, setUsers] = useState<TUserFormData[]>([]);
 
   const { isLoadingDataTable } = useLoadingPageDataTable<TUserFormData>({

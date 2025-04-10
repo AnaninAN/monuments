@@ -14,7 +14,7 @@ import { useState } from 'react';
 import { useLoadingPageDataTable } from '@/hooks/use-loading-page-data-table';
 import { CounterpartyWithAdd, TDataTable } from '@/types/types';
 
-export const CounterpartiesPage = () => {
+const CounterpartiesPage = () => {
   const [counterparties, setCounterparties] = useState<CounterpartyWithAdd[]>(
     []
   );

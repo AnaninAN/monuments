@@ -10,10 +10,11 @@ import { columns } from './columns';
 import { getAllUnitsData } from '@/data/unit';
 import { useLoadingPageDataTable } from '@/hooks/use-loading-page-data-table';
 import { TDataTable } from '@/types/types';
+import { TUnitFormData } from '@/schemas/unit-form-schema';
 
 import { UnitForm } from '@/components/data-table/forms/unit-form';
 import { ThreeTable } from '@/components/data-table/three-table';
-import { TUnitFormData } from '@/schemas/unit-form-schema';
+
 const UnitsPage = () => {
   const [units, setUnits] = useState<TUnitFormData[]>([]);
 

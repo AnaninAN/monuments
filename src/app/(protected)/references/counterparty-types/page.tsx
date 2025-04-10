@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-// import withAuth from '@/hoc/with-auth';
+import withAuth from '@/hoc/with-auth';
 
 import { menu } from '@/consts/menu';
 import { translateColumnsCounterpartyType } from '@/lib/data-table/translate-colums-header';
@@ -15,7 +15,7 @@ import { CounterpartyTypeForm } from '@/components/data-table/forms/counterparty
 import { ThreeTable } from '@/components/data-table/three-table';
 import { TCounterpartyTypeFormData } from '@/schemas/counterparty-type-form-schema';
 
-export const CounterpartyTypesPage = () => {
+const CounterpartyTypesPage = () => {
   const [counterpartyTypes, setCounterpartyTypes] = useState<
     TCounterpartyTypeFormData[]
   >([]);
@@ -40,10 +40,8 @@ export const CounterpartyTypesPage = () => {
   return <ThreeTable columns={columns} dataTable={dataTable} />;
 };
 
-export default CounterpartyTypesPage;
-
-// export default withAuth(
-//   CounterpartyTypesPage,
-//   menu['COUNTERPARTY_TYPES'].roles,
-//   menu['COUNTERPARTY_TYPES'].title
-// );
+export default withAuth(
+  CounterpartyTypesPage,
+  menu['COUNTERPARTY_TYPES'].roles,
+  menu['COUNTERPARTY_TYPES'].title
+);
