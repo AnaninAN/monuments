@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-import withAuth from '@/hoc/with-auth';
+// import withAuth from '@/hoc/with-auth';
 
 import { menu } from '@/consts/menu';
 import { translateColumnsCounterpartyType } from '@/lib/data-table/translate-colums-header';
@@ -40,8 +40,10 @@ export const CounterpartyTypesPage = () => {
   return <ThreeTable columns={columns} dataTable={dataTable} />;
 };
 
-export default withAuth(
-  CounterpartyTypesPage,
-  menu['COUNTERPARTY_TYPES'].roles,
-  menu['COUNTERPARTY_TYPES'].title
-);
+export default CounterpartyTypesPage;
+
+// export default withAuth(
+//   CounterpartyTypesPage,
+//   menu['COUNTERPARTY_TYPES'].roles,
+//   menu['COUNTERPARTY_TYPES'].title
+// );
