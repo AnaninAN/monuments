@@ -21,3 +21,17 @@ export const phoneFormat = (s: string, plus: boolean = true) => {
     `${startsWith} ($1) $2-$3-$4`
   );
 };
+
+export const findIdByName = (
+  items: { id: number; name: string }[],
+  name: string
+): number | undefined => {
+  return items.find((item) => item.name === name)?.id;
+};
+
+export function formatCurrency(amount: number): string {
+  return new Intl.NumberFormat('ru-RU', {
+    style: 'currency',
+    currency: 'RUB',
+  }).format(amount);
+}

@@ -65,11 +65,18 @@ export const translateColumnsMaterial: Record<KeyTMaterialFormData, string> = {
   image: 'Изображение',
   article: 'Артикул',
   minBalance: 'Минимальный остаток',
+  count: 'Общий остаток',
   priceIn: 'Закупочная цена',
+  priceOut: 'Цена продажи',
   materialGroup_name: 'Группа',
   unit_name: 'Единица измерения',
   warehouse_name: 'Склад хранения',
   comment: 'Коментарий',
+  weight: 'Вес, гр',
+  height: 'Высота, мм',
+  width: 'Ширина, мм',
+  length: 'Длина, мм',
+  volume: 'Объем, м³',
 };
 
 export const translateColumnsAction: Record<string, string> = {

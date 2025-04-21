@@ -31,7 +31,8 @@ export const materialAction = async (
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { materialGroup, unit, warehouse, ...newValues } = values;
+    const { materialGroup, unit, warehouse, ...newValues } =
+      validatedFields.data;
     const count = await updateMaterialData(id, newValues);
 
     if (count === null) {
@@ -58,7 +59,8 @@ export const materialAction = async (
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { materialGroup, unit, warehouse, ...newValues } = values;
+    const { materialGroup, unit, warehouse, ...newValues } =
+      validatedFields.data;
     const count = await addMaterialData(newValues);
 
     if (count === null) {

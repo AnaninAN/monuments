@@ -64,14 +64,16 @@ export const useMaterialData = (id?: number) => {
     defaultValues: {
       name: '',
       comment: '',
-      article: '',
-      minBalance: 0,
-      priceIn: 0,
+      article: undefined,
+      minBalance: undefined,
+      priceIn: undefined,
+      priceOut: undefined,
+      count: 0,
       materialGroupId: selectedIdGroup,
       materialGroup: {
         name: selectedNameGroup || 'Материалы',
       },
-      unitId: 0,
+      unitId: undefined,
       unit: {
         name: '',
       },
@@ -79,6 +81,11 @@ export const useMaterialData = (id?: number) => {
       warehouse: {
         name: '',
       },
+      weight: undefined,
+      height: undefined,
+      width: undefined,
+      length: undefined,
+      volume: undefined,
     },
   });
 
@@ -154,9 +161,11 @@ export const useMaterialData = (id?: number) => {
 
         form.setValue('name', materialData?.name ?? '');
         form.setValue('comment', materialData?.comment ?? '');
-        form.setValue('article', materialData?.article ?? '');
-        form.setValue('priceIn', materialData?.priceIn ?? 0);
-        form.setValue('minBalance', materialData?.minBalance ?? 0);
+        form.setValue('article', materialData?.article ?? undefined);
+        form.setValue('priceIn', materialData?.priceIn || undefined);
+        form.setValue('priceOut', materialData?.priceOut || undefined);
+        form.setValue('minBalance', materialData?.minBalance || undefined);
+        form.setValue('count', materialData?.count ?? 0);
         form.setValue('materialGroupId', materialData?.materialGroupId ?? 0);
         form.setValue(
           'materialGroup.name',
@@ -166,6 +175,11 @@ export const useMaterialData = (id?: number) => {
         form.setValue('unit.name', materialData?.unit.name ?? '');
         form.setValue('warehouseId', materialData?.warehouseId ?? null);
         form.setValue('warehouse.name', materialData?.warehouse?.name ?? '');
+        form.setValue('weight', materialData?.weight || undefined);
+        form.setValue('height', materialData?.height || undefined);
+        form.setValue('width', materialData?.width || undefined);
+        form.setValue('length', materialData?.length || undefined);
+        form.setValue('volume', materialData?.volume || undefined);
       }
     } catch (error) {
       console.error('Ошибка при загрузке данных:', error);

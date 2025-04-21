@@ -11,7 +11,7 @@ import { RowActions } from '@/components/data-table/row-actions';
 export type ColumnsType<K> = { key: K; sort: boolean }[];
 
 type DataTableColumnsProps<K extends string> = {
-  key: K;
+  key?: K;
   columns: ColumnsType<K>;
   translateColumns: Record<K, string>;
   delRowDataTableAction?: TDataTableAction;
@@ -55,8 +55,27 @@ export function dataTableColumns<
   delRowDataTableAction,
   FormComponent,
 }: DataTableColumnsProps<K>): ColumnDef<T>[] {
-  return [
-    {
+  const result: ColumnDef<T>[] = [];
+
+  result.push(...renderColumns<T, K>(columns, translateColumns));
+
+  if (delRowDataTableAction) {
+    result.push({
+      id: 'actions',
+      header: ({ column }) =>
+        dataTableColumnHeader<T, K>(column, translateColumnsAction),
+      cell: ({ row }) => (
+        <RowActions
+          id={row.getValue(key as K)}
+          name={row.getValue('name')}
+          delRowDataTableAction={delRowDataTableAction}
+        />
+      ),
+    });
+  }
+
+  if (key) {
+    result.unshift({
       accessorKey: key,
       header: ({ column }) =>
         dataTableColumnHeader<T, K>(column, translateColumns, true),
@@ -70,19 +89,8 @@ export function dataTableColumns<
           />
         </div>
       ),
-    },
-    ...renderColumns<T, K>(columns, translateColumns),
-    {
-      id: 'actions',
-      header: ({ column }) =>
-        dataTableColumnHeader<T, K>(column, translateColumnsAction),
-      cell: ({ row }) => (
-        <RowActions
-          id={row.getValue(key)}
-          name={row.getValue('name')}
-          delRowDataTableAction={delRowDataTableAction}
-        />
-      ),
-    },
-  ];
+    });
+  }
+
+  return result;
 }

@@ -128,15 +128,17 @@ export const updateMaterialData = async (
   data: TMaterial
 ): Promise<number | null> => {
   try {
-    await db.$transaction(async (tx) => {
+    const result = await db.$transaction(async (tx) => {
       await tx.material.update({
         where: { id },
         data,
       });
+      return await tx.material.count();
     });
 
-    return 0;
-  } catch {
+    return result;
+  } catch (e) {
+    console.error('Error updating material:', e);
     return null;
   }
 };

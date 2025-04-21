@@ -43,3 +43,9 @@ next-env.d.ts
 # logs
 /logs/
 *.log
+
+# backup
+/backups/*
+
+# prisma
+/prisma/generated/*

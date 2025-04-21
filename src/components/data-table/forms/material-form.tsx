@@ -62,8 +62,8 @@ export const MaterialForm = ({ id, closeSheet }: FormComponentProps) => {
             title="материал"
             setSubmit={setSubmit}
           />
-          <div className="space-y-4 px-8 py-2 overflow-auto h-[calc(100vh-190px)]">
-            <div className="grid gap-2">
+          <div className="space-y-4 px-8 py-2 overflow-auto">
+            <div className="grid grid-cols-2 gap-4">
               <FormFieldInput
                 form={form}
                 name="name"
@@ -71,8 +71,6 @@ export const MaterialForm = ({ id, closeSheet }: FormComponentProps) => {
                 translate={translateColumnsMaterial}
                 isPending={isPending}
               />
-            </div>
-            <div className="grid gap-2">
               <FormFieldInput
                 form={form}
                 name="article"
@@ -81,7 +79,10 @@ export const MaterialForm = ({ id, closeSheet }: FormComponentProps) => {
                 isPending={isPending}
               />
             </div>
-            <div className="grid gap-2">
+            {/* <div className="grid gap-2">
+              Add image upload component here
+            </div> */}
+            <div className="grid grid-cols-4 gap-4">
               <FormFieldSelect
                 form={form}
                 name="materialGroup.name"
@@ -91,7 +92,7 @@ export const MaterialForm = ({ id, closeSheet }: FormComponentProps) => {
                 isPending={isPending}
               />
             </div>
-            <div className="grid gap-2">
+            <div className="grid grid-cols-4 gap-4">
               <FormFieldSelect
                 form={form}
                 name="unit.name"
@@ -101,8 +102,6 @@ export const MaterialForm = ({ id, closeSheet }: FormComponentProps) => {
                 isPending={isPending}
                 ButtonOpenForm={UnitForm}
               />
-            </div>
-            <div className="grid gap-2">
               <FormFieldSelect
                 form={form}
                 name="warehouse.name"
@@ -112,8 +111,6 @@ export const MaterialForm = ({ id, closeSheet }: FormComponentProps) => {
                 isPending={isPending}
                 ButtonOpenForm={WarehouseForm}
               />
-            </div>
-            <div className="grid gap-2">
               <FormFieldInput
                 form={form}
                 name="priceIn"
@@ -121,9 +118,8 @@ export const MaterialForm = ({ id, closeSheet }: FormComponentProps) => {
                 translate={translateColumnsMaterial}
                 isPending={isPending}
                 type="number"
+                step="any"
               />
-            </div>
-            <div className="grid gap-2">
               <FormFieldInput
                 form={form}
                 name="minBalance"
@@ -131,6 +127,53 @@ export const MaterialForm = ({ id, closeSheet }: FormComponentProps) => {
                 translate={translateColumnsMaterial}
                 isPending={isPending}
                 type="number"
+              />
+            </div>
+            <div className="grid grid-cols-5 gap-4">
+              <FormFieldInput
+                form={form}
+                name="weight"
+                placeholder="Введите вес"
+                translate={translateColumnsMaterial}
+                isPending={isPending}
+                type="number"
+                step="any"
+              />
+              <FormFieldInput
+                form={form}
+                name="height"
+                placeholder="Введите высоту"
+                translate={translateColumnsMaterial}
+                isPending={isPending}
+                type="number"
+                step="any"
+              />
+              <FormFieldInput
+                form={form}
+                name="width"
+                placeholder="Введите ширину"
+                translate={translateColumnsMaterial}
+                isPending={isPending}
+                type="number"
+                step="any"
+              />
+              <FormFieldInput
+                form={form}
+                name="length"
+                placeholder="Введите длину"
+                translate={translateColumnsMaterial}
+                isPending={isPending}
+                type="number"
+                step="any"
+              />
+              <FormFieldInput
+                form={form}
+                name="volume"
+                placeholder="Введите объем"
+                translate={translateColumnsMaterial}
+                isPending={isPending}
+                type="number"
+                step="any"
               />
             </div>
             <div className="grid gap-2">

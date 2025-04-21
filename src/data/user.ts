@@ -112,7 +112,6 @@ export const updateUserData = async (
   idInt: number,
   data: TUserFormData
 ): Promise<number | null> => {
-  console.log(data);
   try {
     await db.$transaction(async (tx) => {
       tx.user.update({

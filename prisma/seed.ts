@@ -1,6 +1,6 @@
 import { hashSync } from 'bcryptjs';
 
-import { db } from '../lib/db';
+import { db } from '@/lib/db';
 import { materialGroup, warehouseGroup } from './const';
 
 async function up() {

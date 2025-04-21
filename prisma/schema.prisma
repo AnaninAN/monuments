@@ -1,10 +1,155 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "./generated/prisma"
 }
 
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
+}
+
+enum Role {
+  OWNER
+  ADMIN
+  OPERATOR
+}
+
+enum Status {
+  ACTIVE
+  ARCHIVE
+}
+
+enum EntityType {
+  MATERIAL
+  DETAIL
+  PRODUCT
+  SERVICE
+}
+
+enum MovementType {
+  IN
+  OUT
+  TRANSFER
+}
+
+enum OrderType {
+  SALE
+  PURCHASE
+}
+
+enum OrderStatus {
+  DRAFT
+  CONFIRMED
+  IN_PROCESS
+  COMPLETED
+  CANCELLED
+}
+
+enum StockAlertType {
+  LOW_STOCK
+  REORDER_POINT
+  EXPIRY
+  OVERSTOCK
+}
+
+enum NotificationType {
+  STOCK_ALERT
+  ORDER_STATUS
+  PRODUCTION_STATUS
+  QUALITY_ALERT
+}
+
+enum NotificationPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum NotificationStatus {
+  NEW
+  READ
+  ARCHIVED
+}
+
+enum PaymentType {
+  CASH
+  BANK
+  CARD
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
+}
+
+enum DocumentType {
+  INVOICE
+  DELIVERY_NOTE
+  QUALITY_CERTIFICATE
+}
+
+enum DocumentStatus {
+  DRAFT
+  CONFIRMED
+  ARCHIVED
+}
+
+enum ProductionOrderStatus {
+  PLANNED
+  IN_PROCESS
+  COMPLETED
+  CANCELLED
+}
+
+enum ProductionOperationStatus {
+  PLANNED
+  IN_PROCESS
+  COMPLETED
+}
+
+enum QualityCheckType {
+  INCOMING
+  IN_PROCESS
+  FINAL
+}
+
+enum QualityCheckStatus {
+  PENDING
+  PASSED
+  FAILED
+}
+
+enum BatchStatus {
+  ACTIVE
+  USED
+  EXPIRED
+}
+
+enum SerialNumberStatus {
+  NEW
+  IN_USE
+  SCRAPPED
+}
+
+enum PriceType {
+  IN
+  OUT
+}
+
+enum ServiceTaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum CashTransactionType {
+  MATERIAL_PURCHASE
+  PRODUCT_SALE
+  SALARY_PAYMENT
+  OTHER_EXPENSE
+  OTHER_INCOME
 }
 
 model User {
@@ -106,6 +251,7 @@ model Counterparty {
   counterpartyTypeId Int
   counterpartyType   CounterpartyType @relation(fields: [counterpartyTypeId], references: [id])
   orders             Order[]
+  monumentOrders     MonumentOrder[]
 
   createdAt          DateTime         @default(now())
   updatedAt          DateTime         @updatedAt
@@ -307,8 +453,8 @@ model Material {
   image              String              @default("")
   name               String              @unique
   article            String              @default("")
-  priceIn            Int                 @default(0)
-  priceOut           Int                 @default(0)
+  priceIn            Float               @default(0)
+  priceOut           Float               @default(0)
   count              Int                 @default(0)
   minBalance         Int                 @default(0)
   comment            String              @default("")
@@ -316,8 +462,12 @@ model Material {
   materialGroupId    Int
   unitId             Int
   warehouseId        Int?
-  createdAt          DateTime            @default(now())
-  updatedAt          DateTime            @updatedAt
+  weight             Float               @default(0)
+  height             Float               @default(0)
+  width              Float               @default(0)
+  length             Float               @default(0)
+  volume             Float               @default(0)
+  
   detailMaterials    DetailMaterial[]
   materialGroup      MaterialGroup       @relation(fields: [materialGroupId], references: [id])
   unit               Unit                @relation(fields: [unitId], references: [id])
@@ -325,6 +475,10 @@ model Material {
   movements          MaterialMovement[]
   operationMaterials OperationMaterial[]
   productMaterials   ProductMaterial[]
+  monumentMaterials  MonumentMaterial[]
+
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
 
   @@index([warehouseId])
   @@index([materialGroupId], map: "Material_materialGroupId_fkey")
@@ -396,21 +550,23 @@ model StockMovement {
 }
 
 model Order {
-  id             Int          @id @default(autoincrement())
-  number         String       @unique
-  type           OrderType
-  status         OrderStatus
-  date           DateTime
-  deliveryDate   DateTime?
-  totalAmount    Int
-  comment        String       @default("")
-  counterpartyId Int
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-  documents      Document[]
-  counterparty   Counterparty @relation(fields: [counterpartyId], references: [id])
-  items          OrderItem[]
-  payments       Payment[]
+  id                Int               @id @default(autoincrement())
+  number            String            @unique
+  type              OrderType
+  status            OrderStatus       @default(DRAFT)
+  date              DateTime
+  deliveryDate      DateTime?
+  totalAmount       Int               @default(0)
+  comment           String            @default("")
+  counterpartyId    Int
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  documents         Document[]
+  counterparty      Counterparty      @relation(fields: [counterpartyId], references: [id])
+  items             OrderItem[]
+  payments          Payment[]
+  cashTransactions  CashTransaction[]
+  productionOrders  ProductionOrder[]
 
   @@index([counterpartyId])
 }
@@ -433,36 +589,39 @@ model OrderItem {
 }
 
 model Payment {
-  id        Int           @id @default(autoincrement())
-  amount    Int
-  date      DateTime
-  type      PaymentType
-  status    PaymentStatus
-  comment   String        @default("")
-  orderId   Int
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
-  order     Order         @relation(fields: [orderId], references: [id])
+  id                Int               @id @default(autoincrement())
+  amount            Int
+  type              PaymentType
+  status            PaymentStatus     @default(PENDING)
+  date              DateTime
+  comment           String            @default("")
+  orderId           Int?
+  order             Order?            @relation(fields: [orderId], references: [id])
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  cashTransactions  CashTransaction[]
 
   @@index([orderId])
 }
 
 model ProductionOrder {
-  id                Int                   @id @default(autoincrement())
-  number            String                @unique
-  status            ProductionOrderStatus
-  startDate         DateTime
-  endDate           DateTime?
-  quantity          Int
-  completedQuantity Int                   @default(0)
-  comment           String                @default("")
+  id                Int                     @id @default(autoincrement())
+  number            String                  @unique
+  status            ProductionOrderStatus   @default(PLANNED)
+  orderId           Int?
+  order             Order?                  @relation(fields: [orderId], references: [id])
   productId         Int
-  createdAt         DateTime              @default(now())
-  updatedAt         DateTime              @updatedAt
+  product           Product                 @relation(fields: [productId], references: [id])
+  quantity          Int
+  startDate         DateTime?
+  endDate           DateTime?
+  comment           String                  @default("")
+  createdAt         DateTime                @default(now())
+  updatedAt         DateTime                @updatedAt
   operations        ProductionOperation[]
-  product           Product               @relation(fields: [productId], references: [id])
   qualityChecks     QualityCheck[]
 
+  @@index([orderId])
   @@index([productId])
 }
 
@@ -686,138 +845,121 @@ model ServiceTask {
   @@index([assignedToId])
 }
 
-enum Role {
-  OWNER
-  ADMIN
-  OPERATOR
+model MonumentType {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  description String    @default("")
+  status      Status    @default(ACTIVE)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  monuments   Monument[]
 }
 
-enum Status {
-  ACTIVE
-  ARCHIVE
+model Monument {
+  id              Int              @id @default(autoincrement())
+  name            String           @unique
+  description     String           @default("")
+  dimensions      String           // JSON string of dimensions
+  basePrice       Int              @default(0)
+  status          Status           @default(ACTIVE)
+  monumentTypeId  Int
+  monumentType    MonumentType     @relation(fields: [monumentTypeId], references: [id])
+  materials       MonumentMaterial[]
+  parts           MonumentPart[]
+  orders          MonumentOrder[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@index([monumentTypeId])
 }
 
-enum EntityType {
-  MATERIAL
-  DETAIL
-  PRODUCT
-  SERVICE
+model MonumentMaterial {
+  id         Int      @id @default(autoincrement())
+  monumentId Int
+  materialId Int
+  quantity   Int
+  price      Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  material   Material @relation(fields: [materialId], references: [id])
+  monument   Monument @relation(fields: [monumentId], references: [id])
+
+  @@unique([monumentId, materialId])
+  @@index([monumentId])
+  @@index([materialId])
 }
 
-enum MovementType {
-  IN
-  OUT
-  TRANSFER
+model Part {
+  id          Int            @id @default(autoincrement())
+  name        String         @unique
+  description String         @default("")
+  price       Int            @default(0)
+  status      Status         @default(ACTIVE)
+  comment     String         @default("")
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  monuments   MonumentPart[]
 }
 
-enum OrderType {
-  SALE
-  PURCHASE
+model MonumentPart {
+  id         Int      @id @default(autoincrement())
+  monumentId Int
+  partId     Int
+  quantity   Int
+  price      Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  part       Part     @relation(fields: [partId], references: [id])
+  monument   Monument @relation(fields: [monumentId], references: [id])
+
+  @@unique([monumentId, partId])
+  @@index([monumentId])
+  @@index([partId])
 }
 
-enum OrderStatus {
-  DRAFT
-  CONFIRMED
-  IN_PROCESS
-  COMPLETED
-  CANCELLED
+model MonumentOrder {
+  id          Int       @id @default(autoincrement())
+  monumentId  Int
+  monument    Monument  @relation(fields: [monumentId], references: [id])
+  customerId  Int
+  customer    Counterparty @relation(fields: [customerId], references: [id])
+  status      OrderStatus @default(DRAFT)
+  totalPrice  Int       @default(0)
+  deposit     Int       @default(0)
+  notes       String    @default("")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([monumentId])
+  @@index([customerId])
 }
 
-enum StockAlertType {
-  LOW_STOCK
-  REORDER_POINT
-  EXPIRY
-  OVERSTOCK
+model CashRegister {
+  id          Int               @id @default(autoincrement())
+  name        String            @unique
+  balance     Int               @default(0)
+  status      Status            @default(ACTIVE)
+  comment     String            @default("")
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  transactions CashTransaction[]
 }
 
-enum NotificationType {
-  STOCK_ALERT
-  ORDER_STATUS
-  PRODUCTION_STATUS
-  QUALITY_ALERT
-}
+model CashTransaction {
+  id              Int                @id @default(autoincrement())
+  amount          Int
+  type            CashTransactionType
+  description     String             @default("")
+  cashRegisterId  Int
+  cashRegister    CashRegister       @relation(fields: [cashRegisterId], references: [id])
+  orderId         Int?
+  order           Order?             @relation(fields: [orderId], references: [id])
+  paymentId       Int?
+  payment         Payment?           @relation(fields: [paymentId], references: [id])
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
 
-enum NotificationPriority {
-  LOW
-  MEDIUM
-  HIGH
-}
-
-enum NotificationStatus {
-  NEW
-  READ
-  ARCHIVED
-}
-
-enum PaymentType {
-  CASH
-  BANK
-  CARD
-}
-
-enum PaymentStatus {
-  PENDING
-  COMPLETED
-  CANCELLED
-}
-
-enum DocumentType {
-  INVOICE
-  DELIVERY_NOTE
-  QUALITY_CERTIFICATE
-}
-
-enum DocumentStatus {
-  DRAFT
-  CONFIRMED
-  ARCHIVED
-}
-
-enum ProductionOrderStatus {
-  PLANNED
-  IN_PROCESS
-  COMPLETED
-  CANCELLED
-}
-
-enum ProductionOperationStatus {
-  PLANNED
-  IN_PROCESS
-  COMPLETED
-}
-
-enum QualityCheckType {
-  INCOMING
-  IN_PROCESS
-  FINAL
-}
-
-enum QualityCheckStatus {
-  PENDING
-  PASSED
-  FAILED
-}
-
-enum BatchStatus {
-  ACTIVE
-  USED
-  EXPIRED
-}
-
-enum SerialNumberStatus {
-  NEW
-  IN_USE
-  SCRAPPED
-}
-
-enum PriceType {
-  IN
-  OUT
-}
-
-enum ServiceTaskStatus {
-  PENDING
-  IN_PROGRESS
-  COMPLETED
-  CANCELLED
+  @@index([cashRegisterId])
+  @@index([orderId])
+  @@index([paymentId])
 }

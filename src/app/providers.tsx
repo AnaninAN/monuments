@@ -6,11 +6,16 @@ import { Toaster } from '@/components/ui/sonner';
 
 import { ThemeProvider } from '@/components/theme-provider';
 import ConfirmationDialog from '@/components/confirmation-dialog';
+import { useInactivityTimeout } from '@/hooks/use-inactivity-timeout';
 
 export const Providers = ({ children }: PropsWithChildren) => {
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useInactivityTimeout();
 
   if (!mounted) {
     return null;

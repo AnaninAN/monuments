@@ -7,9 +7,11 @@ export const MaterialFormSchema = z.object({
     .min(1, 'Пустое значение не допустимо!')
     .max(50, 'Наименование не должно превышать 50 символов!')
     .trim(),
-  article: z.string().trim(),
-  priceIn: z.coerce.number(),
-  minBalance: z.coerce.number(),
+  article: z.string().optional(),
+  priceIn: z.coerce.number().optional(),
+  priceOut: z.coerce.number().optional(),
+  minBalance: z.coerce.number().optional(),
+  count: z.coerce.number(),
   comment: z
     .string()
     .max(100, 'Комментарий не должен превышать 100 символов!')
@@ -28,6 +30,11 @@ export const MaterialFormSchema = z.object({
       name: z.string(),
     })
     .nullable(),
+  weight: z.coerce.number().optional(),
+  height: z.coerce.number().optional(),
+  width: z.coerce.number().optional(),
+  length: z.coerce.number().optional(),
+  volume: z.coerce.number().optional(),
 });
 
 export type TMaterialFormData = z.infer<typeof MaterialFormSchema>;

@@ -1,5 +1,7 @@
+'use client';
+
 import { FieldValues, Path, UseFormReturn } from 'react-hook-form';
-import { Plus } from 'lucide-react';
+import { Pencil, Plus } from 'lucide-react';
 import { Role, Status } from '@prisma/client';
 import { InputMask } from '@react-input/mask';
 
@@ -31,6 +33,7 @@ import {
   translateRole,
   translateStatus,
 } from '@/lib/data-table/translate-cell-table';
+import { findIdByName } from '@/lib/utils';
 
 type FormFieldProps<T extends FieldValues = FieldValues> = {
   name: Path<T>;
@@ -44,7 +47,7 @@ type FormFieldProps<T extends FieldValues = FieldValues> = {
 };
 
 type FormFieldInputProps<T extends FieldValues = FieldValues> =
-  FormFieldProps<T>;
+  FormFieldProps<T> & { step?: string };
 
 type FormFieldInputMaskProps<T extends FieldValues = FieldValues> =
   FormFieldProps<T> & { options: object };
@@ -75,6 +78,7 @@ export function FormFieldInput<T extends FieldValues = FieldValues>({
   translate,
   placeholder,
   type = 'text',
+  step,
 }: FormFieldInputProps<T>) {
   return (
     <FormField
@@ -97,6 +101,7 @@ export function FormFieldInput<T extends FieldValues = FieldValues>({
                 placeholder={placeholder}
                 disabled={isPending}
                 type={type}
+                step={step}
                 {...form.register(name)}
               />
             </FormControl>
@@ -193,6 +198,9 @@ export function FormFieldSelect<T extends FieldValues = FieldValues>({
   className,
   ButtonOpenForm,
 }: FormFieldSelectProps<T>) {
+  const value = form.getValues(name);
+  const id = findIdByName(items, value);
+
   return (
     <div className="flex">
       <div className="flex-1">
@@ -235,9 +243,25 @@ export function FormFieldSelect<T extends FieldValues = FieldValues>({
         />
       </div>
       {ButtonOpenForm && (
-        <Button asChild className="flex self-end ml-3 cursor-pointer">
-          <DataSheet trigger={<Plus />} FormComponent={ButtonOpenForm} />
-        </Button>
+        <>
+          <Button
+            asChild
+            className="flex self-end ml-2 cursor-pointer rounded-[50%] w-8 h-8 mb-[2px]"
+          >
+            <DataSheet trigger={<Plus />} FormComponent={ButtonOpenForm} />
+          </Button>
+          <Button
+            asChild={value}
+            className="flex self-end ml-2 cursor-pointer rounded-[50%] w-8 h-8 mb-[2px]"
+            disabled={!value}
+          >
+            <DataSheet
+              trigger={<Pencil />}
+              id={id}
+              FormComponent={ButtonOpenForm}
+            />
+          </Button>
+        </>
       )}
     </div>
   );

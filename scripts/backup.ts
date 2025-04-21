@@ -32,11 +32,13 @@ async function backupDatabase() {
       MaterialGroup: await prisma.materialGroup.findMany(),
       Unit: await prisma.unit.findMany(),
       Warehouse: await prisma.warehouse.findMany(),
-      Detail: await prisma.detail.findMany(),
-      Product: await prisma.product.findMany(),
-      Service: await prisma.service.findMany(),
-      Order: await prisma.order.findMany(),
+      WarehouseGroup: await prisma.warehouseGroup.findMany(),
+      // Detail: await prisma.detail.findMany(),
+      // Product: await prisma.product.findMany(),
+      // Service: await prisma.service.findMany(),
+      // Order: await prisma.order.findMany(),
       Counterparty: await prisma.counterparty.findMany(),
+      CounterpartyType: await prisma.counterpartyType.findMany(),
       User: await prisma.user.findMany(),
       // Add other tables as needed
     };
