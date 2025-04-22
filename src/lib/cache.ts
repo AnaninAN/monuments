@@ -1,5 +1,5 @@
 import { LRUCache } from 'lru-cache';
-import { ExtendedUser } from '@/next-auth';
+import { ExtendedUser } from '@/types/next-auth';
 
 const userCache = new LRUCache<string, Partial<ExtendedUser>>({
   max: 500,

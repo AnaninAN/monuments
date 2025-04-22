@@ -1,7 +1,7 @@
 'use server';
 
 import { User } from '@prisma/client';
-import { ExtendedUser } from '@/next-auth';
+import { ExtendedUser } from '@/types/next-auth';
 
 import { db } from '@/lib/db';
 import { TUserFormData } from '@/schemas/user-form-schema';

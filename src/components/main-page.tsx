@@ -8,7 +8,7 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/app-sidebar';
-import { ExtendedUser } from '@/next-auth';
+import { ExtendedUser } from '@/types/next-auth';
 import { useUserStore } from '@/store/user';
 
 interface MainPageProps {

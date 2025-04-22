@@ -1,5 +1,5 @@
 import { auth } from '@/auth';
-import { ExtendedUser } from '@/next-auth';
+import { ExtendedUser } from '@/types/next-auth';
 
 export const currentUser = async (): Promise<ExtendedUser | undefined> => {
   const session = await auth();

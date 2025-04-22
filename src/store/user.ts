@@ -1,4 +1,4 @@
-import { ExtendedUser } from '@/next-auth';
+import { ExtendedUser } from '@/types/next-auth';
 import { create } from 'zustand';
 
 interface UserState {
