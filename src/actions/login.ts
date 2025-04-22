@@ -132,7 +132,7 @@ export const login = async (
     return { success: 'Успешный вход!' };
   } catch (error) {
     if (error instanceof AuthError) {
-      switch (error.type) {
+      switch (error.cause) {
         case 'CredentialsSignin':
           logger.error('user', 'Недействительные данные', { email, ip });
           return { error: 'Имя пользователя или(и) пароль не верны!' };
