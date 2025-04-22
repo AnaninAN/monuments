@@ -36,7 +36,28 @@ export type WarehouseWithAdd = Warehouse & {
   warehouseGroup: Pick<WarehouseGroup, 'name'>;
 };
 
-export type MaterialWithAdd = Material & {
+export type MaterialWithAdd = Pick<
+  Material,
+  | 'id'
+  | 'name'
+  | 'article'
+  | 'priceIn'
+  | 'priceOut'
+  | 'count'
+  | 'minBalance'
+  | 'comment'
+  | 'status'
+  | 'materialGroupId'
+  | 'unitId'
+  | 'warehouseId'
+  | 'weight'
+  | 'height'
+  | 'width'
+  | 'length'
+  | 'volume'
+  | 'createdAt'
+  | 'updatedAt'
+> & {
   materialGroup: Pick<MaterialGroup, 'name'>;
   unit: Pick<Unit, 'name'>;
   warehouse: Pick<Warehouse, 'name'> | null;
