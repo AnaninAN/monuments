@@ -46,7 +46,3 @@ next-env.d.ts
 
 # backup
 /backups/*
-
-# generated
-/src/generated/*
-/src/generated
