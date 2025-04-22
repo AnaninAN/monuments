@@ -81,28 +81,28 @@ export const getAllEntityGroupsData = async (
             include: {
               _count: {
                 select: {
-                  warehouse: true,
+                  warehouses: true,
                 },
               },
             },
           });
           return warehouseGroups.map((group) => ({
             ...group,
-            count: group._count.warehouse,
+            count: group._count.warehouses,
           }));
         case 'materialGroup':
           const materialGroups = await tx.materialGroup.findMany({
             include: {
               _count: {
                 select: {
-                  material: true,
+                  materials: true,
                 },
               },
             },
           });
           return materialGroups.map((group) => ({
             ...group,
-            count: group._count.material,
+            count: group._count.materials,
           }));
         default:
           return [];
