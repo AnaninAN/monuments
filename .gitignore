@@ -47,5 +47,6 @@ next-env.d.ts
 # backup
 /backups/*
 
-# prisma
-/prisma/generated/*
+# generated
+/src/generated/*
+/src/generated
